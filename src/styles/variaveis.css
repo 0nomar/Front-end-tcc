@@ -1,0 +1,166 @@
+/* ============================================================
+   variaveis.css — Variáveis CSS globais do projeto IniCiência
+   Centraliza cores, tipografia, espaçamentos, bordas e sombras
+   ============================================================ */
+
+:root {
+  /* ------------------------------------------
+     Fontes
+  ------------------------------------------ */
+  --fonte-principal: 'Inter', sans-serif;
+  --fonte-titulo: 'Poppins', sans-serif;
+
+  /* ------------------------------------------
+     Tamanhos de fonte
+  ------------------------------------------ */
+  --tamanho-minimo:    0.60rem;  /*  ~9.6px */
+  --tamanho-xs:        0.65rem;  /* ~10.4px */
+  --tamanho-pequeno:   0.72rem;  /* ~11.5px */
+  --tamanho-base:      0.80rem;  /* ~12.8px */
+  --tamanho-medio:     0.875rem; /*   14px  */
+  --tamanho-normal:    0.95rem;  /* ~15.2px */
+  --tamanho-grande:    1rem;     /*   16px  */
+  --tamanho-subtitulo: 1.1rem;   /* ~17.6px */
+  --tamanho-titulo:    1.2rem;   /* ~19.2px */
+  --tamanho-display:   1.4rem;   /* ~22.4px */
+  --tamanho-heroi:     1.6rem;   /* ~25.6px */
+
+  /* ------------------------------------------
+     Pesos de fonte
+  ------------------------------------------ */
+  --peso-normal:  400;
+  --peso-medio:   500;
+  --peso-semi:    600;
+  --peso-negrito: 700;
+  --peso-extra:   800;
+
+  /* ------------------------------------------
+     Cores principais
+  ------------------------------------------ */
+  --cor-primaria:           #2563eb; /* blue-600  */
+  --cor-primaria-escura:    #1d4ed8; /* blue-700  */
+  --cor-primaria-clara:     #eff6ff; /* blue-50   */
+  --cor-primaria-leve:      #dbeafe; /* blue-100  */
+  --cor-primaria-borda:     #bfdbfe; /* blue-200  */
+  --cor-primaria-texto:     #1e40af; /* blue-800  */
+
+  --cor-secundaria:         #7c3aed; /* violet-600 */
+  --cor-secundaria-escura:  #6d28d9; /* violet-700 */
+  --cor-secundaria-clara:   #f5f3ff; /* violet-50  */
+  --cor-secundaria-leve:    #ede9fe; /* violet-100 */
+  --cor-secundaria-borda:   #ddd6fe; /* violet-200 */
+  --cor-secundaria-media:   #8b5cf6; /* violet-500 */
+
+  --cor-sucesso:            #16a34a; /* green-600  */
+  --cor-sucesso-escura:     #15803d; /* green-700  */
+  --cor-sucesso-clara:      #f0fdf4; /* green-50   */
+  --cor-sucesso-leve:       #dcfce7; /* green-100  */
+  --cor-sucesso-borda:      #bbf7d0; /* green-200  */
+  --cor-sucesso-media:      #22c55e; /* green-500  */
+
+  --cor-atencao:            #ca8a04; /* yellow-600 */
+  --cor-atencao-escura:     #a16207; /* yellow-700 */
+  --cor-atencao-clara:      #fefce8; /* yellow-50  */
+  --cor-atencao-leve:       #fef9c3; /* yellow-100 */
+
+  --cor-alerta:             #d97706; /* amber-600  */
+  --cor-alerta-clara:       #fffbeb; /* amber-50   */
+
+  --cor-laranja:            #ea580c; /* orange-600 */
+  --cor-laranja-escura:     #c2410c; /* orange-700 */
+  --cor-laranja-clara:      #fff7ed; /* orange-50  */
+  --cor-laranja-leve:       #fed7aa; /* orange-200 */
+  --cor-laranja-borda:      #fdba74; /* orange-300 */
+
+  --cor-erro:               #dc2626; /* red-600    */
+  --cor-erro-escura:        #b91c1c; /* red-700    */
+  --cor-erro-clara:         #fef2f2; /* red-50     */
+  --cor-erro-leve:          #fee2e2; /* red-100    */
+  --cor-erro-borda:         #fecaca; /* red-200    */
+  --cor-erro-media:         #ef4444; /* red-500    */
+
+  --cor-esmeralda:          #059669; /* emerald-600 */
+  --cor-esmeralda-clara:    #ecfdf5; /* emerald-50  */
+
+  --cor-rosa:               #db2777; /* pink-600   */
+  --cor-rosa-clara:         #fdf2f8; /* pink-50    */
+
+  --cor-amarelo-estrela:    #facc15; /* yellow-400 */
+
+  /* ------------------------------------------
+     Tons de cinza (escala completa)
+  ------------------------------------------ */
+  --cor-fundo:          #f9fafb; /* gray-50   */
+  --cor-branco:         #ffffff;
+  --cor-borda-clara:    #f3f4f6; /* gray-100  */
+  --cor-borda:          #e5e7eb; /* gray-200  */
+  --cor-borda-media:    #d1d5db; /* gray-300  */
+  --cor-texto-mudo:     #9ca3af; /* gray-400  */
+  --cor-texto-fraco:    #6b7280; /* gray-500  */
+  --cor-texto-medio:    #4b5563; /* gray-600  */
+  --cor-texto-secundario: #374151; /* gray-700 */
+  --cor-texto-forte:    #1f2937; /* gray-800  */
+  --cor-texto:          #111827; /* gray-900  */
+  --cor-fundo-leve:     #f3f4f6; /* gray-100  */
+  --cor-fundo-medio:    #e5e7eb; /* gray-200  */
+
+  /* ------------------------------------------
+     Gradientes prontos
+  ------------------------------------------ */
+  --gradiente-primario:     linear-gradient(to right, var(--cor-primaria), var(--cor-secundaria));
+  --gradiente-primario-br:  linear-gradient(to bottom right, var(--cor-primaria), #5b21b6);
+  --gradiente-suave:        linear-gradient(to bottom right, var(--cor-secundaria-clara), var(--cor-primaria-clara));
+  --gradiente-barra:        linear-gradient(to right, #3b82f6, #8b5cf6); /* blue-500 → violet-500 */
+  --gradiente-avatar:       linear-gradient(to bottom right, #3b82f6, #8b5cf6);
+  --gradiente-avatar-claro: linear-gradient(to bottom right, #60a5fa, #a78bfa); /* blue-400 → violet-400 */
+
+  /* ------------------------------------------
+     Espaçamentos
+  ------------------------------------------ */
+  --espaco-1:  0.25rem;  /*  4px */
+  --espaco-2:  0.5rem;   /*  8px */
+  --espaco-3:  0.75rem;  /* 12px */
+  --espaco-4:  1rem;     /* 16px */
+  --espaco-5:  1.25rem;  /* 20px */
+  --espaco-6:  1.5rem;   /* 24px */
+  --espaco-7:  1.75rem;  /* 28px */
+  --espaco-8:  2rem;     /* 32px */
+  --espaco-10: 2.5rem;   /* 40px */
+  --espaco-12: 3rem;     /* 48px */
+  --espaco-16: 4rem;     /* 64px */
+
+  /* ------------------------------------------
+     Bordas e raios
+  ------------------------------------------ */
+  --raio-pequeno:  0.5rem;   /*  8px — rounded-lg    */
+  --raio-medio:    0.75rem;  /* 12px — rounded-xl    */
+  --raio-grande:   1rem;     /* 16px — rounded-2xl   */
+  --raio-extra:    1.25rem;  /* 20px — rounded-3xl   */
+  --raio-completo: 9999px;   /* pill / circle        */
+
+  /* ------------------------------------------
+     Sombras
+  ------------------------------------------ */
+  --sombra-minima:    0 1px 2px rgba(0, 0, 0, 0.05);
+  --sombra-pequena:   0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --sombra-media:     0 4px 12px rgba(0, 0, 0, 0.08);
+  --sombra-grande:    0 8px 24px rgba(0, 0, 0, 0.12);
+  --sombra-extra:     0 20px 40px rgba(0, 0, 0, 0.15);
+  --sombra-primaria:  0 8px 24px rgba(37, 99, 235, 0.2);
+  --sombra-primaria-leve: 0 4px 16px rgba(37, 99, 235, 0.12);
+  --sombra-azul-card: 0 16px 30px rgba(37, 99, 235, 0.18);
+
+  /* ------------------------------------------
+     Transições
+  ------------------------------------------ */
+  --transicao-rapida:  all 0.15s ease;
+  --transicao-normal:  all 0.2s ease;
+  --transicao-lenta:   all 0.3s ease;
+
+  /* ------------------------------------------
+     Layout — largura da barra lateral
+  ------------------------------------------ */
+  --largura-sidebar:          15rem;  /* 240px / w-60 */
+  --largura-sidebar-recolhida: 4rem;  /*  64px / w-16 */
+  --altura-topbar:             4rem;  /*  64px / h-16 */
+}
