@@ -1,10 +1,43 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
-import { FlaskConical, Eye, EyeOff, Mail, Lock, User, Building2, BookOpen, ArrowRight, CheckCircle } from "lucide-react";
+import {
+  FlaskConical,
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  User,
+  Building2,
+  BookOpen,
+  ArrowRight,
+  CheckCircle,
+} from "lucide-react";
 import "./RegisterPage.css";
 
-const courses = ["Ciência da Computação","Sistemas de Informação","Engenharia de Computação","Engenharia Elétrica","Física","Matemática","Biologia","Biomedicina","Medicina","Química","Psicologia","Administração","Outro"];
-const institutions = ["Universidade Federal do Brasil (UFB)","Universidade Estadual de São Paulo (UNESP)","Universidade de São Paulo (USP)","Universidade Federal de Minas Gerais (UFMG)","Pontifícia Universidade Católica (PUC)","Outra"];
+const courses = [
+  "Ciencia da Computacao",
+  "Sistemas de Informacao",
+  "Engenharia de Computacao",
+  "Engenharia Eletrica",
+  "Fisica",
+  "Matematica",
+  "Biologia",
+  "Biomedicina",
+  "Medicina",
+  "Quimica",
+  "Psicologia",
+  "Administracao",
+  "Outro",
+];
+
+const institutions = [
+  "Universidade Federal do Brasil (UFB)",
+  "Universidade Estadual de Sao Paulo (UNESP)",
+  "Universidade de Sao Paulo (USP)",
+  "Universidade Federal de Minas Gerais (UFMG)",
+  "Pontificia Universidade Catolica (PUC)",
+  "Outra",
+];
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -12,15 +45,26 @@ export default function RegisterPage() {
   const [userType, setUserType] = useState("student");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", password: "", confirmPassword: "", course: "", institution: "", semester: "", department: "" });
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    course: "",
+    institution: "",
+    semester: "",
+    department: "",
+  });
 
   const update = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
-  const handleNext = () => { if (step < 3) setStep(step + 1); };
+  const handleNext = () => {
+    if (step < 3) setStep(step + 1);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1200));
+    await new Promise((resolve) => setTimeout(resolve, 1200));
     setLoading(false);
     navigate("/app");
   };
@@ -28,19 +72,17 @@ export default function RegisterPage() {
   return (
     <div className="pagina-cadastro">
       <div className="pagina-cadastro__container">
-        {/* Cabeçalho */}
         <div className="pagina-cadastro__cabecalho">
           <Link to="/" className="pagina-cadastro__logo-link">
             <div className="pagina-cadastro__logo-icone">
               <FlaskConical size={18} style={{ color: "white" }} />
             </div>
-            <span className="pagina-cadastro__logo-nome">IniCiência</span>
+            <span className="pagina-cadastro__logo-nome">IniCiencia</span>
           </Link>
           <h1 className="pagina-cadastro__titulo">Criar sua conta</h1>
-          <p className="pagina-cadastro__subtitulo">Junte-se à plataforma de iniciação científica</p>
+          <p className="pagina-cadastro__subtitulo">Junte-se a plataforma de iniciacao cientifica</p>
         </div>
 
-        {/* Progresso */}
         <div className="pagina-cadastro__progresso">
           {[1, 2, 3].map((s) => (
             <div key={s} className="pagina-cadastro__passo">
@@ -48,20 +90,18 @@ export default function RegisterPage() {
                 {s < step ? <CheckCircle size={14} /> : s}
               </div>
               <span className={`pagina-cadastro__label-passo ${s === step ? "pagina-cadastro__label-passo--ativo" : "pagina-cadastro__label-passo--inativo"}`}>
-                {s === 1 ? "Tipo de conta" : s === 2 ? "Dados pessoais" : "Informações acadêmicas"}
+                {s === 1 ? "Tipo de conta" : s === 2 ? "Dados pessoais" : "Informacoes academicas"}
               </span>
               {s < 3 && <div className={`pagina-cadastro__linha-passo ${s < step ? "pagina-cadastro__linha-passo--ativa" : "pagina-cadastro__linha-passo--inativa"}`} />}
             </div>
           ))}
         </div>
 
-        {/* Painel */}
         <div className="pagina-cadastro__painel">
           <form onSubmit={handleSubmit}>
-            {/* Step 1 */}
             {step === 1 && (
               <div>
-                <h2 className="cadastro-step__titulo">Como você vai usar a plataforma?</h2>
+                <h2 className="cadastro-step__titulo">Como voce vai usar a plataforma?</h2>
                 <p className="cadastro-step__subtitulo">Escolha o tipo de conta que melhor descreve seu papel.</p>
                 <div className="cadastro-tipo__grade">
                   {["student", "advisor"].map((type) => (
@@ -71,7 +111,7 @@ export default function RegisterPage() {
                       onClick={() => setUserType(type)}
                       className={`cadastro-tipo__opcao ${userType === type ? "cadastro-tipo__opcao--selecionado" : "cadastro-tipo__opcao--disponivel"}`}
                     >
-                      <span className="cadastro-tipo__emoji">{type === "student" ? "🎓" : "🔬"}</span>
+                      <span className="cadastro-tipo__emoji">{type === "student" ? "ALUNO" : "ORIENT."}</span>
                       <span className={`cadastro-tipo__nome ${userType === type ? "cadastro-tipo__nome--selecionado" : "cadastro-tipo__nome--disponivel"}`}>
                         {type === "student" ? "Aluno" : "Orientador"}
                       </span>
@@ -87,44 +127,79 @@ export default function RegisterPage() {
               </div>
             )}
 
-            {/* Step 2 */}
             {step === 2 && (
               <div>
                 <h2 className="cadastro-step__titulo">Dados pessoais</h2>
-                <p className="cadastro-step__subtitulo">Preencha suas informações básicas.</p>
+                <p className="cadastro-step__subtitulo">Preencha suas informacoes basicas.</p>
                 <div className="cadastro-campos">
-                  <div>
+                  <div className="campo-cadastro">
                     <label className="campo-cadastro__label">Nome completo</label>
                     <div className="campo-cadastro__wrapper">
                       <User size={16} className="campo-cadastro__icone-esquerda" />
-                      <input type="text" value={form.name} onChange={(e) => update("name", e.target.value)} className="campo-cadastro__input" placeholder="Seu nome completo" required />
+                      <input
+                        type="text"
+                        value={form.name}
+                        onChange={(e) => update("name", e.target.value)}
+                        className="campo-cadastro__input"
+                        placeholder="Seu nome completo"
+                        autoComplete="name"
+                        required
+                      />
                     </div>
                   </div>
-                  <div>
+
+                  <div className="campo-cadastro">
                     <label className="campo-cadastro__label">E-mail institucional</label>
                     <div className="campo-cadastro__wrapper">
                       <Mail size={16} className="campo-cadastro__icone-esquerda" />
-                      <input type="email" value={form.email} onChange={(e) => update("email", e.target.value)} className="campo-cadastro__input" placeholder="seu@universidade.br" required />
+                      <input
+                        type="email"
+                        value={form.email}
+                        onChange={(e) => update("email", e.target.value)}
+                        className="campo-cadastro__input"
+                        placeholder="seu@universidade.br"
+                        autoComplete="email"
+                        required
+                      />
                     </div>
                   </div>
-                  <div>
+
+                  <div className="campo-cadastro">
                     <label className="campo-cadastro__label">Senha</label>
                     <div className="campo-cadastro__wrapper">
                       <Lock size={16} className="campo-cadastro__icone-esquerda" />
-                      <input type={showPassword ? "text" : "password"} value={form.password} onChange={(e) => update("password", e.target.value)} className="campo-cadastro__input" placeholder="Mínimo 8 caracteres" required />
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        value={form.password}
+                        onChange={(e) => update("password", e.target.value)}
+                        className="campo-cadastro__input campo-cadastro__input--com-acao"
+                        placeholder="Minimo 8 caracteres"
+                        autoComplete="new-password"
+                        required
+                      />
                       <button type="button" onClick={() => setShowPassword(!showPassword)} className="campo-cadastro__botao-senha">
                         {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
                     </div>
                   </div>
-                  <div>
+
+                  <div className="campo-cadastro">
                     <label className="campo-cadastro__label">Confirmar senha</label>
                     <div className="campo-cadastro__wrapper">
                       <Lock size={16} className="campo-cadastro__icone-esquerda" />
-                      <input type="password" value={form.confirmPassword} onChange={(e) => update("confirmPassword", e.target.value)} className="campo-cadastro__input" placeholder="Repita a senha" required />
+                      <input
+                        type="password"
+                        value={form.confirmPassword}
+                        onChange={(e) => update("confirmPassword", e.target.value)}
+                        className="campo-cadastro__input"
+                        placeholder="Repita a senha"
+                        autoComplete="new-password"
+                        required
+                      />
                     </div>
                   </div>
                 </div>
+
                 <div className="cadastro-step__acoes">
                   <button type="button" onClick={() => setStep(1)} className="cadastro-step__botao-voltar">Voltar</button>
                   <button type="button" onClick={handleNext} className="cadastro-step__botao-avancar">
@@ -134,23 +209,23 @@ export default function RegisterPage() {
               </div>
             )}
 
-            {/* Step 3 */}
             {step === 3 && (
               <div>
-                <h2 className="cadastro-step__titulo">Informações acadêmicas</h2>
-                <p className="cadastro-step__subtitulo">Ajude-nos a personalizar sua experiência.</p>
+                <h2 className="cadastro-step__titulo">Informacoes academicas</h2>
+                <p className="cadastro-step__subtitulo">Ajude-nos a personalizar sua experiencia.</p>
                 <div className="cadastro-campos">
-                  <div>
-                    <label className="campo-cadastro__label">Instituição de ensino</label>
+                  <div className="campo-cadastro">
+                    <label className="campo-cadastro__label">Instituicao de ensino</label>
                     <div className="campo-cadastro__wrapper">
                       <Building2 size={16} className="campo-cadastro__icone-esquerda" />
                       <select value={form.institution} onChange={(e) => update("institution", e.target.value)} className="campo-cadastro__select" required>
-                        <option value="">Selecione sua instituição</option>
-                        {institutions.map((i) => <option key={i} value={i}>{i}</option>)}
+                        <option value="">Selecione sua instituicao</option>
+                        {institutions.map((institution) => <option key={institution} value={institution}>{institution}</option>)}
                       </select>
                     </div>
                   </div>
-                  <div>
+
+                  <div className="campo-cadastro">
                     <label className="campo-cadastro__label">{userType === "student" ? "Curso" : "Departamento"}</label>
                     <div className="campo-cadastro__wrapper">
                       <BookOpen size={16} className="campo-cadastro__icone-esquerda" />
@@ -161,26 +236,31 @@ export default function RegisterPage() {
                         required
                       >
                         <option value="">Selecione {userType === "student" ? "o curso" : "o departamento"}</option>
-                        {courses.map((c) => <option key={c} value={c}>{c}</option>)}
+                        {courses.map((course) => <option key={course} value={course}>{course}</option>)}
                       </select>
                     </div>
                   </div>
+
                   {userType === "student" && (
-                    <div>
+                    <div className="campo-cadastro">
                       <label className="campo-cadastro__label">Semestre atual</label>
                       <select value={form.semester} onChange={(e) => update("semester", e.target.value)} className="campo-cadastro__select--sem-icone">
                         <option value="">Selecione o semestre</option>
-                        {[1,2,3,4,5,6,7,8,9,10].map((s) => <option key={s} value={`${s}º Semestre`}>{s}º Semestre</option>)}
+                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((semester) => (
+                          <option key={semester} value={`${semester}o Semestre`}>{semester}o Semestre</option>
+                        ))}
                       </select>
                     </div>
                   )}
-                  <div className="campo-cadastro__termos">
+
+                  <div className="campo-cadastro__termos campo-cadastro--largura-total">
                     <input type="checkbox" id="terms" className="campo-cadastro__checkbox" required />
                     <label htmlFor="terms" className="campo-cadastro__termos-texto">
-                      Concordo com os <a href="#" className="campo-cadastro__termos-link">Termos de Uso</a> e a <a href="#" className="campo-cadastro__termos-link">Política de Privacidade</a>
+                      Concordo com os <a href="#" className="campo-cadastro__termos-link">Termos de Uso</a> e a <a href="#" className="campo-cadastro__termos-link">Politica de Privacidade</a>
                     </label>
                   </div>
                 </div>
+
                 <div className="cadastro-step__acoes">
                   <button type="button" onClick={() => setStep(2)} className="cadastro-step__botao-voltar">Voltar</button>
                   <button type="submit" disabled={loading} className="cadastro-step__botao-enviar">
@@ -193,7 +273,7 @@ export default function RegisterPage() {
         </div>
 
         <p className="pagina-cadastro__rodape">
-          Já tem conta?{" "}
+          Ja tem conta?{" "}
           <Link to="/login" className="pagina-cadastro__link-login">Fazer login</Link>
         </p>
       </div>

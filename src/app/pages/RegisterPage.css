@@ -218,9 +218,25 @@
    Campos do formulário
    ================================================================ */
 .cadastro-campos {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--espaco-4);
+}
+
+.campo-cadastro {
   display: flex;
   flex-direction: column;
-  gap: var(--espaco-4);
+  min-width: 0;
+}
+
+.campo-cadastro--largura-total {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 768px) {
+  .cadastro-campos {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .campo-cadastro__label {
@@ -260,6 +276,10 @@
 .campo-cadastro__input:focus {
   box-shadow: 0 0 0 2px var(--cor-primaria);
   border-color: transparent;
+}
+
+.campo-cadastro__input--com-acao {
+  padding-right: 2.75rem;
 }
 
 .campo-cadastro__botao-senha {

@@ -1,5 +1,5 @@
 import { Bell, Search, Menu, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { currentUser, notifications } from "../data/mockData";
@@ -7,8 +7,31 @@ import "./Topbar.css";
 
 export function Topbar({ onMenuClick, title, subtitle }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const profileMenuRef = useRef(null);
   const navigate = useNavigate();
   const unreadCount = notifications.filter((n) => !n.read).length;
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (!profileMenuRef.current?.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideClick);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideClick);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, []);
 
   return (
     <header className="barra-topo">
@@ -46,12 +69,15 @@ export function Topbar({ onMenuClick, title, subtitle }) {
           )}
         </motion.button>
 
-        <div className="barra-topo__area-perfil">
+        <div className="barra-topo__area-perfil" ref={profileMenuRef}>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => setDropdownOpen(!dropdownOpen)}
             className="barra-topo__botao-perfil"
+            aria-expanded={dropdownOpen}
+            aria-haspopup="menu"
+            aria-label="Abrir menu de perfil"
           >
             <div className="barra-topo__avatar">
               <span className="barra-topo__iniciais-avatar">{currentUser.avatar}</span>

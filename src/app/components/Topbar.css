@@ -13,7 +13,7 @@
   position: sticky;
   top: 0;
   z-index: 20;
-  overflow-x: hidden;
+  overflow: visible;
 }
 
 @media (min-width: 768px) {
@@ -156,6 +156,7 @@
 /* ---- Perfil do usuário ---- */
 .barra-topo__area-perfil {
   position: relative;
+  z-index: 70;
 }
 
 .barra-topo__botao-perfil {
@@ -236,7 +237,7 @@
   box-shadow: var(--sombra-extra);
   border: 1px solid var(--cor-borda-clara);
   padding: var(--espaco-2) 0;
-  z-index: 50;
+  z-index: 80;
 }
 
 .barra-topo__item-menu {
