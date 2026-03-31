@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router";
 import {
   FlaskConical,
+  GraduationCap,
   Eye,
   EyeOff,
   Mail,
@@ -111,7 +112,9 @@ export default function RegisterPage() {
                       onClick={() => setUserType(type)}
                       className={`cadastro-tipo__opcao ${userType === type ? "cadastro-tipo__opcao--selecionado" : "cadastro-tipo__opcao--disponivel"}`}
                     >
-                      <span className="cadastro-tipo__emoji">{type === "student" ? "ALUNO" : "ORIENT."}</span>
+                      <span className="cadastro-tipo__icone" aria-hidden="true">
+                        {type === "student" ? <GraduationCap size={20} /> : <FlaskConical size={20} />}
+                      </span>
                       <span className={`cadastro-tipo__nome ${userType === type ? "cadastro-tipo__nome--selecionado" : "cadastro-tipo__nome--disponivel"}`}>
                         {type === "student" ? "Aluno" : "Orientador"}
                       </span>

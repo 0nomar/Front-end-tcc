@@ -112,6 +112,20 @@
 @media (min-width: 640px) {
   .pagina-cadastro__label-passo {
     display: block;
+    white-space: nowrap;
+    line-height: 1.1;
+  }
+
+  .pagina-cadastro__passo {
+    min-width: 0;
+  }
+
+  .pagina-cadastro__progresso {
+    gap: var(--espaco-2);
+  }
+
+  .pagina-cadastro__linha-passo {
+    width: 2.5rem;
   }
 }
 
@@ -168,12 +182,16 @@
 }
 
 .cadastro-tipo__opcao {
+  min-height: 11rem;
   padding: var(--espaco-5);
   border-radius: var(--raio-grande);
   border: 2px solid;
   text-align: left;
   cursor: pointer;
   transition: var(--transicao-normal);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .cadastro-tipo__opcao--selecionado {
@@ -190,10 +208,24 @@
   border-color: var(--cor-borda-media);
 }
 
-.cadastro-tipo__emoji {
-  font-size: 1.875rem;
-  display: block;
+.cadastro-tipo__icone {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--raio-medio);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: var(--espaco-3);
+}
+
+.cadastro-tipo__opcao--selecionado .cadastro-tipo__icone {
+  background-color: var(--cor-primaria-leve);
+  color: var(--cor-primaria);
+}
+
+.cadastro-tipo__opcao--disponivel .cadastro-tipo__icone {
+  background-color: var(--cor-branco);
+  color: var(--cor-texto-medio);
 }
 
 .cadastro-tipo__nome--selecionado { color: var(--cor-primaria-texto); }
@@ -212,6 +244,7 @@
   font-size: 0.75rem;
   margin-top: var(--espaco-1);
   display: block;
+  line-height: 1.45;
 }
 
 /* ================================================================
@@ -245,6 +278,7 @@
   margin-bottom: 0.375rem;
   font-size: var(--tamanho-medio);
   font-weight: var(--peso-medio);
+  min-height: 1.25rem;
 }
 
 .campo-cadastro__wrapper {
@@ -262,11 +296,13 @@
 
 .campo-cadastro__input {
   width: 100%;
+  height: 3rem;
   padding: var(--espaco-3) var(--espaco-4) var(--espaco-3) 2.5rem;
   background-color: var(--cor-fundo);
   border: 1px solid var(--cor-borda);
   border-radius: var(--raio-grande);
   font-size: var(--tamanho-medio);
+  line-height: 1.2;
   color: var(--cor-texto);
   outline: none;
   transition: var(--transicao-normal);
@@ -295,11 +331,13 @@
 
 .campo-cadastro__select {
   width: 100%;
+  height: 3rem;
   padding: var(--espaco-3) var(--espaco-4) var(--espaco-3) 2.5rem;
   background-color: var(--cor-fundo);
   border: 1px solid var(--cor-borda);
   border-radius: var(--raio-grande);
   font-size: var(--tamanho-medio);
+  line-height: 1.2;
   color: var(--cor-texto);
   outline: none;
   transition: var(--transicao-normal);
@@ -314,11 +352,13 @@
 
 .campo-cadastro__select--sem-icone {
   width: 100%;
+  height: 3rem;
   padding: var(--espaco-3) var(--espaco-4);
   background-color: var(--cor-fundo);
   border: 1px solid var(--cor-borda);
   border-radius: var(--raio-grande);
   font-size: var(--tamanho-medio);
+  line-height: 1.2;
   color: var(--cor-texto);
   outline: none;
   transition: var(--transicao-normal);
@@ -366,9 +406,16 @@
    Ações de navegação entre steps
    ================================================================ */
 .cadastro-step__acoes {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: var(--espaco-3);
   margin-top: var(--espaco-6);
+}
+
+@media (max-width: 479px) {
+  .cadastro-step__acoes {
+    grid-template-columns: 1fr;
+  }
 }
 
 .cadastro-step__botao-voltar {
