@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Star, Send, CheckCircle, MessageSquare, Award } from "lucide-react";
 import { feedbacks, projects } from "../data/mockData";
+import "./FeedbackPage.css";
 
 const categories = [
   { key: "technical", label: "Técnico" },
@@ -12,7 +13,7 @@ const categories = [
 function StarRating({ value, onChange, readOnly = false }) {
   const [hovered, setHovered] = useState(0);
   return (
-    <div className="flex gap-1">
+    <div className="avaliacao-estrelas">
       {[1, 2, 3, 4, 5].map((s) => (
         <button
           key={s}
@@ -21,19 +22,23 @@ function StarRating({ value, onChange, readOnly = false }) {
           onMouseEnter={() => !readOnly && setHovered(s)}
           onMouseLeave={() => !readOnly && setHovered(0)}
           disabled={readOnly}
-          className={`transition-transform ${!readOnly ? "hover:scale-110 cursor-pointer" : "cursor-default"}`}
+          className="avaliacao-estrelas__botao"
         >
           <Star
             size={20}
-            className={`transition-colors ${
-              s <= (hovered || value) ? "text-yellow-400 fill-yellow-400" : "text-gray-200 fill-gray-200"
-            }`}
+            className={s <= (hovered || value) ? "avaliacao-estrelas__icone--ativa" : "avaliacao-estrelas__icone--inativa"}
           />
         </button>
       ))}
     </div>
   );
 }
+
+const statConfig = [
+  { label: "Feedbacks recebidos", key: "count", icon: MessageSquare, areaClass: "resumo-feedback__icone-area--azul", iconClass: "resumo-feedback__icone--azul" },
+  { label: "Nota média", key: "avg", icon: Star, areaClass: "resumo-feedback__icone-area--amarelo", iconClass: "resumo-feedback__icone--amarelo" },
+  { label: "Desempenho geral", key: "perf", icon: Award, areaClass: "resumo-feedback__icone-area--violeta", iconClass: "resumo-feedback__icone--violeta" },
+];
 
 export default function FeedbackPage() {
   const [showForm, setShowForm] = useState(false);
@@ -63,86 +68,64 @@ export default function FeedbackPage() {
       ? feedbacks.reduce((acc, f) => acc + f.rating, 0) / feedbacks.length
       : 0;
 
+  const statsValues = [feedbacks.length, averageRating.toFixed(1), "Excelente"];
+
   return (
-    <div className="space-y-6" style={{ fontFamily: "'Inter', sans-serif" }}>
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
-        {[
-          { label: "Feedbacks recebidos", value: feedbacks.length, icon: MessageSquare, color: "blue" },
-          { label: "Nota média", value: averageRating.toFixed(1), icon: Star, color: "yellow" },
-          { label: "Desempenho geral", value: "Excelente", icon: Award, color: "violet" },
-        ].map((s) => {
-          const colorMap = {
-            blue: { bg: "bg-blue-50", icon: "text-blue-600" },
-            yellow: { bg: "bg-yellow-50", icon: "text-yellow-600" },
-            violet: { bg: "bg-violet-50", icon: "text-violet-600" },
-          };
-          return (
-            <div key={s.label} className="bg-white rounded-2xl border border-gray-100 p-5">
-              <div className={`w-10 h-10 ${colorMap[s.color].bg} rounded-xl flex items-center justify-center mb-3`}>
-                <s.icon size={18} className={colorMap[s.color].icon} />
-              </div>
-              <p className="text-gray-900" style={{ fontSize: "1.5rem", fontWeight: 700 }}>{s.value}</p>
-              <p className="text-gray-500 mt-0.5" style={{ fontSize: "0.75rem" }}>{s.label}</p>
+    <div className="pagina-feedback">
+      {/* Resumos */}
+      <div className="pagina-feedback__grade-resumos">
+        {statConfig.map((s, i) => (
+          <div key={s.label} className="resumo-feedback">
+            <div className={`resumo-feedback__icone-area ${s.areaClass}`}>
+              <s.icon size={18} className={s.iconClass} />
             </div>
-          );
-        })}
+            <p className="resumo-feedback__valor">{statsValues[i]}</p>
+            <p className="resumo-feedback__label">{s.label}</p>
+          </div>
+        ))}
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Received feedbacks */}
+      <div className="pagina-feedback__grade-principal">
+        {/* Feedbacks recebidos */}
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-gray-900" style={{ fontWeight: 700, fontSize: "1rem" }}>
-              Feedbacks recebidos
-            </h3>
-          </div>
-
-          <div className="space-y-4">
+          <h3 className="pagina-feedback__secao-titulo">Feedbacks recebidos</h3>
+          <div className="pagina-feedback__lista">
             {feedbacks.map((fb) => (
-              <div key={fb.id} className="bg-white rounded-2xl border border-gray-100 p-6">
-                {/* Header */}
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-violet-500 flex items-center justify-center">
-                    <span className="text-white" style={{ fontSize: "0.72rem", fontWeight: 700 }}>
-                      {fb.from.avatar}
-                    </span>
+              <div key={fb.id} className="feedback-card">
+                <div className="feedback-card__cabecalho">
+                  <div className="feedback-card__avatar">
+                    <span className="feedback-card__avatar-inicial">{fb.from.avatar}</span>
                   </div>
-                  <div className="flex-1">
-                    <p className="text-gray-900" style={{ fontWeight: 600, fontSize: "0.875rem" }}>
-                      {fb.from.name}
-                    </p>
-                    <p className="text-gray-400" style={{ fontSize: "0.75rem" }}>
+                  <div className="feedback-card__info">
+                    <p className="feedback-card__nome">{fb.from.name}</p>
+                    <p className="feedback-card__meta">
                       {new Date(fb.date).toLocaleDateString("pt-BR")} · {fb.project.title.slice(0, 30)}...
                     </p>
                   </div>
-                  <div className="flex items-center gap-1">
+                  <div className="feedback-card__estrelas">
                     {[1, 2, 3, 4, 5].map((s) => (
-                      <Star key={s} size={14} className={s <= fb.rating ? "text-yellow-400 fill-yellow-400" : "text-gray-200"} />
+                      <Star
+                        key={s}
+                        size={14}
+                        className={s <= fb.rating ? "feedback-card__estrela--ativa" : "feedback-card__estrela--inativa"}
+                      />
                     ))}
                   </div>
                 </div>
 
-                {/* Comment */}
-                <p className="text-gray-600 mb-4 p-4 bg-gray-50 rounded-xl" style={{ fontSize: "0.875rem", lineHeight: 1.6 }}>
-                  "{fb.comment}"
-                </p>
+                <p className="feedback-card__comentario">"{fb.comment}"</p>
 
-                {/* Category ratings */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="feedback-card__grade-categorias">
                   {categories.map((cat) => {
                     const val = fb.categories[cat.key];
                     return (
                       <div key={cat.key}>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-gray-500" style={{ fontSize: "0.72rem" }}>{cat.label}</span>
-                          <span className="text-gray-700" style={{ fontSize: "0.72rem", fontWeight: 600 }}>{val}/5</span>
+                        <div className="feedback-card__categoria-linha">
+                          <span className="feedback-card__categoria-label">{cat.label}</span>
+                          <span className="feedback-card__categoria-valor">{val}/5</span>
                         </div>
-                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-gradient-to-r from-yellow-400 to-orange-400 rounded-full"
-                            style={{ width: `${(val / 5) * 100}%` }}
-                          />
+                        <div className="feedback-card__trilha-categoria">
+                          <div className="feedback-card__barra-categoria" style={{ width: `${(val / 5) * 100}%` }} />
                         </div>
                       </div>
                     );
@@ -152,81 +135,63 @@ export default function FeedbackPage() {
             ))}
 
             {feedbacks.length === 0 && (
-              <div className="text-center py-12 bg-white rounded-2xl border border-gray-100">
-                <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
-                  <Star size={22} className="text-gray-400" />
+              <div className="feedback-card--vazio">
+                <div className="feedback-card__icone-vazio">
+                  <Star size={22} className="resumo-feedback__icone--amarelo" />
                 </div>
-                <p className="text-gray-600" style={{ fontWeight: 500 }}>Nenhum feedback ainda</p>
-                <p className="text-gray-400 mt-1" style={{ fontSize: "0.875rem" }}>
-                  Feedbacks aparecerão aqui quando recebidos.
-                </p>
+                <p className="feedback-card__titulo-vazio">Nenhum feedback ainda</p>
+                <p className="feedback-card__subtitulo-vazio">Feedbacks aparecerão aqui quando recebidos.</p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Give feedback */}
+        {/* Avaliar orientador */}
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-gray-900" style={{ fontWeight: 700, fontSize: "1rem" }}>
-              Avaliar orientador
-            </h3>
-          </div>
+          <h3 className="pagina-feedback__secao-titulo">Avaliar orientador</h3>
 
           {submitted ? (
-            <div className="bg-white rounded-2xl border border-green-100 p-8 text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <CheckCircle size={28} className="text-green-600" />
+            <div className="avaliacao-orientador avaliacao-orientador--enviada">
+              <div className="avaliacao-orientador__icone-sucesso">
+                <CheckCircle size={28} style={{ color: "var(--cor-sucesso)" }} />
               </div>
-              <h3 className="text-gray-900 mb-2" style={{ fontWeight: 700, fontSize: "1.1rem" }}>
-                Feedback enviado!
-              </h3>
-              <p className="text-gray-500 mb-4" style={{ fontSize: "0.875rem" }}>
+              <h3 className="avaliacao-orientador__titulo-sucesso">Feedback enviado!</h3>
+              <p className="avaliacao-orientador__texto-sucesso">
                 Obrigado pela sua avaliação. Isso ajuda a melhorar a experiência de pesquisa.
               </p>
               <button
                 onClick={() => { setSubmitted(false); setShowForm(false); setRating(0); setComment(""); }}
-                className="px-6 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors"
-                style={{ fontSize: "0.875rem", fontWeight: 600 }}
+                className="avaliacao-orientador__botao-outro"
               >
                 Dar outro feedback
               </button>
             </div>
           ) : (
-            <div className="bg-white rounded-2xl border border-gray-100 p-6">
+            <div className="avaliacao-orientador">
               {!showForm ? (
-                <div className="text-center py-6">
-                  <div className="flex justify-center gap-1 mb-4">
+                <div className="avaliacao-orientador__prompt">
+                  <div className="avaliacao-orientador__estrelas-prompt">
                     {[1, 2, 3, 4, 5].map((s) => (
-                      <Star key={s} size={28} className="text-gray-200 fill-gray-200" />
+                      <Star key={s} size={28} className="avaliacao-orientador__estrela-vazia" />
                     ))}
                   </div>
-                  <h4 className="text-gray-900 mb-2" style={{ fontWeight: 600, fontSize: "1rem" }}>
-                    Como foi sua experiência?
-                  </h4>
-                  <p className="text-gray-500 mb-6" style={{ fontSize: "0.875rem" }}>
+                  <h4 className="avaliacao-orientador__titulo-prompt">Como foi sua experiência?</h4>
+                  <p className="avaliacao-orientador__texto-prompt">
                     Avalie seu orientador e contribua para a comunidade acadêmica.
                   </p>
-                  <button
-                    onClick={() => setShowForm(true)}
-                    className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
-                    style={{ fontSize: "0.875rem", fontWeight: 600 }}
-                  >
+                  <button onClick={() => setShowForm(true)} className="avaliacao-orientador__botao-iniciar">
                     Avaliar orientador
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  {/* Project select */}
-                  <div>
-                    <label className="block text-gray-700 mb-2" style={{ fontSize: "0.875rem", fontWeight: 500 }}>
-                      Projeto
-                    </label>
+                <form onSubmit={handleSubmit} className="formulario-avaliacao">
+                  {/* Projeto */}
+                  <div className="formulario-avaliacao__grupo">
+                    <label className="formulario-avaliacao__label">Projeto</label>
                     <select
                       value={selectedProject}
                       onChange={(e) => setSelectedProject(e.target.value)}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                      style={{ fontSize: "0.875rem" }}
+                      className="formulario-avaliacao__select"
                     >
                       {projects.map((p) => (
                         <option key={p.id} value={p.id}>{p.title.slice(0, 50)}...</option>
@@ -234,30 +199,26 @@ export default function FeedbackPage() {
                     </select>
                   </div>
 
-                  {/* Overall rating */}
-                  <div>
-                    <label className="block text-gray-700 mb-3" style={{ fontSize: "0.875rem", fontWeight: 500 }}>
-                      Avaliação geral
-                    </label>
-                    <div className="flex items-center gap-4">
+                  {/* Avaliação geral */}
+                  <div className="formulario-avaliacao__grupo">
+                    <label className="formulario-avaliacao__label">Avaliação geral</label>
+                    <div className="formulario-avaliacao__linha-estrelas">
                       <StarRating value={rating} onChange={setRating} />
                       {rating > 0 && (
-                        <span className="text-gray-500" style={{ fontSize: "0.875rem" }}>
+                        <span className="formulario-avaliacao__nivel">
                           {["", "Ruim", "Regular", "Bom", "Muito bom", "Excelente"][rating]}
                         </span>
                       )}
                     </div>
                   </div>
 
-                  {/* Category ratings */}
-                  <div>
-                    <label className="block text-gray-700 mb-3" style={{ fontSize: "0.875rem", fontWeight: 500 }}>
-                      Avaliação por categoria
-                    </label>
-                    <div className="space-y-3">
+                  {/* Categorias */}
+                  <div className="formulario-avaliacao__grupo">
+                    <label className="formulario-avaliacao__label">Avaliação por categoria</label>
+                    <div className="formulario-avaliacao__lista-categorias">
                       {categories.map((cat) => (
-                        <div key={cat.key} className="flex items-center justify-between">
-                          <span className="text-gray-600 w-32" style={{ fontSize: "0.875rem" }}>{cat.label}</span>
+                        <div key={cat.key} className="formulario-avaliacao__categoria-linha">
+                          <span className="formulario-avaliacao__categoria-nome">{cat.label}</span>
                           <StarRating
                             value={categoryRatings[cat.key]}
                             onChange={(v) => setCategoryRatings({ ...categoryRatings, [cat.key]: v })}
@@ -267,39 +228,30 @@ export default function FeedbackPage() {
                     </div>
                   </div>
 
-                  {/* Comment */}
-                  <div>
-                    <label className="block text-gray-700 mb-2" style={{ fontSize: "0.875rem", fontWeight: 500 }}>
-                      Comentário
-                    </label>
+                  {/* Comentário */}
+                  <div className="formulario-avaliacao__grupo">
+                    <label className="formulario-avaliacao__label">Comentário</label>
                     <textarea
                       value={comment}
                       onChange={(e) => setComment(e.target.value)}
                       rows={4}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"
+                      className="formulario-avaliacao__textarea"
                       placeholder="Compartilhe sua experiência com este orientador..."
-                      style={{ fontSize: "0.875rem" }}
                       required
                     />
                   </div>
 
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setShowForm(false)}
-                      className="flex-1 py-3 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition-colors"
-                      style={{ fontSize: "0.875rem" }}
-                    >
+                  <div className="formulario-avaliacao__acoes">
+                    <button type="button" onClick={() => setShowForm(false)} className="formulario-avaliacao__botao-cancelar">
                       Cancelar
                     </button>
                     <button
                       type="submit"
                       disabled={loading || rating === 0 || !comment}
-                      className="flex-1 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                      style={{ fontWeight: 600, fontSize: "0.875rem" }}
+                      className="formulario-avaliacao__botao-enviar"
                     >
                       {loading ? (
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <div className="formulario-avaliacao__spinner" />
                       ) : (
                         <>
                           <Send size={15} /> Enviar avaliação

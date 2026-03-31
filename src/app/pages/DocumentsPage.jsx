@@ -1,31 +1,29 @@
 import { useState, useRef } from "react";
 import {
-  Upload,
-  FileText,
-  Image,
-  CheckCircle,
-  Clock,
-  XCircle,
-  Trash2,
-  Download,
-  Eye,
-  FolderOpen,
-  Plus,
+  Upload, FileText, Image, CheckCircle, Clock,
+  XCircle, Trash2, Download, Eye, FolderOpen, Plus,
 } from "lucide-react";
 import { documents } from "../data/mockData";
+import "./DocumentsPage.css";
 
 const categoryColors = {
-  "Acadêmico": { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200" },
-  Pessoal: { bg: "bg-violet-50", text: "text-violet-700", border: "border-violet-200" },
-  "Inscrição": { bg: "bg-orange-50", text: "text-orange-700", border: "border-orange-200" },
-  Certificados: { bg: "bg-green-50", text: "text-green-700", border: "border-green-200" },
+  "Acadêmico":   { chipClass: "documento-item__categoria", style: { background: "var(--cor-primaria-clara)", color: "var(--cor-primaria-texto)", borderColor: "var(--cor-primaria-borda)" } },
+  "Pessoal":     { chipClass: "documento-item__categoria", style: { background: "var(--cor-secundaria-clara)", color: "var(--cor-secundaria-escura)", borderColor: "var(--cor-secundaria-borda)" } },
+  "Inscrição":   { chipClass: "documento-item__categoria", style: { background: "var(--cor-laranja-clara)", color: "var(--cor-laranja-escura)", borderColor: "var(--cor-laranja-borda)" } },
+  "Certificados":{ chipClass: "documento-item__categoria", style: { background: "var(--cor-sucesso-clara)", color: "var(--cor-sucesso-escura)", borderColor: "var(--cor-sucesso-borda)" } },
 };
 
 const statusConfig = {
-  verified: { icon: CheckCircle, label: "Verificado", bg: "bg-green-50", text: "text-green-700" },
-  pending: { icon: Clock, label: "Em análise", bg: "bg-yellow-50", text: "text-yellow-700" },
-  rejected: { icon: XCircle, label: "Rejeitado", bg: "bg-red-50", text: "text-red-700" },
+  verified: { icon: CheckCircle, label: "Verificado", style: { background: "var(--cor-sucesso-clara)", color: "var(--cor-sucesso-escura)" } },
+  pending:  { icon: Clock,       label: "Em análise", style: { background: "var(--cor-atencao-clara)", color: "var(--cor-atencao-escura)" } },
+  rejected: { icon: XCircle,     label: "Rejeitado",  style: { background: "var(--cor-erro-clara)",   color: "var(--cor-erro-escura)" } },
 };
+
+const statItems = [
+  { key: "total",   label: "Total de documentos", icon: FolderOpen, areaClass: "resumo-documentos__icone-area--azul",    iconClass: "resumo-documentos__icone--azul" },
+  { key: "verified",label: "Verificados",          icon: CheckCircle, areaClass: "resumo-documentos__icone-area--verde",  iconClass: "resumo-documentos__icone--verde" },
+  { key: "pending", label: "Em análise",           icon: Clock,       areaClass: "resumo-documentos__icone-area--amarelo",iconClass: "resumo-documentos__icone--amarelo" },
+];
 
 export default function DocumentsPage() {
   const [docs, setDocs] = useState(documents);
@@ -45,10 +43,7 @@ export default function DocumentsPage() {
 
     const interval = setInterval(() => {
       setUploadProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
+        if (prev >= 100) { clearInterval(interval); return 100; }
         return prev + 10;
       });
     }, 100);
@@ -81,91 +76,73 @@ export default function DocumentsPage() {
   };
 
   const verifiedCount = docs.filter((d) => d.status === "verified").length;
-  const pendingCount = docs.filter((d) => d.status === "pending").length;
+  const pendingCount  = docs.filter((d) => d.status === "pending").length;
+  const statValues = { total: docs.length, verified: verifiedCount, pending: pendingCount };
 
   return (
-    <div className="space-y-6 w-full min-w-0 overflow-x-clip" style={{ fontFamily: "'Inter', sans-serif" }}>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[
-          { label: "Total de documentos", value: docs.length, icon: FolderOpen, color: "blue" },
-          { label: "Verificados", value: verifiedCount, icon: CheckCircle, color: "green" },
-          { label: "Em análise", value: pendingCount, icon: Clock, color: "yellow" },
-        ].map((s) => {
-          const colorMap = {
-            blue: { bg: "bg-blue-50", icon: "text-blue-600" },
-            green: { bg: "bg-green-50", icon: "text-green-600" },
-            yellow: { bg: "bg-yellow-50", icon: "text-yellow-600" },
-          };
-          return (
-            <div key={s.label} className="bg-white rounded-2xl border border-gray-100 p-5 w-full min-w-0">
-              <div className={`w-10 h-10 ${colorMap[s.color].bg} rounded-xl flex items-center justify-center mb-3`}>
-                <s.icon size={18} className={colorMap[s.color].icon} />
-              </div>
-              <p className="text-gray-900" style={{ fontSize: "1.5rem", fontWeight: 700 }}>{s.value}</p>
-              <p className="text-gray-500 mt-0.5" style={{ fontSize: "0.75rem" }}>{s.label}</p>
+    <div className="pagina-documentos">
+      {/* Resumos */}
+      <div className="pagina-documentos__grade-resumos">
+        {statItems.map((s) => (
+          <div key={s.label} className="resumo-documentos">
+            <div className={`resumo-documentos__icone-area ${s.areaClass}`}>
+              <s.icon size={18} className={s.iconClass} />
             </div>
-          );
-        })}
+            <p className="resumo-documentos__valor">{statValues[s.key]}</p>
+            <p className="resumo-documentos__label">{s.label}</p>
+          </div>
+        ))}
       </div>
 
+      {/* Zona de upload */}
       <div
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
-        className={`relative border-2 border-dashed rounded-2xl p-6 md:p-10 text-center cursor-pointer transition-all w-full min-w-0 ${
-          dragging
-            ? "border-blue-500 bg-blue-50"
-            : "border-gray-200 bg-gray-50 hover:border-blue-300 hover:bg-blue-50/30"
-        }`}
+        className={`pagina-documentos__zona-upload ${dragging ? "pagina-documentos__zona-upload--arrastando" : "pagina-documentos__zona-upload--normal"}`}
       >
         <input
           ref={fileInputRef}
           type="file"
           multiple
           accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
-          className="hidden"
+          style={{ display: "none" }}
           onChange={(e) => handleUpload(e.target.files)}
         />
 
         {uploading ? (
-          <div className="space-y-3">
-            <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto">
-              <Upload size={20} className="text-blue-600 animate-bounce" />
+          <div className="pagina-documentos__progresso-upload">
+            <div className="pagina-documentos__upload-icone-animado">
+              <Upload size={20} />
             </div>
-            <p className="text-gray-700" style={{ fontWeight: 500 }}>Enviando arquivo...</p>
-            <div className="w-full max-w-xs mx-auto h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div className="h-full bg-blue-600 rounded-full transition-all duration-100" style={{ width: `${uploadProgress}%` }} />
+            <p className="pagina-documentos__upload-label">Enviando arquivo...</p>
+            <div className="pagina-documentos__trilha-progresso">
+              <div className="pagina-documentos__barra-progresso" style={{ width: `${uploadProgress}%` }} />
             </div>
-            <p className="text-gray-400" style={{ fontSize: "0.8rem" }}>{uploadProgress}%</p>
+            <p className="pagina-documentos__percentual-progresso">{uploadProgress}%</p>
           </div>
         ) : (
           <>
-            <div className="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Upload size={22} className={`${dragging ? "text-blue-700" : "text-blue-600"}`} />
+            <div className="pagina-documentos__upload-icone-area">
+              <Upload size={22} className={dragging ? "pagina-documentos__upload-icone--arrastando" : "pagina-documentos__upload-icone--normal"} />
             </div>
-            <p className="text-gray-700 mb-2" style={{ fontWeight: 600, fontSize: "0.95rem" }}>
+            <p className="pagina-documentos__upload-titulo">
               {dragging ? "Solte os arquivos aqui" : "Arraste arquivos ou clique para fazer upload"}
             </p>
-            <p className="text-gray-400" style={{ fontSize: "0.8rem" }}>
-              PDF, DOC, DOCX, PNG, JPG até 10MB
-            </p>
+            <p className="pagina-documentos__upload-subtitulo">PDF, DOC, DOCX, PNG, JPG até 10MB</p>
           </>
         )}
       </div>
 
-      <div className="flex items-center gap-3 w-full">
-        <div className="flex flex-wrap sm:flex-nowrap gap-2 sm:overflow-x-auto pb-1 w-full max-w-full">
+      {/* Filtros */}
+      <div className="pagina-documentos__filtros">
+        <div className="pagina-documentos__lista-filtros">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`max-w-full px-4 py-2 rounded-xl border transition-all ${
-                selectedCategory === cat
-                  ? "bg-blue-600 text-white border-blue-600"
-                  : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
-              }`}
-              style={{ fontSize: "0.82rem" }}
+              className={`pagina-documentos__chip-filtro ${selectedCategory === cat ? "pagina-documentos__chip-filtro--ativo" : "pagina-documentos__chip-filtro--inativo"}`}
             >
               {cat}
             </button>
@@ -173,77 +150,61 @@ export default function DocumentsPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden w-full min-w-0">
-        <div className="px-4 md:px-6 py-4 border-b border-gray-50 flex flex-col sm:flex-row items-start sm:items-center gap-2 justify-between">
-          <h3 className="text-gray-900" style={{ fontWeight: 600, fontSize: "0.95rem" }}>
+      {/* Lista de documentos */}
+      <div className="pagina-documentos__lista">
+        <div className="pagina-documentos__cabecalho-lista">
+          <h3 className="pagina-documentos__contagem">
             {filteredDocs.length} documento{filteredDocs.length !== 1 ? "s" : ""}
           </h3>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors"
-            style={{ fontSize: "0.8rem", fontWeight: 500 }}
-          >
+          <button onClick={() => fileInputRef.current?.click()} className="pagina-documentos__botao-adicionar">
             <Plus size={14} />
             Adicionar
           </button>
         </div>
 
         {filteredDocs.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
-              <FolderOpen size={22} className="text-gray-400" />
+          <div className="pagina-documentos__vazio">
+            <div className="pagina-documentos__icone-vazio">
+              <FolderOpen size={22} />
             </div>
-            <p className="text-gray-600" style={{ fontWeight: 500 }}>Nenhum documento nesta categoria</p>
+            <p className="pagina-documentos__texto-vazio">Nenhum documento nesta categoria</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-50">
+          <div>
             {filteredDocs.map((doc) => {
               const sc = statusConfig[doc.status];
-              const catColor = categoryColors[doc.category] || { bg: "bg-gray-50", text: "text-gray-700", border: "border-gray-200" };
+              const catColor = categoryColors[doc.category] || { style: { background: "var(--cor-fundo)", color: "var(--cor-texto-secundario)", borderColor: "var(--cor-borda)" } };
               const StatusIcon = sc.icon;
 
               return (
-                <div key={doc.id} className="px-4 md:px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 md:gap-4 hover:bg-gray-50 transition-colors group min-w-0">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    doc.type === "image" ? "bg-pink-50" : "bg-red-50"
-                  }`}>
+                <div key={doc.id} className="documento-item">
+                  <div className={`documento-item__icone-area ${doc.type === "image" ? "documento-item__icone-area--imagem" : "documento-item__icone-area--pdf"}`}>
                     {doc.type === "image" ? (
-                      <Image size={18} className="text-pink-600" />
+                      <Image size={18} className="documento-item__icone--imagem" />
                     ) : (
-                      <FileText size={18} className="text-red-600" />
+                      <FileText size={18} className="documento-item__icone--pdf" />
                     )}
                   </div>
 
-                  <div className="flex-1 min-w-0">
-                    <p className="text-gray-900 break-words" style={{ fontWeight: 500, fontSize: "0.875rem" }}>
-                      {doc.name}
-                    </p>
-                    <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-0.5" style={{ fontSize: "0.72rem" }}>
-                      <span className="text-gray-400">{doc.size}</span>
-                      <span className="text-gray-300">·</span>
-                      <span className="text-gray-400">{new Date(doc.uploadedAt).toLocaleDateString("pt-BR")}</span>
-                      <span className={`px-2 py-0.5 rounded-md ${catColor.bg} ${catColor.text} border ${catColor.border}`} style={{ fontWeight: 500 }}>
-                        {doc.category}
-                      </span>
+                  <div className="documento-item__info">
+                    <p className="documento-item__nome">{doc.name}</p>
+                    <div className="documento-item__meta">
+                      <span className="documento-item__tamanho">{doc.size}</span>
+                      <span className="documento-item__separador">·</span>
+                      <span className="documento-item__data">{new Date(doc.uploadedAt).toLocaleDateString("pt-BR")}</span>
+                      <span className="documento-item__categoria" style={catColor.style}>{doc.category}</span>
                     </div>
                   </div>
 
-                  <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl ${sc.bg} ${sc.text} flex-shrink-0`} style={{ fontSize: "0.72rem", fontWeight: 600 }}>
+                  <div className="documento-item__status" style={sc.style}>
                     <StatusIcon size={12} />
                     {sc.label}
                   </div>
 
-                  <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity flex-shrink-0">
-                    <button className="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition-colors">
-                      <Eye size={15} />
-                    </button>
-                    <button className="p-1.5 rounded-lg hover:bg-blue-50 text-gray-400 hover:text-blue-600 transition-colors">
-                      <Download size={15} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(doc.id)}
-                      className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
-                    >
+                  <div className="documento-item__acoes">
+                    <button className="documento-item__botao-acao"><Eye size={15} /></button>
+                    <button className="documento-item__botao-acao"><Download size={15} /></button>
+                    <button onClick={() => handleDelete(doc.id)} className="documento-item__botao-acao documento-item__botao-excluir">
                       <Trash2 size={15} />
                     </button>
                   </div>
@@ -254,11 +215,10 @@ export default function DocumentsPage() {
         )}
       </div>
 
-      <div className="bg-blue-50 rounded-2xl border border-blue-100 p-5 w-full min-w-0">
-        <h3 className="text-blue-800 mb-2" style={{ fontWeight: 600, fontSize: "0.9rem" }}>
-          📋 Documentos recomendados
-        </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      {/* Documentos recomendados */}
+      <div className="pagina-documentos__recomendados">
+        <h3 className="pagina-documentos__recomendados-titulo">📋 Documentos recomendados</h3>
+        <div className="pagina-documentos__grade-recomendados">
           {[
             "Histórico escolar atualizado",
             "Comprovante de matrícula",
@@ -267,9 +227,9 @@ export default function DocumentsPage() {
             "Certificados de cursos",
             "RG ou CPF",
           ].map((item) => (
-            <div key={item} className="flex items-center gap-2 text-blue-700" style={{ fontSize: "0.8rem" }}>
-              <CheckCircle size={13} className="text-blue-500 flex-shrink-0" />
-              <span className="break-words">{item}</span>
+            <div key={item} className="pagina-documentos__item-recomendado">
+              <CheckCircle size={13} className="pagina-documentos__icone-recomendado" />
+              <span className="pagina-documentos__texto-recomendado">{item}</span>
             </div>
           ))}
         </div>

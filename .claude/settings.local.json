@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find src/app/pages src/app/components src/app/layouts -name \"*.jsx\" -type f -exec grep -h \"className=\" {} +)",
+      "Bash(grep -v '^$')"
+    ]
+  }
+}

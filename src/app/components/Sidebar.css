@@ -2,6 +2,13 @@
    Sidebar.css — Estilos da barra lateral de navegação
    ============================================================ */
 
+/* ---- Conteúdo interno (compartilhado desktop/mobile) ---- */
+.barra-lateral__conteudo-interno {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 /* ---- Barra lateral (desktop) ---- */
 .barra-lateral {
   display: none;
@@ -293,7 +300,6 @@
 
 /* ---- Overlay mobile ---- */
 .sobreposicao-mobile {
-  display: none;
   position: fixed;
   inset: 0;
   background-color: rgba(0, 0, 0, 0.5);

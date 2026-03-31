@@ -39,7 +39,7 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
   };
 
   const SidebarContent = () => (
-    <div className="barra-lateral__conteudo-interno" style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+    <div className="barra-lateral__conteudo-interno">
       <div className={`barra-lateral__cabecalho ${collapsed ? "barra-lateral__cabecalho--centralizado" : ""}`}>
         <div className="barra-lateral__logo">
           <FlaskConical size={18} className="barra-lateral__logo-icone" />
@@ -109,7 +109,7 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
           className="barra-lateral__item-configuracoes"
           onClick={() => setMobileOpen(false)}
         >
-          <Settings size={18} className="barra-lateral__icone-nav" style={{ flexShrink: 0 }} />
+          <Settings size={18} className="barra-lateral__icone-nav" />
           {!collapsed && <span className="barra-lateral__rotulo-nav">Configuracoes</span>}
         </NavLink>
 
