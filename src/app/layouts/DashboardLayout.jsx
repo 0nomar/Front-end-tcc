@@ -16,7 +16,6 @@ const pageTitles = {
   "/app/documents": { title: "Documentos", subtitle: "Seus arquivos enviados" },
   "/app/notifications": { title: "Notificacoes", subtitle: "Suas atualizacoes recentes" },
   "/app/configuracoes": { title: "Configuracoes", subtitle: "Preferencias da conta" },
-  "/configuracoes": { title: "Configuracoes", subtitle: "Preferencias da conta" },
 };
 
 export function DashboardLayout() {
