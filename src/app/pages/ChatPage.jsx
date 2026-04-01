@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Send, Search, Phone, Video, MoreVertical, Smile, Paperclip, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
@@ -48,8 +48,11 @@ export default function ChatPage() {
     }, 1500);
   };
 
-  const filtered = conversations.filter((c) =>
-    c.participant.name.toLowerCase().includes(search.toLowerCase())
+  const filtered = useMemo(
+    () => conversations.filter((c) =>
+      c.participant.name.toLowerCase().includes(search.toLowerCase())
+    ),
+    [search]
   );
 
   return (

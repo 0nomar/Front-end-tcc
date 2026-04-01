@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
 import { Search, FolderOpen, Users, Clock, DollarSign, ChevronRight, Bookmark, SlidersHorizontal, X } from "lucide-react";
@@ -22,15 +22,19 @@ export default function ProjectsPage() {
   const [savedProjects, setSavedProjects] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
 
-  const filtered = projects.filter((p) => {
-    const matchSearch =
-      p.title.toLowerCase().includes(search.toLowerCase()) ||
-      p.description.toLowerCase().includes(search.toLowerCase()) ||
-      p.tags.some((t) => t.toLowerCase().includes(search.toLowerCase()));
-    const matchArea = selectedArea === "Todas" || p.area === selectedArea;
-    const matchStatus = selectedStatus === "Todos" || p.status === selectedStatus;
-    return matchSearch && matchArea && matchStatus;
-  });
+  const filtered = useMemo(
+    () =>
+      projects.filter((p) => {
+        const matchSearch =
+          p.title.toLowerCase().includes(search.toLowerCase()) ||
+          p.description.toLowerCase().includes(search.toLowerCase()) ||
+          p.tags.some((t) => t.toLowerCase().includes(search.toLowerCase()));
+        const matchArea = selectedArea === "Todas" || p.area === selectedArea;
+        const matchStatus = selectedStatus === "Todos" || p.status === selectedStatus;
+        return matchSearch && matchArea && matchStatus;
+      }),
+    [search, selectedArea, selectedStatus]
+  );
 
   const toggleSave = (id, e) => {
     e.stopPropagation();

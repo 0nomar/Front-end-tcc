@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import {
   Upload, FileText, Image, CheckCircle, Clock,
   XCircle, Trash2, Download, Eye, FolderOpen, Plus,
@@ -33,8 +33,14 @@ export default function DocumentsPage() {
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const fileInputRef = useRef(null);
 
-  const categories = ["Todos", ...Array.from(new Set(docs.map((d) => d.category)))];
-  const filteredDocs = selectedCategory === "Todos" ? docs : docs.filter((d) => d.category === selectedCategory);
+  const categories = useMemo(
+    () => ["Todos", ...Array.from(new Set(docs.map((d) => d.category)))],
+    [docs]
+  );
+  const filteredDocs = useMemo(
+    () => (selectedCategory === "Todos" ? docs : docs.filter((d) => d.category === selectedCategory)),
+    [docs, selectedCategory]
+  );
 
   const handleUpload = async (files) => {
     if (!files || files.length === 0) return;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import {
   Bell,
@@ -36,8 +36,14 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState(initialNotifications);
   const [filter, setFilter] = useState("all");
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
-  const filtered = filter === "all" ? notifications : notifications.filter((n) => n.type === filter);
+  const unreadCount = useMemo(
+    () => notifications.filter((n) => !n.read).length,
+    [notifications]
+  );
+  const filtered = useMemo(
+    () => (filter === "all" ? notifications : notifications.filter((n) => n.type === filter)),
+    [filter, notifications]
+  );
 
   const markAsRead = (id) =>
     setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));

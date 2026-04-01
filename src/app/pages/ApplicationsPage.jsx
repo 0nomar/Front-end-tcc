@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import {
   FileText,
@@ -48,15 +48,20 @@ export default function ApplicationsPage() {
   const [filter, setFilter] = useState("all");
   const [expandedId, setExpandedId] = useState(null);
 
-  const filtered =
-    filter === "all" ? applications : applications.filter((a) => a.status === filter);
+  const filtered = useMemo(
+    () => (filter === "all" ? applications : applications.filter((a) => a.status === filter)),
+    [filter]
+  );
 
-  const counts = {
-    all:      applications.length,
-    approved: applications.filter((a) => a.status === "approved").length,
-    pending:  applications.filter((a) => a.status === "pending").length,
-    rejected: applications.filter((a) => a.status === "rejected").length,
-  };
+  const counts = useMemo(
+    () => ({
+      all:      applications.length,
+      approved: applications.filter((a) => a.status === "approved").length,
+      pending:  applications.filter((a) => a.status === "pending").length,
+      rejected: applications.filter((a) => a.status === "rejected").length,
+    }),
+    []
+  );
 
   return (
     <div className="pagina-inscricoes">
