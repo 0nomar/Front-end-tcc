@@ -10,18 +10,18 @@ import "./LandingPage.css";
 
 const navItems = [
   { label: "Problema", id: "problema" },
-  { label: "Solucao", id: "solucao" },
+  { label: "Solução", id: "solucao" },
   { label: "Funcionalidades", id: "funcionalidades" },
   { label: "Como Funciona", id: "como-funciona" },
 ];
 
 const features = [
   { icon: Search,       title: "Busca Inteligente de Projetos",  description: "Encontre projetos alinhados ao seu perfil com filtros por area, curso e bolsa disponivel.", colorClass: "landing__card-feature__icone-area--azul" },
-  { icon: FileText,     title: "Inscricao 100% Online",          description: "Candidate-se a projetos, envie documentos e acompanhe tudo em um unico lugar.", colorClass: "landing__card-feature__icone-area--violeta" },
+  { icon: FileText,     title: "Inscrição 100% Online",          description: "Candidate-se a projetos, envie documentos e acompanhe tudo em um unico lugar.", colorClass: "landing__card-feature__icone-area--violeta" },
   { icon: TrendingUp,   title: "Acompanhamento de Progresso",    description: "Visualize marcos, entregas e evolucao do projeto com timelines interativas.", colorClass: "landing__card-feature__icone-area--esmeralda" },
   { icon: MessageSquare,title: "Chat com Orientadores",          description: "Comunicacao direta e agil com seu orientador sem precisar de e-mails.", colorClass: "landing__card-feature__icone-area--laranja" },
   { icon: Star,         title: "Sistema de Feedback",            description: "Receba avaliacoes detalhadas e construtivas ao longo da pesquisa.", colorClass: "landing__card-feature__icone-area--amarelo" },
-  { icon: Shield,       title: "Gestao de Documentos",           description: "Faca upload e gerencie todos os seus documentos academicos com seguranca.", colorClass: "landing__card-feature__icone-area--rosa" },
+  { icon: Shield,       title: "Gestão de Documentos",           description: "Faca upload e gerencie todos os seus documentos academicos com seguranca.", colorClass: "landing__card-feature__icone-area--rosa" },
 ];
 
 const steps = [
@@ -31,8 +31,8 @@ const steps = [
 ];
 
 const benefits = {
-  students: ["Acesso centralizado a projetos de IC","Candidatura simples e rapida","Comunicacao direta com orientadores","Acompanhamento do seu progresso","Feedback estruturado e construtivo","Gestao de documentos integrada"],
-  advisors: ["Publicacao e gestao de projetos","Selecao eficiente de candidatos","Comunicacao centralizada","Monitoramento de alunos em tempo real","Emissao de feedbacks organizados","Relatorios e metricas de progresso"],
+  students: ["Acesso centralizado a projetos de IC","Candidatura simples e rápida","Comunicação direta com orientadores","Acompanhamento do seu progresso","Feedback estruturado e construtivo","Gestão de documentos integrada"],
+  advisors: ["Publicação e gestão de projetos","Seleção eficiente de candidatos","Comunicação centralizada","Monitoramento de alunos em tempo real","Emissão de feedbacks organizados","Relatórios e métricas de progresso"],
 };
 
 const stats = [
@@ -52,19 +52,19 @@ const mockupNavItems = [
 const problemCards = [
   {
     id: "emails-planilhas",
-    marker: "EMAIL",
+    icon: "EMAIL",
     title: "E-mails e planilhas",
-    desc: "Processos seletivos gerenciados por e-mail, causando perda de informacoes e atrasos.",
+    desc: "Processos seletivos gerenciados por e-mail, causando perda de informações e atrasos.",
   },
   {
     id: "falta-visibilidade",
-    marker: "BUSCA",
+    icon: "BUSCA",
     title: "Falta de visibilidade",
-    desc: "Alunos nao sabem quais projetos estao disponiveis ou como candidatar-se.",
+    desc: "Alunos nao sabem quais projetos estão disponíveis ou como candidatar-se.",
   },
   {
     id: "acompanhamento-manual",
-    marker: "CHECK",
+    icon: "CHECK",
     title: "Acompanhamento manual",
     desc: "Sem sistema centralizado, progresso e feedbacks ficam perdidos ou esquecidos.",
   },
@@ -113,7 +113,7 @@ export default function LandingPage() {
             <div className="landing__logo-icone">
               <FlaskConical size={18} style={{ color: "white" }} />
             </div>
-            <span className="landing__logo-nome">IniCiencia</span>
+            <span className="landing__logo-nome">CollabResearch</span>
           </div>
 
           <div className="landing__nav-links">
@@ -145,7 +145,7 @@ export default function LandingPage() {
             ))}
             <div className="landing__menu-mobile-acoes">
               <motion.button {...buttonMotion} onClick={() => navigate("/login")} className="landing__menu-mobile-entrar">Entrar</motion.button>
-              <motion.button {...buttonMotion} onClick={() => navigate("/register")} className="landing__menu-mobile-criar">Criar conta gratis</motion.button>
+              <motion.button {...buttonMotion} onClick={() => navigate("/register")} className="landing__menu-mobile-criar">Criar conta grátis</motion.button>
             </div>
           </motion.div>
         )}
@@ -165,10 +165,6 @@ export default function LandingPage() {
               transition={{ duration: 0.35, ease: "easeOut" }}
               className="landing__hero-texto"
             >
-              <div className="landing__hero-badge">
-                <Zap size={14} style={{ color: "var(--cor-primaria)" }} />
-                <span className="landing__hero-badge-texto">Plataforma #1 para Iniciacao Cientifica</span>
-              </div>
 
               <h1 className="landing__hero-titulo">
                 Sua pesquisa comeca{" "}
@@ -176,12 +172,12 @@ export default function LandingPage() {
               </h1>
 
               <p className="landing__hero-subtitulo">
-                A plataforma completa para alunos encontrarem projetos de iniciacao cientifica e orientadores gerirem suas pesquisas de forma simples e eficiente.
+                A plataforma completa para alunos encontrarem projetos de iniciação científica e orientadores gerirem suas pesquisas de forma simples e eficiente.
               </p>
 
               <div className="landing__hero-botoes">
                 <motion.button {...buttonMotion} onClick={() => navigate("/register")} className="landing__hero-botao-primario">
-                  Criar conta gratis <ArrowRight size={18} />
+                  Criar conta grátis <ArrowRight size={18} />
                 </motion.button>
                 <motion.button {...buttonMotion} onClick={() => navigate("/login")} className="landing__hero-botao-secundario">
                   Fazer login
@@ -189,7 +185,7 @@ export default function LandingPage() {
               </div>
 
               <div className="landing__hero-checklist">
-                {["Gratuito para estudantes", "Seguro e confiavel", "Suporte ativo"].map((item) => (
+                {["Gratuito para estudantes", "Seguro e confiável", "Suporte ativo"].map((item) => (
                   <div key={item} className="landing__hero-check-item">
                     <CheckCircle size={14} className="landing__hero-check-icone" />
                     {item}
@@ -260,7 +256,7 @@ export default function LandingPage() {
                       <CheckCircle size={16} />
                     </div>
                     <div>
-                      <span className="landing__toast-titulo">Inscricao aprovada!</span>
+                      <span className="landing__toast-titulo">Inscrição aprovada!</span>
                       <span className="landing__toast-subtitulo">Projeto NLP - agora</span>
                     </div>
                   </div>
@@ -303,10 +299,10 @@ export default function LandingPage() {
           <div className="landing__secao-cabecalho">
             <span className="landing__secao-badge landing__secao-badge--vermelho">O Problema</span>
             <h2 className="landing__secao-titulo">
-              A iniciacao cientifica ainda e <span className="landing__secao-titulo-destaque--vermelho">caotica</span>
+              A iniciação científica ainda e <span className="landing__secao-titulo-destaque--vermelho">caótica</span>
             </h2>
             <p className="landing__secao-subtitulo">
-              Hoje, o processo envolve e-mails dispersos, planilhas desatualizadas e comunicacoes confusas.
+              Hoje, o processo envolve e-mails dispersos, planilhas desatualizadas e comunicações confusas.
             </p>
           </div>
           <motion.div variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="landing__grade-3">
@@ -328,15 +324,15 @@ export default function LandingPage() {
           <div className="landing__secao-gradiente-bola-2" />
         </div>
         <div className="landing__secao-interno" style={{ textAlign: "center", position: "relative" }}>
-          <span className="landing__secao-badge landing__secao-badge--branco">A Solucao</span>
-          <h2 className="landing__secao-titulo landing__secao-titulo--branco">Uma plataforma feita para a pesquisa academica</h2>
+          <span className="landing__secao-badge landing__secao-badge--branco">A Solução</span>
+          <h2 className="landing__secao-titulo landing__secao-titulo--branco">Uma plataforma feita para a pesquisa acadêmica</h2>
           <p className="landing__secao-subtitulo--azul-claro">
-            O <strong style={{ color: "white" }}>IniCiencia</strong> centraliza todo o ecossistema de iniciacao cientifica.
+            O <strong style={{ color: "white" }}>CollabResearch</strong> centraliza todo o ecossistema de iniciação científica.
           </p>
           <motion.div variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="landing__grade-solucao">
             {[
               { icon: Users, label: "Para alunos e orientadores" },
-              { icon: Globe, label: "100% online e acessivel" },
+              { icon: Globe, label: "100% online e acessível" },
               { icon: Zap,   label: "Rapido e facil de usar" },
             ].map((item) => (
               <motion.div key={item.label} variants={itemFadeUp} whileHover={{ scale: 1.03 }} className="landing__card-solucao">
@@ -377,7 +373,6 @@ export default function LandingPage() {
             <h2 className="landing__secao-titulo">Simples como 1, 2, 3</h2>
           </div>
           <motion.div variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.25 }} className="landing__grade-3" style={{ position: "relative" }}>
-            <div className="landing__linha-passos" />
             {steps.map((step) => (
               <motion.div key={step.number} variants={itemFadeUp} className="landing__passo">
                 <div className="landing__passo-numero">
@@ -396,7 +391,7 @@ export default function LandingPage() {
         <div className="landing__secao-interno">
           <div className="landing__secao-cabecalho">
             <span className="landing__secao-badge landing__secao-badge--esmeralda">Beneficios</span>
-            <h2 className="landing__secao-titulo">Para toda a comunidade academica</h2>
+            <h2 className="landing__secao-titulo">Para toda a comunidade acadêmica</h2>
           </div>
           <motion.div variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="landing__grade-2">
             <motion.div variants={itemFadeUp} whileHover={{ scale: 1.03 }} className="landing__card-beneficios landing__card-beneficios--alunos">
@@ -437,14 +432,14 @@ export default function LandingPage() {
       <motion.section variants={sectionFadeUp} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="landing__secao landing__secao--escuro">
         <div className="landing__cta-decoracao" />
         <div className="landing__cta-interno">
-          <h2 className="landing__cta-titulo">Comece sua jornada cientifica hoje</h2>
-          <p className="landing__cta-subtitulo">Junte-se a milhares de estudantes e orientadores que ja transformaram sua experiencia.</p>
+          <h2 className="landing__cta-titulo">Comece sua jornada científica hoje</h2>
+          <p className="landing__cta-subtitulo">Junte-se a milhares de estudantes e orientadores que ja transformaram sua experiência.</p>
           <div className="landing__cta-botoes">
             <motion.button {...buttonMotion} onClick={() => navigate("/register")} className="landing__cta-botao-primario">
               Criar conta gratis <ArrowRight size={18} />
             </motion.button>
             <motion.button {...buttonMotion} onClick={() => navigate("/login")} className="landing__cta-botao-secundario">
-              Ja tenho conta
+              Já tenho conta
             </motion.button>
           </div>
         </div>
@@ -464,9 +459,9 @@ export default function LandingPage() {
               <div className="landing__rodape-logo-icone">
                 <FlaskConical size={15} style={{ color: "white" }} />
               </div>
-              <span className="landing__rodape-logo-nome">IniCiencia</span>
+              <span className="landing__rodape-logo-nome">CollabResearch</span>
             </div>
-            <p className="landing__rodape-copyright">© 2025 IniCiencia. Plataforma de Gerenciamento de Iniciacao Cientifica.</p>
+            <p className="landing__rodape-copyright">© 2025 CollabResearch. Plataforma de Gerenciamento de Iniciação Científica.</p>
             <div className="landing__rodape-links">
               {["Termos", "Privacidade", "Contato"].map((item) => (
                 <a key={item} href="#" className="landing__rodape-link">{item}</a>
