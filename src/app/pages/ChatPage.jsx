@@ -1,59 +1,89 @@
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Send, Search, Phone, Video, MoreVertical, Smile, Paperclip, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
-import { conversations } from "../data/mockData";
+import { useAuth } from "../hooks/useAuth";
+import { useAsyncData } from "../hooks/useAsyncData";
+import { conversationService } from "../services/conversationService";
+import { StatusView } from "../components/StatusView";
 import "./ChatPage.css";
 
+function getInitials(name) {
+  if (!name) return "IC";
+  return name
+    .split(" ")
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
+}
+
 export default function ChatPage() {
-  const [selected, setSelected] = useState(conversations[0]);
-  const [messages, setMessages] = useState(conversations[0].messages);
+  const { user } = useAuth();
+  const messagesEndRef = useRef(null);
+  const [selectedConversation, setSelectedConversation] = useState(null);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [search, setSearch] = useState("");
   const [showMobileList, setShowMobileList] = useState(true);
-  const messagesEndRef = useRef(null);
+  const { data, loading, error } = useAsyncData(
+    async () => {
+      if (!user?.id) return [];
+      const result = await conversationService.listByUser(user.id);
+      return Array.isArray(result) ? result : [];
+    },
+    [user?.id],
+    { initialData: [] },
+  );
+  const conversations = Array.isArray(data) ? data : [];
+
+  useEffect(() => {
+    if (!selectedConversation && conversations.length > 0) {
+      setSelectedConversation(conversations[0]);
+    }
+  }, [conversations, selectedConversation]);
+
+  useEffect(() => {
+    if (!selectedConversation?.id) return;
+    conversationService
+      .listMessages(selectedConversation.id)
+      .then((result) => setMessages(Array.isArray(result) ? result : []))
+      .catch(() => setMessages([]));
+  }, [selectedConversation]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const selectConversation = (conv) => {
-    setSelected(conv);
-    setMessages(conv.messages);
-    setShowMobileList(false);
-  };
-
-  const sendMessage = () => {
-    if (!input.trim()) return;
-    const newMsg = {
-      id: `m${Date.now()}`,
-      sender: "user",
-      content: input.trim(),
-      time: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
-      date: "Hoje",
-    };
-    setMessages((prev) => [...prev, newMsg]);
-    setInput("");
-    toast.success("Mensagem enviada.");
-
-    setTimeout(() => {
-      const reply = {
-        id: `m${Date.now() + 1}`,
-        sender: "advisor",
-        content: "Entendido! Obrigado pela mensagem. Vou verificar e te retorno em breve.",
-        time: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
-        date: "Hoje",
-      };
-      setMessages((prev) => [...prev, reply]);
-    }, 1500);
-  };
-
   const filtered = useMemo(
-    () => conversations.filter((c) =>
-      c.participant.name.toLowerCase().includes(search.toLowerCase())
-    ),
-    [search]
+    () =>
+      conversations.filter((conversation) =>
+        (conversation?.participante?.nome ?? conversation?.titulo ?? "")
+          .toLowerCase()
+          .includes(search.toLowerCase()),
+      ),
+    [conversations, search],
   );
+
+  const sendMessage = async () => {
+    if (!input.trim() || !selectedConversation?.id) return;
+
+    try {
+      await conversationService.sendMessage(selectedConversation.id, input.trim());
+      const updated = await conversationService.listMessages(selectedConversation.id);
+      setMessages(Array.isArray(updated) ? updated : []);
+      setInput("");
+    } catch (err) {
+      toast.error(err.message || "Nao foi possivel enviar a mensagem.");
+    }
+  };
+
+  if (loading) {
+    return <StatusView title="Carregando conversas" description="Buscando mensagens reais da API." />;
+  }
+
+  if (error) {
+    return <StatusView title="Falha ao carregar conversas" description={error.message} />;
+  }
 
   return (
     <motion.div
@@ -62,7 +92,6 @@ export default function ChatPage() {
       transition={{ duration: 0.3 }}
       className="pagina-chat"
     >
-      {/* Lista de conversas */}
       <div className={`pagina-chat__lista-conversas ${showMobileList ? "pagina-chat__lista-conversas--visivel" : ""}`}>
         <div className="pagina-chat__cabecalho-lista">
           <h2 className="pagina-chat__titulo-lista">Mensagens</h2>
@@ -79,65 +108,61 @@ export default function ChatPage() {
         </div>
 
         <div className="pagina-chat__rolagem-conversas">
-          {filtered.map((conv, index) => (
-            <motion.button
-              key={conv.id}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25, delay: index * 0.03 }}
-              whileHover={{ scale: 1.03, boxShadow: "0 8px 18px rgba(37,99,235,0.1)" }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => selectConversation(conv)}
-              className={`conversa-item ${selected?.id === conv.id ? "conversa-item--selecionada" : ""}`}
-            >
-              <div className="conversa-item__avatar-area">
-                <div className="conversa-item__avatar">
-                  <span className="conversa-item__iniciais">{conv.participant.avatar}</span>
+          {filtered.map((conversation, index) => {
+            const participantName = conversation?.participante?.nome ?? conversation?.titulo ?? "Conversa";
+            return (
+              <motion.button
+                key={conversation.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25, delay: index * 0.03 }}
+                whileHover={{ scale: 1.03, boxShadow: "0 8px 18px rgba(37,99,235,0.1)" }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => {
+                  setSelectedConversation(conversation);
+                  setShowMobileList(false);
+                }}
+                className={`conversa-item ${selectedConversation?.id === conversation.id ? "conversa-item--selecionada" : ""}`}
+              >
+                <div className="conversa-item__avatar-area">
+                  <div className="conversa-item__avatar">
+                    <span className="conversa-item__iniciais">{getInitials(participantName)}</span>
+                  </div>
+                  <div className="conversa-item__indicador-online" />
                 </div>
-                <div className="conversa-item__indicador-online" />
-              </div>
 
-              <div className="conversa-item__info">
-                <div className="conversa-item__linha-nome">
-                  <p className={`conversa-item__nome ${conv.unread > 0 ? "conversa-item__nome--nao-lida" : "conversa-item__nome--lida"}`}>
-                    {conv.participant.name.replace("Prof. Dr. ", "Prof. ").replace("Profa. Dra. ", "Profa. ")}
-                  </p>
-                  <span className="conversa-item__hora">{conv.lastMessageTime}</span>
+                <div className="conversa-item__info">
+                  <div className="conversa-item__linha-nome">
+                    <p className="conversa-item__nome conversa-item__nome--lida">{participantName}</p>
+                  </div>
+                  <div className="conversa-item__linha-preview">
+                    <p className="conversa-item__preview">{conversation?.ultimaMensagem ?? "Abrir conversa"}</p>
+                  </div>
                 </div>
-                <div className="conversa-item__linha-preview">
-                  <p className="conversa-item__preview">{conv.lastMessage}</p>
-                  {conv.unread > 0 && (
-                    <span className="conversa-item__badge-nao-lida">{conv.unread}</span>
-                  )}
-                </div>
-              </div>
-            </motion.button>
-          ))}
+              </motion.button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Área de conversa */}
       <div className={`pagina-chat__area-conversa ${!showMobileList ? "pagina-chat__area-conversa--visivel" : ""}`}>
-        {selected ? (
+        {selectedConversation ? (
           <>
             <div className="pagina-chat__topo-conversa">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => setShowMobileList(true)}
-                className="pagina-chat__botao-voltar"
-              >
+              <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} onClick={() => setShowMobileList(true)} className="pagina-chat__botao-voltar">
                 <ArrowLeft size={18} style={{ color: "var(--cor-texto-medio)" }} />
               </motion.button>
               <div className="pagina-chat__avatar-conversa">
                 <div className="pagina-chat__foto-conversa">
-                  <span className="pagina-chat__iniciais-conversa">{selected.participant.avatar}</span>
+                  <span className="pagina-chat__iniciais-conversa">
+                    {getInitials(selectedConversation?.participante?.nome ?? selectedConversation?.titulo)}
+                  </span>
                 </div>
                 <div className="pagina-chat__ponto-online" />
               </div>
               <div className="pagina-chat__dados-contato">
-                <p className="pagina-chat__nome-contato">{selected.participant.name}</p>
-                <p className="pagina-chat__status-online">Online agora</p>
+                <p className="pagina-chat__nome-contato">{selectedConversation?.participante?.nome ?? selectedConversation?.titulo ?? "Conversa"}</p>
+                <p className="pagina-chat__status-online">Conversa em tempo real</p>
               </div>
               <div className="pagina-chat__acoes-conversa">
                 <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} className="pagina-chat__botao-acao-conversa">
@@ -153,39 +178,31 @@ export default function ChatPage() {
             </div>
 
             <div className="pagina-chat__mensagens">
-              {messages.map((msg, i) => {
-                const isUser = msg.sender === "user";
-                const showDate = i === 0 || messages[i - 1].date !== msg.date;
+              {messages.map((message, index) => {
+                const mine =
+                  message?.remetente?.id === user?.id ||
+                  message?.autor?.id === user?.id ||
+                  message?.usuario?.id === user?.id;
 
                 return (
-                  <motion.div
-                    key={msg.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25, delay: i * 0.02 }}
-                  >
-                    {showDate && (
-                      <div className="pagina-chat__separador-data">
-                        <span className="pagina-chat__etiqueta-data">{msg.date}</span>
-                      </div>
-                    )}
-                    <div className={`mensagem-linha ${isUser ? "mensagem-linha--usuario" : "mensagem-linha--contato"}`}>
-                      {!isUser && (
+                  <motion.div key={message.id ?? index} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25, delay: index * 0.02 }}>
+                    <div className={`mensagem-linha ${mine ? "mensagem-linha--usuario" : "mensagem-linha--contato"}`}>
+                      {!mine && (
                         <div className="mensagem-linha__avatar mensagem-linha__avatar--contato">
-                          <span className="mensagem-linha__iniciais-avatar">{selected.participant.avatar}</span>
+                          <span className="mensagem-linha__iniciais-avatar">{getInitials(selectedConversation?.participante?.nome ?? selectedConversation?.titulo)}</span>
                         </div>
                       )}
                       <div className="mensagem-linha__area">
-                        <div className={`bolha-mensagem ${isUser ? "bolha-mensagem--usuario" : "bolha-mensagem--contato"}`}>
-                          <p className="bolha-mensagem__texto">{msg.content}</p>
+                        <div className={`bolha-mensagem ${mine ? "bolha-mensagem--usuario" : "bolha-mensagem--contato"}`}>
+                          <p className="bolha-mensagem__texto">{message?.conteudo ?? message?.content ?? ""}</p>
                         </div>
-                        <p className={`mensagem-linha__horario ${isUser ? "mensagem-linha__horario--direita" : "mensagem-linha__horario--esquerda"}`}>
-                          {msg.time}
+                        <p className={`mensagem-linha__horario ${mine ? "mensagem-linha__horario--direita" : "mensagem-linha__horario--esquerda"}`}>
+                          {message?.dataEnvio ? new Date(message.dataEnvio).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : ""}
                         </p>
                       </div>
-                      {isUser && (
+                      {mine && (
                         <div className="mensagem-linha__avatar mensagem-linha__avatar--usuario">
-                          <span className="mensagem-linha__iniciais-avatar">LM</span>
+                          <span className="mensagem-linha__iniciais-avatar">{getInitials(user?.nome)}</span>
                         </div>
                       )}
                     </div>
@@ -213,13 +230,7 @@ export default function ChatPage() {
                     <Smile size={16} />
                   </motion.button>
                 </div>
-                <motion.button
-                  whileHover={{ scale: input.trim() ? 1.05 : 1 }}
-                  whileTap={{ scale: input.trim() ? 0.97 : 1 }}
-                  onClick={sendMessage}
-                  disabled={!input.trim()}
-                  className="pagina-chat__botao-enviar"
-                >
+                <motion.button whileHover={{ scale: input.trim() ? 1.05 : 1 }} whileTap={{ scale: input.trim() ? 0.97 : 1 }} onClick={sendMessage} disabled={!input.trim()} className="pagina-chat__botao-enviar">
                   <Send size={17} />
                 </motion.button>
               </div>
@@ -232,7 +243,7 @@ export default function ChatPage() {
                 <Send size={24} style={{ color: "var(--cor-texto-mudo)" }} />
               </div>
               <p className="pagina-chat__titulo-vazio">Selecione uma conversa</p>
-              <p className="pagina-chat__descricao-vazio">Escolha um orientador para comecar</p>
+              <p className="pagina-chat__descricao-vazio">Escolha uma conversa retornada pela API para comecar.</p>
             </div>
           </div>
         )}

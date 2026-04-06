@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router";
 import { DashboardLayout } from "./layouts/DashboardLayout";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -30,7 +31,11 @@ export const router = createBrowserRouter([
   },
   {
     path: "/app",
-    Component: DashboardLayout,
+    element: (
+      <ProtectedRoute>
+        <DashboardLayout />
+      </ProtectedRoute>
+    ),
     children: [
       { index: true, Component: DashboardPage },
       { path: "projects", Component: ProjectsPage },
@@ -43,13 +48,6 @@ export const router = createBrowserRouter([
       { path: "documents", Component: DocumentsPage },
       { path: "notifications", Component: NotificationsPage },
       { path: "configuracoes", Component: SettingsPage },
-    ],
-  },
-  {
-    path: "/configuracoes",
-    Component: DashboardLayout,
-    children: [
-      { index: true, Component: SettingsPage },
     ],
   },
 ]);

@@ -1,33 +1,29 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Star, Send, CheckCircle, MessageSquare, Award } from "lucide-react";
-import { feedbacks, projects } from "../data/mockData";
+import { toast } from "sonner";
+import { useAuth } from "../hooks/useAuth";
+import { useAsyncData } from "../hooks/useAsyncData";
+import { feedbackService } from "../services/feedbackService";
+import { userService } from "../services/userService";
+import { mapFeedback, mapProject } from "../utils/adapters";
+import { StatusView } from "../components/StatusView";
 import "./FeedbackPage.css";
-
-const categories = [
-  { key: "technical", label: "Técnico" },
-  { key: "communication", label: "Comunicação" },
-  { key: "punctuality", label: "Pontualidade" },
-  { key: "initiative", label: "Iniciativa" },
-];
 
 function StarRating({ value, onChange, readOnly = false }) {
   const [hovered, setHovered] = useState(0);
   return (
     <div className="avaliacao-estrelas">
-      {[1, 2, 3, 4, 5].map((s) => (
+      {[1, 2, 3, 4, 5].map((score) => (
         <button
-          key={s}
+          key={score}
           type="button"
-          onClick={() => !readOnly && onChange?.(s)}
-          onMouseEnter={() => !readOnly && setHovered(s)}
+          onClick={() => !readOnly && onChange?.(score)}
+          onMouseEnter={() => !readOnly && setHovered(score)}
           onMouseLeave={() => !readOnly && setHovered(0)}
           disabled={readOnly}
           className="avaliacao-estrelas__botao"
         >
-          <Star
-            size={20}
-            className={s <= (hovered || value) ? "avaliacao-estrelas__icone--ativa" : "avaliacao-estrelas__icone--inativa"}
-          />
+          <Star size={20} className={score <= (hovered || value) ? "avaliacao-estrelas__icone--ativa" : "avaliacao-estrelas__icone--inativa"} />
         </button>
       ))}
     </div>
@@ -35,120 +31,128 @@ function StarRating({ value, onChange, readOnly = false }) {
 }
 
 const statConfig = [
-  { label: "Feedbacks recebidos", key: "count", icon: MessageSquare, areaClass: "resumo-feedback__icone-area--azul", iconClass: "resumo-feedback__icone--azul" },
-  { label: "Nota média", key: "avg", icon: Star, areaClass: "resumo-feedback__icone-area--amarelo", iconClass: "resumo-feedback__icone--amarelo" },
-  { label: "Desempenho geral", key: "perf", icon: Award, areaClass: "resumo-feedback__icone-area--violeta", iconClass: "resumo-feedback__icone--violeta" },
+  { label: "Feedbacks recebidos", icon: MessageSquare, areaClass: "resumo-feedback__icone-area--azul", iconClass: "resumo-feedback__icone--azul" },
+  { label: "Nota media", icon: Star, areaClass: "resumo-feedback__icone-area--amarelo", iconClass: "resumo-feedback__icone--amarelo" },
+  { label: "Desempenho geral", icon: Award, areaClass: "resumo-feedback__icone-area--violeta", iconClass: "resumo-feedback__icone--violeta" },
 ];
 
 export default function FeedbackPage() {
+  const { user } = useAuth();
+  const { data, loading, error } = useAsyncData(async () => {
+    if (!user?.id) return { feedbacks: [], projects: [] };
+    const [feedbacks, projects] = await Promise.all([
+      feedbackService.listByUser(user.id).catch(() => []),
+      userService.getProjects(user.id).catch(() => []),
+    ]);
+
+    return {
+      feedbacks: Array.isArray(feedbacks) ? feedbacks.map(mapFeedback) : [],
+      projects: Array.isArray(projects) ? projects.map(mapProject) : [],
+    };
+  }, [user?.id], { initialData: { feedbacks: [], projects: [] } });
+
   const [showForm, setShowForm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [rating, setRating] = useState(0);
-  const [categoryRatings, setCategoryRatings] = useState({
-    technical: 0,
-    communication: 0,
-    punctuality: 0,
-    initiative: 0,
-  });
   const [comment, setComment] = useState("");
-  const [selectedProject, setSelectedProject] = useState(projects[0].id);
-  const [loading, setLoading] = useState(false);
+  const [selectedProject, setSelectedProject] = useState("");
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+
+  const averageRating = useMemo(() => {
+    const feedbacks = data?.feedbacks ?? [];
+    if (!feedbacks.length) return "0.0";
+    return (feedbacks.reduce((acc, item) => acc + item.rating, 0) / feedbacks.length).toFixed(1);
+  }, [data]);
+
+  const statsValues = [data?.feedbacks?.length ?? 0, averageRating, Number(averageRating) >= 4 ? "Excelente" : "Em evolucao"];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setLoading(false);
-    setSubmitted(true);
-    setShowForm(false);
+    setLoadingSubmit(true);
+
+    try {
+      await feedbackService.create({
+        projetoId: Number(selectedProject),
+        nota: rating,
+        comentario: comment,
+      });
+      toast.success("Feedback enviado com sucesso.");
+      setSubmitted(true);
+      setShowForm(false);
+      setRating(0);
+      setComment("");
+    } catch (err) {
+      toast.error(err.message || "Nao foi possivel enviar o feedback.");
+    } finally {
+      setLoadingSubmit(false);
+    }
   };
 
-  const averageRating =
-    feedbacks.length > 0
-      ? feedbacks.reduce((acc, f) => acc + f.rating, 0) / feedbacks.length
-      : 0;
+  if (loading) {
+    return <StatusView title="Carregando feedbacks" description="Buscando avaliacoes reais da API." />;
+  }
 
-  const statsValues = [feedbacks.length, averageRating.toFixed(1), "Excelente"];
+  if (error) {
+    return <StatusView title="Falha ao carregar feedbacks" description={error.message} />;
+  }
 
   return (
     <div className="pagina-feedback">
-      {/* Resumos */}
       <div className="pagina-feedback__grade-resumos">
-        {statConfig.map((s, i) => (
-          <div key={s.label} className="resumo-feedback">
-            <div className={`resumo-feedback__icone-area ${s.areaClass}`}>
-              <s.icon size={18} className={s.iconClass} />
+        {statConfig.map((item, index) => (
+          <div key={item.label} className="resumo-feedback">
+            <div className={`resumo-feedback__icone-area ${item.areaClass}`}>
+              <item.icon size={18} className={item.iconClass} />
             </div>
-            <p className="resumo-feedback__valor">{statsValues[i]}</p>
-            <p className="resumo-feedback__label">{s.label}</p>
+            <p className="resumo-feedback__valor">{statsValues[index]}</p>
+            <p className="resumo-feedback__label">{item.label}</p>
           </div>
         ))}
       </div>
 
       <div className="pagina-feedback__grade-principal">
-        {/* Feedbacks recebidos */}
         <div>
           <h3 className="pagina-feedback__secao-titulo">Feedbacks recebidos</h3>
           <div className="pagina-feedback__lista">
-            {feedbacks.map((fb) => (
-              <div key={fb.id} className="feedback-card">
+            {(data.feedbacks ?? []).map((feedback) => (
+              <div key={feedback.id} className="feedback-card">
                 <div className="feedback-card__cabecalho">
                   <div className="feedback-card__avatar">
-                    <span className="feedback-card__avatar-inicial">{fb.from.avatar}</span>
+                    <span className="feedback-card__avatar-inicial">
+                      {(feedback.from?.nome ?? "IC").split(" ").slice(0, 2).map((part) => part[0]).join("")}
+                    </span>
                   </div>
                   <div className="feedback-card__info">
-                    <p className="feedback-card__nome">{fb.from.name}</p>
+                    <p className="feedback-card__nome">{feedback.from?.nome ?? "Usuario"}</p>
                     <p className="feedback-card__meta">
-                      {new Date(fb.date).toLocaleDateString("pt-BR")} · {fb.project.title.slice(0, 30)}...
+                      {feedback.date ? new Date(feedback.date).toLocaleDateString("pt-BR") : "-"} · {feedback.project?.title ?? "Projeto"}
                     </p>
                   </div>
                   <div className="feedback-card__estrelas">
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <Star
-                        key={s}
-                        size={14}
-                        className={s <= fb.rating ? "feedback-card__estrela--ativa" : "feedback-card__estrela--inativa"}
-                      />
+                    {[1, 2, 3, 4, 5].map((score) => (
+                      <Star key={score} size={14} className={score <= feedback.rating ? "feedback-card__estrela--ativa" : "feedback-card__estrela--inativa"} />
                     ))}
                   </div>
                 </div>
 
-                <p className="feedback-card__comentario">"{fb.comment}"</p>
-
-                <div className="feedback-card__grade-categorias">
-                  {categories.map((cat) => {
-                    const val = fb.categories[cat.key];
-                    return (
-                      <div key={cat.key}>
-                        <div className="feedback-card__categoria-linha">
-                          <span className="feedback-card__categoria-label">{cat.label}</span>
-                          <span className="feedback-card__categoria-valor">{val}/5</span>
-                        </div>
-                        <div className="feedback-card__trilha-categoria">
-                          <div className="feedback-card__barra-categoria" style={{ width: `${(val / 5) * 100}%` }} />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                <p className="feedback-card__comentario">"{feedback.comment}"</p>
               </div>
             ))}
 
-            {feedbacks.length === 0 && (
+            {(data.feedbacks ?? []).length === 0 && (
               <div className="feedback-card--vazio">
                 <div className="feedback-card__icone-vazio">
                   <Star size={22} className="resumo-feedback__icone--amarelo" />
                 </div>
                 <p className="feedback-card__titulo-vazio">Nenhum feedback ainda</p>
-                <p className="feedback-card__subtitulo-vazio">Feedbacks aparecerão aqui quando recebidos.</p>
+                <p className="feedback-card__subtitulo-vazio">Os feedbacks reais enviados e recebidos aparecerao aqui.</p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Avaliar orientador */}
         <div>
-          <h3 className="pagina-feedback__secao-titulo">Avaliar orientador</h3>
+          <h3 className="pagina-feedback__secao-titulo">Avaliar projeto</h3>
 
           {submitted ? (
             <div className="avaliacao-orientador avaliacao-orientador--enviada">
@@ -156,13 +160,8 @@ export default function FeedbackPage() {
                 <CheckCircle size={28} style={{ color: "var(--cor-sucesso)" }} />
               </div>
               <h3 className="avaliacao-orientador__titulo-sucesso">Feedback enviado!</h3>
-              <p className="avaliacao-orientador__texto-sucesso">
-                Obrigado pela sua avaliação. Isso ajuda a melhorar a experiência de pesquisa.
-              </p>
-              <button
-                onClick={() => { setSubmitted(false); setShowForm(false); setRating(0); setComment(""); }}
-                className="avaliacao-orientador__botao-outro"
-              >
+              <p className="avaliacao-orientador__texto-sucesso">Sua avaliacao foi registrada via API.</p>
+              <button onClick={() => setSubmitted(false)} className="avaliacao-orientador__botao-outro">
                 Dar outro feedback
               </button>
             </div>
@@ -171,92 +170,44 @@ export default function FeedbackPage() {
               {!showForm ? (
                 <div className="avaliacao-orientador__prompt">
                   <div className="avaliacao-orientador__estrelas-prompt">
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <Star key={s} size={28} className="avaliacao-orientador__estrela-vazia" />
-                    ))}
+                    {[1, 2, 3, 4, 5].map((score) => <Star key={score} size={28} className="avaliacao-orientador__estrela-vazia" />)}
                   </div>
-                  <h4 className="avaliacao-orientador__titulo-prompt">Como foi sua experiência?</h4>
-                  <p className="avaliacao-orientador__texto-prompt">
-                    Avalie seu orientador e contribua para a comunidade acadêmica.
-                  </p>
+                  <h4 className="avaliacao-orientador__titulo-prompt">Como foi sua experiencia?</h4>
+                  <p className="avaliacao-orientador__texto-prompt">Avalie projetos e orientacoes com base nos dados reais do sistema.</p>
                   <button onClick={() => setShowForm(true)} className="avaliacao-orientador__botao-iniciar">
-                    Avaliar orientador
+                    Avaliar
                   </button>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="formulario-avaliacao">
-                  {/* Projeto */}
                   <div className="formulario-avaliacao__grupo">
                     <label className="formulario-avaliacao__label">Projeto</label>
-                    <select
-                      value={selectedProject}
-                      onChange={(e) => setSelectedProject(e.target.value)}
-                      className="formulario-avaliacao__select"
-                    >
-                      {projects.map((p) => (
-                        <option key={p.id} value={p.id}>{p.title.slice(0, 50)}...</option>
+                    <select value={selectedProject} onChange={(e) => setSelectedProject(e.target.value)} className="formulario-avaliacao__select" required>
+                      <option value="">Selecione um projeto</option>
+                      {(data.projects ?? []).map((project) => (
+                        <option key={project.id} value={project.id}>{project.title}</option>
                       ))}
                     </select>
                   </div>
 
-                  {/* Avaliação geral */}
                   <div className="formulario-avaliacao__grupo">
-                    <label className="formulario-avaliacao__label">Avaliação geral</label>
+                    <label className="formulario-avaliacao__label">Avaliacao geral</label>
                     <div className="formulario-avaliacao__linha-estrelas">
                       <StarRating value={rating} onChange={setRating} />
-                      {rating > 0 && (
-                        <span className="formulario-avaliacao__nivel">
-                          {["", "Ruim", "Regular", "Bom", "Muito bom", "Excelente"][rating]}
-                        </span>
-                      )}
                     </div>
                   </div>
 
-                  {/* Categorias */}
                   <div className="formulario-avaliacao__grupo">
-                    <label className="formulario-avaliacao__label">Avaliação por categoria</label>
-                    <div className="formulario-avaliacao__lista-categorias">
-                      {categories.map((cat) => (
-                        <div key={cat.key} className="formulario-avaliacao__categoria-linha">
-                          <span className="formulario-avaliacao__categoria-nome">{cat.label}</span>
-                          <StarRating
-                            value={categoryRatings[cat.key]}
-                            onChange={(v) => setCategoryRatings({ ...categoryRatings, [cat.key]: v })}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Comentário */}
-                  <div className="formulario-avaliacao__grupo">
-                    <label className="formulario-avaliacao__label">Comentário</label>
-                    <textarea
-                      value={comment}
-                      onChange={(e) => setComment(e.target.value)}
-                      rows={4}
-                      className="formulario-avaliacao__textarea"
-                      placeholder="Compartilhe sua experiência com este orientador..."
-                      required
-                    />
+                    <label className="formulario-avaliacao__label">Comentario</label>
+                    <textarea value={comment} onChange={(e) => setComment(e.target.value)} rows={4} className="formulario-avaliacao__textarea" placeholder="Compartilhe sua experiencia..." required />
                   </div>
 
                   <div className="formulario-avaliacao__acoes">
                     <button type="button" onClick={() => setShowForm(false)} className="formulario-avaliacao__botao-cancelar">
                       Cancelar
                     </button>
-                    <button
-                      type="submit"
-                      disabled={loading || rating === 0 || !comment}
-                      className="formulario-avaliacao__botao-enviar"
-                    >
-                      {loading ? (
-                        <div className="formulario-avaliacao__spinner" />
-                      ) : (
-                        <>
-                          <Send size={15} /> Enviar avaliação
-                        </>
-                      )}
+                    <button type="submit" disabled={loadingSubmit || rating === 0 || !comment || !selectedProject} className="formulario-avaliacao__botao-enviar">
+                      {loadingSubmit ? <div className="formulario-avaliacao__spinner" /> : <><Send size={15} /> Enviar avaliacao</>}
                     </button>
                   </div>
                 </form>

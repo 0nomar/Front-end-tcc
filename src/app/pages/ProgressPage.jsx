@@ -1,58 +1,96 @@
-import { useState } from "react";
-import { CheckCircle, Clock, Circle, TrendingUp, Calendar, AlertCircle, Plus } from "lucide-react";
-import { progressData } from "../data/mockData";
+import { useMemo, useState } from "react";
+import { CheckCircle, Clock, Circle, TrendingUp, Calendar, Plus } from "lucide-react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { toast } from "sonner";
+import { useAuth } from "../hooks/useAuth";
+import { useAsyncData } from "../hooks/useAsyncData";
+import { userService } from "../services/userService";
+import { projectService } from "../services/projectService";
+import { mapProject, mapProgressItem } from "../utils/adapters";
+import { StatusView } from "../components/StatusView";
 import "./ProgressPage.css";
 
-const updateTypeConfig = {
-  milestone: { iconeAreaClass: "atualizacao-item__icone-area--marco", iconeClass: "atualizacao-item__icone-svg--marco", etiquetaClass: "atualizacao-item__etiqueta--marco", tipoAtivoClass: "formulario-atualizacao__tipo--marco-ativo", label: "Marco" },
-  update:    { iconeAreaClass: "atualizacao-item__icone-area--atualizacao", iconeClass: "atualizacao-item__icone-svg--atualizacao", etiquetaClass: "atualizacao-item__etiqueta--atualizacao", tipoAtivoClass: "formulario-atualizacao__tipo--atualizacao-ativo", label: "Atualização" },
-  issue:     { iconeAreaClass: "atualizacao-item__icone-area--problema", iconeClass: "atualizacao-item__icone-svg--problema", etiquetaClass: "atualizacao-item__etiqueta--problema", tipoAtivoClass: "formulario-atualizacao__tipo--problema-ativo", label: "Problema" },
-};
-
-const milestoneConfig = {
-  completed:   { icon: CheckCircle, iconClass: "marco-linha-do-tempo__icone-svg--concluido", iconeClass: "marco-linha-do-tempo__icone--concluido", conectorClass: "marco-linha-do-tempo__conector--concluido", tituloClass: "marco-linha-do-tempo__titulo--concluido", etiquetaClass: "marco-linha-do-tempo__etiqueta--concluido", etiquetaLabel: "Concluído" },
-  "in-progress": { icon: Clock, iconClass: "marco-linha-do-tempo__icone-svg--andamento", iconeClass: "marco-linha-do-tempo__icone--andamento", conectorClass: "marco-linha-do-tempo__conector--andamento", tituloClass: "marco-linha-do-tempo__titulo--andamento", etiquetaClass: "marco-linha-do-tempo__etiqueta--andamento", etiquetaLabel: "Em andamento" },
-  pending:     { icon: Circle, iconClass: "marco-linha-do-tempo__icone-svg--pendente", iconeClass: "marco-linha-do-tempo__icone--pendente", conectorClass: "marco-linha-do-tempo__conector--pendente", tituloClass: "marco-linha-do-tempo__titulo--pendente", etiquetaClass: null, etiquetaLabel: null },
-};
-
 export default function ProgressPage() {
+  const { user } = useAuth();
+  const [selectedProjectId, setSelectedProjectId] = useState("");
   const [showAddUpdate, setShowAddUpdate] = useState(false);
-  const [newUpdate, setNewUpdate] = useState({ title: "", content: "", type: "update" });
-  const [updates, setUpdates] = useState(progressData.updates);
+  const [newUpdate, setNewUpdate] = useState("");
+  const { data, loading, error, reload } = useAsyncData(async () => {
+    if (!user?.id) return { projects: [], progressByProject: {} };
+    const projectsResult = await userService.getProjects(user.id).catch(() => []);
+    const projects = Array.isArray(projectsResult) ? projectsResult.map(mapProject) : [];
+    const progressEntries = await Promise.all(
+      projects.map(async (project) => ({
+        projectId: project.id,
+        items: (() => {
+          const result = projectService.getProgress(project.id).catch(() => []);
+          return result;
+        })(),
+      })),
+    );
 
-  const handleAddUpdate = () => {
-    if (!newUpdate.title || !newUpdate.content) return;
-    const upd = {
-      id: `upd${Date.now()}`,
-      title: newUpdate.title,
-      content: newUpdate.content,
-      author: "Lucas Mendes",
-      date: new Date().toISOString().split("T")[0],
-      type: newUpdate.type,
+    return {
+      projects,
+      progressByProject: Object.fromEntries(
+        (await Promise.all(
+          progressEntries.map(async (entryPromise) => {
+            const entry = await entryPromise;
+            const items = await entry.items;
+            return [entry.projectId, Array.isArray(items) ? items.map(mapProgressItem) : []];
+          }),
+        )),
+      ),
     };
-    setUpdates([upd, ...updates]);
-    setNewUpdate({ title: "", content: "", type: "update" });
-    setShowAddUpdate(false);
+  }, [user?.id], { initialData: { projects: [], progressByProject: {} } });
+
+  const projects = data?.projects ?? [];
+  const selectedProject = projects.find((project) => String(project.id) === String(selectedProjectId)) ?? projects[0];
+  const selectedProgress = selectedProject ? data?.progressByProject?.[selectedProject.id] ?? [] : [];
+
+  const completionPercent = useMemo(() => {
+    if (!selectedProject) return 0;
+    if (selectedProject.status === "FINALIZADO") return 100;
+    if (selectedProject.status === "EM_ANDAMENTO") return 65;
+    return selectedProgress.length > 0 ? 30 : 10;
+  }, [selectedProject, selectedProgress]);
+
+  const handleAddUpdate = async () => {
+    if (!newUpdate.trim() || !selectedProject?.id) return;
+
+    try {
+      await projectService.addProgress(selectedProject.id, { descricao: newUpdate.trim() });
+      toast.success("Atualizacao publicada com sucesso.");
+      setNewUpdate("");
+      setShowAddUpdate(false);
+      await reload();
+    } catch (err) {
+      toast.error(err.message || "Nao foi possivel registrar a atualizacao.");
+    }
   };
 
-  const daysLeft = Math.ceil(
-    (new Date(progressData.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
-  );
+  if (loading) {
+    return <StatusView title="Carregando progresso" description="Buscando progresso real dos projetos." />;
+  }
+
+  if (error) {
+    return <StatusView title="Falha ao carregar progresso" description={error.message} />;
+  }
+
+  if (!selectedProject) {
+    return <StatusView title="Sem projetos vinculados" description="Nao encontramos projetos associados ao usuario autenticado." />;
+  }
 
   return (
     <div className="pagina-progresso">
-      {/* Visão geral */}
       <div className="pagina-progresso__grade-visao-geral">
-        {/* Donut */}
         <div className="progresso-donut">
           <div className="progresso-donut__grafico">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={[
-                    { value: progressData.completionPercent },
-                    { value: 100 - progressData.completionPercent },
+                    { value: completionPercent },
+                    { value: 100 - completionPercent },
                   ]}
                   cx="50%"
                   cy="50%"
@@ -70,41 +108,36 @@ export default function ProgressPage() {
             </ResponsiveContainer>
             <div className="progresso-donut__centro">
               <div className="progresso-donut__centro-conteudo">
-                <p className="progresso-donut__percentual">{progressData.completionPercent}%</p>
-                <p className="progresso-donut__label-percentual">concluído</p>
+                <p className="progresso-donut__percentual">{completionPercent}%</p>
+                <p className="progresso-donut__label-percentual">concluido</p>
               </div>
             </div>
           </div>
           <p className="progresso-donut__titulo">Progresso geral</p>
-          <p className="progresso-donut__subtitulo">
-            {progressData.milestones.filter(m => m.status === "completed").length} de {progressData.milestones.length} marcos concluídos
-          </p>
+          <p className="progresso-donut__subtitulo">{selectedProgress.length} atualizacoes registradas</p>
         </div>
 
-        {/* Info do projeto */}
         <div className="pagina-progresso__info-projeto">
           <div className="pagina-progresso__cabecalho-projeto">
             <div>
-              <h2 className="pagina-progresso__titulo-projeto">{progressData.project.title}</h2>
-              <p className="pagina-progresso__orientador-projeto">
-                Orientador: {progressData.project.advisor.name}
-              </p>
+              <h2 className="pagina-progresso__titulo-projeto">{selectedProject.title}</h2>
+              <p className="pagina-progresso__orientador-projeto">Orientador: {selectedProject.advisor?.name ?? "Sem orientador"}</p>
             </div>
-            <span className="pagina-progresso__badge-status">Em andamento</span>
+            <span className="pagina-progresso__badge-status">{selectedProject.status}</span>
           </div>
 
           <div className="pagina-progresso__grade-datas">
             {[
-              { label: "Início", value: new Date(progressData.startDate).toLocaleDateString("pt-BR"), icon: Calendar },
-              { label: "Término previsto", value: new Date(progressData.endDate).toLocaleDateString("pt-BR"), icon: Calendar },
-              { label: "Dias restantes", value: `${daysLeft} dias`, icon: Clock },
-            ].map((s) => (
-              <div key={s.label} className="pagina-progresso__item-data">
+              { label: "Criado em", value: selectedProject.createdAt ? new Date(selectedProject.createdAt).toLocaleDateString("pt-BR") : "-", icon: Calendar },
+              { label: "Atualizacoes", value: selectedProgress.length, icon: TrendingUp },
+              { label: "Vagas", value: `${Math.max(selectedProject.slots - selectedProject.slotsUsed, 0)}/${selectedProject.slots}`, icon: Clock },
+            ].map((item) => (
+              <div key={item.label} className="pagina-progresso__item-data">
                 <div className="pagina-progresso__linha-data">
-                  <s.icon size={13} className="pagina-progresso__icone-data" />
-                  <span className="pagina-progresso__label-data">{s.label}</span>
+                  <item.icon size={13} className="pagina-progresso__icone-data" />
+                  <span className="pagina-progresso__label-data">{item.label}</span>
                 </div>
-                <p className="pagina-progresso__valor-data">{s.value}</p>
+                <p className="pagina-progresso__valor-data">{item.value}</p>
               </div>
             ))}
           </div>
@@ -112,111 +145,80 @@ export default function ProgressPage() {
           <div className="pagina-progresso__secao-barra">
             <div className="pagina-progresso__topo-barra">
               <span className="pagina-progresso__fase-atual">
-                Fase atual: <span className="pagina-progresso__fase-destaque">{progressData.currentPhase}</span>
+                Projeto selecionado:
+                <span className="pagina-progresso__fase-destaque"> {selectedProject.title}</span>
               </span>
-              <span className="pagina-progresso__percentual-barra">{progressData.completionPercent}%</span>
+              <span className="pagina-progresso__percentual-barra">{completionPercent}%</span>
             </div>
             <div className="pagina-progresso__trilha-barra">
-              <div
-                className="pagina-progresso__preenchimento-barra"
-                style={{ width: `${progressData.completionPercent}%` }}
-              />
+              <div className="pagina-progresso__preenchimento-barra" style={{ width: `${completionPercent}%` }} />
             </div>
           </div>
+
+          <select
+            value={selectedProjectId || selectedProject.id}
+            onChange={(e) => setSelectedProjectId(e.target.value)}
+            className="formulario-atualizacao__input"
+            style={{ marginTop: "1rem" }}
+          >
+            {projects.map((project) => (
+              <option key={project.id} value={project.id}>{project.title}</option>
+            ))}
+          </select>
         </div>
       </div>
 
       <div className="pagina-progresso__grade-inferior">
-        {/* Linha do tempo */}
         <div className="pagina-progresso__card">
           <div className="pagina-progresso__card-padding">
             <h3 className="pagina-progresso__titulo-card">Linha do tempo</h3>
             <div className="linha-do-tempo">
-              {progressData.milestones.map((milestone, i) => {
-                const cfg = milestoneConfig[milestone.status];
-                const Icon = cfg.icon;
-                const isLast = i === progressData.milestones.length - 1;
-
-                return (
-                  <div key={milestone.id} className="marco-linha-do-tempo">
-                    {!isLast && (
-                      <div className={`marco-linha-do-tempo__conector ${cfg.conectorClass}`} />
-                    )}
-                    <div className={`marco-linha-do-tempo__icone ${cfg.iconeClass}`}>
-                      <Icon size={17} className={cfg.iconClass} />
-                    </div>
-                    <div className="marco-linha-do-tempo__conteudo">
-                      <div className="marco-linha-do-tempo__linha-titulo">
-                        <h4 className={`marco-linha-do-tempo__titulo ${cfg.tituloClass}`}>
-                          {milestone.title}
-                        </h4>
-                        {cfg.etiquetaLabel && (
-                          <span className={`marco-linha-do-tempo__etiqueta ${cfg.etiquetaClass}`}>
-                            {cfg.etiquetaLabel}
-                          </span>
-                        )}
+              {selectedProgress.length === 0 ? (
+                <StatusView title="Sem atualizacoes" description="Ainda nao existem registros de progresso para este projeto." />
+              ) : (
+                selectedProgress.map((progress, index) => {
+                  const Icon = index === 0 ? CheckCircle : index % 2 === 0 ? Clock : Circle;
+                  return (
+                    <div key={progress.id} className="marco-linha-do-tempo">
+                      <div className="marco-linha-do-tempo__conector marco-linha-do-tempo__conector--andamento" />
+                      <div className="marco-linha-do-tempo__icone marco-linha-do-tempo__icone--andamento">
+                        <Icon size={17} className="marco-linha-do-tempo__icone-svg--andamento" />
                       </div>
-                      <p className="marco-linha-do-tempo__descricao">{milestone.description}</p>
-                      <div className="marco-linha-do-tempo__datas">
-                        <span className="marco-linha-do-tempo__prazo">
-                          Prazo: {new Date(milestone.dueDate).toLocaleDateString("pt-BR")}
-                        </span>
-                        {milestone.completedDate && (
-                          <span className="marco-linha-do-tempo__conclusao">
-                            Concluído: {new Date(milestone.completedDate).toLocaleDateString("pt-BR")}
+                      <div className="marco-linha-do-tempo__conteudo">
+                        <div className="marco-linha-do-tempo__linha-titulo">
+                          <h4 className="marco-linha-do-tempo__titulo marco-linha-do-tempo__titulo--andamento">{progress.title}</h4>
+                        </div>
+                        <p className="marco-linha-do-tempo__descricao">{progress.content}</p>
+                        <div className="marco-linha-do-tempo__datas">
+                          <span className="marco-linha-do-tempo__prazo">
+                            {progress.date ? new Date(progress.date).toLocaleDateString("pt-BR") : "-"}
                           </span>
-                        )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           </div>
         </div>
 
-        {/* Atualizações */}
         <div className="pagina-progresso__card">
           <div className="pagina-progresso__cabecalho-atualizacoes">
-            <h3 className="pagina-progresso__titulo-card" style={{ marginBottom: 0 }}>Atualizações</h3>
-            <button
-              onClick={() => setShowAddUpdate(!showAddUpdate)}
-              className="pagina-progresso__botao-nova-atualizacao"
-            >
+            <h3 className="pagina-progresso__titulo-card" style={{ marginBottom: 0 }}>Atualizacoes</h3>
+            <button onClick={() => setShowAddUpdate(!showAddUpdate)} className="pagina-progresso__botao-nova-atualizacao">
               <Plus size={14} />
-              Nova atualização
+              Nova atualizacao
             </button>
           </div>
 
           {showAddUpdate && (
             <div className="formulario-atualizacao">
               <div className="formulario-atualizacao__conteudo">
-                <div className="formulario-atualizacao__tipos">
-                  {["update", "milestone", "issue"].map((t) => (
-                    <button
-                      key={t}
-                      onClick={() => setNewUpdate({ ...newUpdate, type: t })}
-                      className={`formulario-atualizacao__tipo ${
-                        newUpdate.type === t
-                          ? updateTypeConfig[t].tipoAtivoClass
-                          : "formulario-atualizacao__tipo--inativo"
-                      }`}
-                    >
-                      {updateTypeConfig[t].label}
-                    </button>
-                  ))}
-                </div>
-                <input
-                  type="text"
-                  value={newUpdate.title}
-                  onChange={(e) => setNewUpdate({ ...newUpdate, title: e.target.value })}
-                  placeholder="Título da atualização..."
-                  className="formulario-atualizacao__input"
-                />
                 <textarea
-                  value={newUpdate.content}
-                  onChange={(e) => setNewUpdate({ ...newUpdate, content: e.target.value })}
-                  placeholder="Descreva a atualização..."
+                  value={newUpdate}
+                  onChange={(e) => setNewUpdate(e.target.value)}
+                  placeholder="Descreva a atualizacao..."
                   rows={3}
                   className="formulario-atualizacao__textarea"
                 />
@@ -233,36 +235,27 @@ export default function ProgressPage() {
           )}
 
           <div className="pagina-progresso__lista-atualizacoes">
-            {updates.map((update) => {
-              const cfg = updateTypeConfig[update.type];
-              return (
-                <div key={update.id} className="atualizacao-item">
-                  <div className="atualizacao-item__linha">
-                    <div className={`atualizacao-item__icone-area ${cfg.iconeAreaClass}`}>
-                      {update.type === "milestone" ? (
-                        <CheckCircle size={14} className={cfg.iconeClass} />
-                      ) : update.type === "issue" ? (
-                        <AlertCircle size={14} className={cfg.iconeClass} />
-                      ) : (
-                        <TrendingUp size={14} className={cfg.iconeClass} />
-                      )}
+            {selectedProgress.map((progress) => (
+              <div key={progress.id} className="atualizacao-item">
+                <div className="atualizacao-item__linha">
+                  <div className="atualizacao-item__icone-area atualizacao-item__icone-area--atualizacao">
+                    <TrendingUp size={14} className="atualizacao-item__icone-svg--atualizacao" />
+                  </div>
+                  <div className="atualizacao-item__conteudo">
+                    <div className="atualizacao-item__linha-titulo">
+                      <h4 className="atualizacao-item__titulo">{progress.title}</h4>
+                      <span className="atualizacao-item__etiqueta atualizacao-item__etiqueta--atualizacao">Atualizacao</span>
                     </div>
-                    <div className="atualizacao-item__conteudo">
-                      <div className="atualizacao-item__linha-titulo">
-                        <h4 className="atualizacao-item__titulo">{update.title}</h4>
-                        <span className={`atualizacao-item__etiqueta ${cfg.etiquetaClass}`}>{cfg.label}</span>
-                      </div>
-                      <p className="atualizacao-item__texto">{update.content}</p>
-                      <div className="atualizacao-item__meta">
-                        <span>{update.author}</span>
-                        <span>·</span>
-                        <span>{new Date(update.date).toLocaleDateString("pt-BR")}</span>
-                      </div>
+                    <p className="atualizacao-item__texto">{progress.content}</p>
+                    <div className="atualizacao-item__meta">
+                      <span>{progress.author || "Sistema"}</span>
+                      <span>·</span>
+                      <span>{progress.date ? new Date(progress.date).toLocaleDateString("pt-BR") : "-"}</span>
                     </div>
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </div>
       </div>

@@ -1,26 +1,35 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
 import { FlaskConical, Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
 import "./LoginPage.css";
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("lucas.mendes@universidade.br");
-  const [password, setPassword] = useState("••••••••");
+  const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setLoading(false);
-    navigate("/app");
+    setError("");
+
+    try {
+      await login({ email, senha: password });
+      navigate("/app");
+    } catch (err) {
+      setError(err.message || "Nao foi possivel entrar. Verifique suas credenciais.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="pagina-login">
-      {/* Painel esquerdo */}
       <div className="pagina-login__painel-esquerdo">
         <div className="pagina-login__decoracao-esquerda">
           <div className="pagina-login__decoracao-circulo-topo" />
@@ -50,10 +59,9 @@ export default function LoginPage() {
             ))}
           </div>
         </div>
-        <p className="pagina-login__rodape-esquerdo">© 2025 IniCiência. Todos os direitos reservados.</p>
+        <p className="pagina-login__rodape-esquerdo">© 2026 IniCiência. Todos os direitos reservados.</p>
       </div>
 
-      {/* Painel direito */}
       <div className="pagina-login__painel-direito">
         <div className="pagina-login__formulario-area">
           <Link to="/" className="pagina-login__logo-mobile">
@@ -79,6 +87,8 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   className="campo-formulario__input"
                   placeholder="seu@universidade.br"
+                  autoComplete="email"
+                  required
                 />
               </div>
             </div>
@@ -86,7 +96,7 @@ export default function LoginPage() {
             <div>
               <div className="campo-formulario__cabecalho">
                 <label className="campo-formulario__rotulo" style={{ margin: 0 }}>Senha</label>
-                <a href="#" className="campo-formulario__link-esqueceu">Esqueceu a senha?</a>
+                <span className="campo-formulario__link-esqueceu">A autenticação usa a API real</span>
               </div>
               <div className="campo-formulario__area-input">
                 <Lock size={16} className="campo-formulario__icone-esquerda" />
@@ -95,7 +105,9 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="campo-formulario__input campo-formulario__input--com-icone-direita"
-                  placeholder="••••••••"
+                  placeholder="Digite sua senha"
+                  autoComplete="current-password"
+                  required
                 />
                 <button
                   type="button"
@@ -106,6 +118,12 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
+
+            {error ? (
+              <p className="pagina-login__subtitulo" style={{ color: "var(--cor-erro)" }}>
+                {error}
+              </p>
+            ) : null}
 
             <div className="campo-formulario__linha-checkbox">
               <input type="checkbox" id="remember" className="campo-formulario__checkbox" defaultChecked />
@@ -121,19 +139,9 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="pagina-login__divisor">
-            <div className="pagina-login__divisor-linha" />
-            <span className="pagina-login__divisor-texto">ou</span>
-            <div className="pagina-login__divisor-linha" />
-          </div>
-
-          <button onClick={() => navigate("/app")} className="pagina-login__botao-demo">
-            <span>🎓</span> Acessar como demonstração
-          </button>
-
           <p className="pagina-login__link-cadastro">
             Não tem conta?{" "}
-            <Link to="/register" className="pagina-login__link-cadastro-link">Cadastre-se grátis</Link>
+            <Link to="/register" className="pagina-login__link-cadastro-link">Cadastre-se</Link>
           </p>
         </div>
       </div>

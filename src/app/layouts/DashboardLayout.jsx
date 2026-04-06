@@ -3,10 +3,11 @@ import { Outlet, useLocation } from "react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { Sidebar } from "../components/Sidebar";
 import { Topbar } from "../components/Topbar";
+import { useAuth } from "../hooks/useAuth";
 import "./DashboardLayout.css";
 
 const pageTitles = {
-  "/app": { title: "Dashboard", subtitle: "Bem-vindo de volta, Lucas!" },
+  "/app": { title: "Dashboard", subtitle: "Bem-vindo de volta" },
   "/app/projects": { title: "Projetos", subtitle: "Explore oportunidades de pesquisa" },
   "/app/applications": { title: "Minhas Inscricoes", subtitle: "Acompanhe o status das suas candidaturas" },
   "/app/chat": { title: "Mensagens", subtitle: "Conversas com orientadores" },
@@ -22,8 +23,16 @@ export function DashboardLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const { user } = useAuth();
 
-  const pageInfo = pageTitles[location.pathname] || { title: "Iniciacao Cientifica" };
+  const baseInfo = pageTitles[location.pathname] || { title: "Iniciacao Cientifica", subtitle: "" };
+  const pageInfo = {
+    ...baseInfo,
+    subtitle:
+      location.pathname === "/app" && user?.nome
+        ? `Bem-vindo de volta, ${user.nome.split(" ")[0]}!`
+        : baseInfo.subtitle,
+  };
 
   return (
     <div className="pagina-app">

@@ -2,14 +2,29 @@ import { Bell, Search, Menu, ChevronDown } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { AnimatePresence, motion } from "framer-motion";
-import { currentUser, notifications } from "../data/mockData";
+import { useAuth } from "../hooks/useAuth";
+import { useAsyncData } from "../hooks/useAsyncData";
+import { notificationService } from "../services/notificationService";
+import { formatUserType } from "../utils/formatters";
 import "./Topbar.css";
+
+function getInitials(name) {
+  if (!name) return "IC";
+  return name
+    .split(" ")
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
+}
 
 export function Topbar({ onMenuClick, title, subtitle }) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const profileMenuRef = useRef(null);
   const navigate = useNavigate();
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const { user, logout } = useAuth();
+  const { data } = useAsyncData(() => notificationService.listMine(), [], { initialData: [] });
+  const notifications = Array.isArray(data) ? data : [];
+  const unreadCount = notifications.filter((item) => !item.lida).length;
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -33,6 +48,11 @@ export function Topbar({ onMenuClick, title, subtitle }) {
     };
   }, []);
 
+  const handleLogout = async () => {
+    setDropdownOpen(false);
+    await logout();
+  };
+
   return (
     <header className="barra-topo">
       <div className="barra-topo__secao-esquerda">
@@ -51,7 +71,7 @@ export function Topbar({ onMenuClick, title, subtitle }) {
       </div>
 
       <div className="barra-topo__secao-direita">
-        <button className="barra-topo__busca">
+        <button className="barra-topo__busca" type="button">
           <Search size={15} />
           <span>Buscar...</span>
           <span className="barra-topo__atalho-busca">CTRL+K</span>
@@ -80,13 +100,11 @@ export function Topbar({ onMenuClick, title, subtitle }) {
             aria-label="Abrir menu de perfil"
           >
             <div className="barra-topo__avatar">
-              <span className="barra-topo__iniciais-avatar">{currentUser.avatar}</span>
+              <span className="barra-topo__iniciais-avatar">{getInitials(user?.nome)}</span>
             </div>
             <div className="barra-topo__info-perfil">
-              <p className="barra-topo__nome-perfil">{currentUser.name.split(" ")[0]}</p>
-              <p className="barra-topo__tipo-perfil">
-                {currentUser.type === "student" ? "Aluno" : "Orientador"}
-              </p>
+              <p className="barra-topo__nome-perfil">{user?.nome?.split(" ")[0] ?? "Usuario"}</p>
+              <p className="barra-topo__tipo-perfil">{formatUserType(user?.tipo)}</p>
             </div>
             <ChevronDown size={14} className="barra-topo__icone-dropdown" />
           </motion.button>
@@ -107,14 +125,14 @@ export function Topbar({ onMenuClick, title, subtitle }) {
                   Meu Perfil
                 </button>
                 <button
-                  onClick={() => { navigate("/configuracoes"); setDropdownOpen(false); }}
+                  onClick={() => { navigate("/app/configuracoes"); setDropdownOpen(false); }}
                   className="barra-topo__item-menu"
                 >
                   Configuracoes
                 </button>
                 <hr className="barra-topo__divisor-menu" />
                 <button
-                  onClick={() => { navigate("/"); setDropdownOpen(false); }}
+                  onClick={handleLogout}
                   className="barra-topo__item-menu barra-topo__item-menu--sair"
                 >
                   Sair

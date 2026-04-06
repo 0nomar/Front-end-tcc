@@ -12,7 +12,9 @@ import {
   BookOpen,
   ArrowRight,
   CheckCircle,
+  Hash,
 } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
 import "./RegisterPage.css";
 
 const courses = [
@@ -42,10 +44,12 @@ const institutions = [
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const { register } = useAuth();
   const [step, setStep] = useState(1);
   const [userType, setUserType] = useState("student");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -55,19 +59,44 @@ export default function RegisterPage() {
     institution: "",
     semester: "",
     department: "",
+    ra: "",
   });
 
   const update = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
+
   const handleNext = () => {
+    setError("");
+    if (step === 2 && form.password !== form.confirmPassword) {
+      setError("As senhas nao coincidem.");
+      return;
+    }
     if (step < 3) setStep(step + 1);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+
+    if (form.password !== form.confirmPassword) {
+      setError("As senhas nao coincidem.");
+      return;
+    }
+
     setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-    setLoading(false);
-    navigate("/app");
+
+    try {
+      await register({
+        nome: form.name,
+        email: form.email,
+        senha: form.password,
+        ra: form.ra,
+      });
+      navigate("/app");
+    } catch (err) {
+      setError(err.message || "Nao foi possivel criar a conta.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -168,6 +197,21 @@ export default function RegisterPage() {
                   </div>
 
                   <div className="campo-cadastro">
+                    <label className="campo-cadastro__label">RA</label>
+                    <div className="campo-cadastro__wrapper">
+                      <Hash size={16} className="campo-cadastro__icone-esquerda" />
+                      <input
+                        type="text"
+                        value={form.ra}
+                        onChange={(e) => update("ra", e.target.value)}
+                        className="campo-cadastro__input"
+                        placeholder="Seu registro academico"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="campo-cadastro">
                     <label className="campo-cadastro__label">Senha</label>
                     <div className="campo-cadastro__wrapper">
                       <Lock size={16} className="campo-cadastro__icone-esquerda" />
@@ -203,6 +247,10 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
+                {error ? (
+                  <p className="cadastro-step__subtitulo" style={{ color: "var(--cor-erro)" }}>{error}</p>
+                ) : null}
+
                 <div className="cadastro-step__acoes">
                   <button type="button" onClick={() => setStep(1)} className="cadastro-step__botao-voltar">Voltar</button>
                   <button type="button" onClick={handleNext} className="cadastro-step__botao-avancar">
@@ -215,7 +263,7 @@ export default function RegisterPage() {
             {step === 3 && (
               <div>
                 <h2 className="cadastro-step__titulo">Informacoes academicas</h2>
-                <p className="cadastro-step__subtitulo">Ajude-nos a personalizar sua experiencia.</p>
+                <p className="cadastro-step__subtitulo">Esses dados ajudam na organizacao do perfil.</p>
                 <div className="cadastro-campos">
                   <div className="campo-cadastro">
                     <label className="campo-cadastro__label">Instituicao de ensino</label>
@@ -263,6 +311,10 @@ export default function RegisterPage() {
                     </label>
                   </div>
                 </div>
+
+                {error ? (
+                  <p className="cadastro-step__subtitulo" style={{ color: "var(--cor-erro)" }}>{error}</p>
+                ) : null}
 
                 <div className="cadastro-step__acoes">
                   <button type="button" onClick={() => setStep(2)} className="cadastro-step__botao-voltar">Voltar</button>

@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from "react-router";
+import { NavLink } from "react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   LayoutDashboard,
@@ -15,7 +15,10 @@ import {
   FlaskConical,
   Settings,
 } from "lucide-react";
-import { currentUser, notifications } from "../data/mockData";
+import { useAuth } from "../hooks/useAuth";
+import { useAsyncData } from "../hooks/useAsyncData";
+import { notificationService } from "../services/notificationService";
+import { formatUserType } from "../utils/formatters";
 import "./Sidebar.css";
 
 const navItems = [
@@ -30,12 +33,23 @@ const navItems = [
   { path: "/app/profile", label: "Meu Perfil", icon: User },
 ];
 
-export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
-  const navigate = useNavigate();
-  const unreadCount = notifications.filter((n) => !n.read).length;
+function getInitials(name) {
+  if (!name) return "IC";
+  return name
+    .split(" ")
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
+}
 
-  const handleLogout = () => {
-    navigate("/");
+export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
+  const { user, logout } = useAuth();
+  const { data } = useAsyncData(() => notificationService.listMine(), [], { initialData: [] });
+  const notifications = Array.isArray(data) ? data : [];
+  const unreadCount = notifications.filter((item) => !item.lida).length;
+
+  const handleLogout = async () => {
+    await logout();
   };
 
   const SidebarContent = () => (
@@ -94,9 +108,6 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
                 {!collapsed && item.label === "Notificacoes" && unreadCount > 0 && (
                   <span className="barra-lateral__contador">{unreadCount}</span>
                 )}
-                {!collapsed && item.label === "Mensagens" && (
-                  <span className="barra-lateral__contador barra-lateral__contador--mensagens">2</span>
-                )}
               </>
             )}
           </NavLink>
@@ -105,7 +116,7 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
 
       <div className="barra-lateral__rodape">
         <NavLink
-          to="/configuracoes"
+          to="/app/configuracoes"
           className="barra-lateral__item-configuracoes"
           onClick={() => setMobileOpen(false)}
         >
@@ -126,13 +137,11 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
         {!collapsed && (
           <div className="barra-lateral__perfil-usuario">
             <div className="barra-lateral__avatar-usuario">
-              <span className="barra-lateral__iniciais-usuario">{currentUser.avatar}</span>
+              <span className="barra-lateral__iniciais-usuario">{getInitials(user?.nome)}</span>
             </div>
             <div className="barra-lateral__info-usuario">
-              <p className="barra-lateral__nome-usuario">{currentUser.name}</p>
-              <p className="barra-lateral__tipo-usuario">
-                {currentUser.type === "student" ? "Aluno" : "Orientador"}
-              </p>
+              <p className="barra-lateral__nome-usuario">{user?.nome ?? "Usuario"}</p>
+              <p className="barra-lateral__tipo-usuario">{formatUserType(user?.tipo)}</p>
             </div>
           </div>
         )}
@@ -142,9 +151,7 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
 
   return (
     <>
-      <aside
-        className={`barra-lateral ${collapsed ? "barra-lateral--recolhida" : ""}`}
-      >
+      <aside className={`barra-lateral ${collapsed ? "barra-lateral--recolhida" : ""}`}>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.97 }}

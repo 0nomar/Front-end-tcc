@@ -1,18 +1,28 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import {
-  ArrowLeft, Users, Clock, DollarSign, BookOpen, Star,
-  CheckCircle, Send, Mail, MessageSquare, Share2, Bookmark,
-  BarChart2, Eye,
+  ArrowLeft,
+  Users,
+  Clock,
+  BookOpen,
+  Send,
+  Mail,
+  MessageSquare,
+  Share2,
+  Bookmark,
+  BarChart2,
+  Eye,
+  CheckCircle,
 } from "lucide-react";
-import { projects } from "../data/mockData";
+import { toast } from "sonner";
+import { useAsyncData } from "../hooks/useAsyncData";
+import { projectService } from "../services/projectService";
+import { applicationService } from "../services/applicationService";
+import { feedbackService } from "../services/feedbackService";
+import { StatusView } from "../components/StatusView";
+import { mapFeedback, mapProject, mapProgressItem } from "../utils/adapters";
+import { formatProjectStatus } from "../utils/formatters";
 import "./ProjectDetailPage.css";
-
-const statusStyles = {
-  open:         { badgeClass: "detalhe-card__badge-status--aberto",   label: "Aberto para inscrições" },
-  "in-progress":{ badgeClass: "detalhe-card__badge-status--andamento", label: "Em andamento" },
-  closed:       { badgeClass: "detalhe-card__badge-status--encerrado", label: "Encerrado" },
-};
 
 export default function ProjectDetailPage() {
   const { id } = useParams();
@@ -20,19 +30,51 @@ export default function ProjectDetailPage() {
   const [saved, setSaved] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [motivation, setMotivation] = useState("");
-  const [applied, setApplied] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loadingApply, setLoadingApply] = useState(false);
+  const { data, loading, error, reload } = useAsyncData(async () => {
+    const [project, progress, feedbacks] = await Promise.all([
+      projectService.getById(id),
+      projectService.getProgress(id).catch(() => []),
+      feedbackService.listByProject(id).catch(() => []),
+    ]);
 
-  const project = projects.find((p) => p.id === id) || projects[0];
-  const sc = statusStyles[project.status];
+    return {
+      project: mapProject(project),
+      progress: Array.isArray(progress) ? progress.map(mapProgressItem) : [],
+      feedbacks: Array.isArray(feedbacks) ? feedbacks.map(mapFeedback) : [],
+    };
+  }, [id], { initialData: { project: null, progress: [], feedbacks: [] } });
+
+  const project = data?.project;
+  const feedbackAverage = useMemo(() => {
+    const ratings = data?.feedbacks ?? [];
+    if (!ratings.length) return "0.0";
+    return (ratings.reduce((acc, item) => acc + item.rating, 0) / ratings.length).toFixed(1);
+  }, [data]);
 
   const handleApply = async () => {
-    setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setLoading(false);
-    setApplied(true);
-    setShowModal(false);
+    setLoadingApply(true);
+
+    try {
+      await applicationService.create(id);
+      toast.success("Inscricao enviada com sucesso.");
+      setShowModal(false);
+      setMotivation("");
+      await reload();
+    } catch (err) {
+      toast.error(err.message || "Nao foi possivel enviar a inscricao.");
+    } finally {
+      setLoadingApply(false);
+    }
   };
+
+  if (loading) {
+    return <StatusView title="Carregando projeto" description="Buscando detalhes do projeto na API." />;
+  }
+
+  if (error || !project) {
+    return <StatusView title="Projeto indisponivel" description={error?.message || "Nao foi possivel localizar este projeto."} />;
+  }
 
   return (
     <div className="pagina-detalhe-projeto">
@@ -42,13 +84,13 @@ export default function ProjectDetailPage() {
       </button>
 
       <div className="pagina-detalhe-projeto__grade">
-        {/* Conteúdo principal */}
         <div className="pagina-detalhe-projeto__conteudo-principal">
-          {/* Cabeçalho */}
           <div className="detalhe-card">
             <div className="detalhe-card__topo">
               <div className="detalhe-card__badges">
-                <span className={`detalhe-card__badge-status ${sc.badgeClass}`}>{sc.label}</span>
+                <span className="detalhe-card__badge-status detalhe-card__badge-status--aberto">
+                  {formatProjectStatus(project.status)}
+                </span>
                 <span className="detalhe-card__badge-area">{project.area}</span>
               </div>
               <div className="detalhe-card__acoes-topo">
@@ -69,146 +111,128 @@ export default function ProjectDetailPage() {
             <div className="detalhe-card__estatisticas">
               <div className="detalhe-card__stat-item">
                 <Eye size={14} />
-                {project.views} visualizações
+                {data.feedbacks.length} feedbacks
               </div>
               <div className="detalhe-card__stat-item">
                 <BarChart2 size={14} />
-                {project.applications} inscrições
+                {data.progress.length} atualizacoes
               </div>
               <div className="detalhe-card__stat-item">
                 <Clock size={14} />
-                Publicado em {new Date(project.createdAt).toLocaleDateString("pt-BR")}
+                Publicado em {project.createdAt ? new Date(project.createdAt).toLocaleDateString("pt-BR") : "-"}
               </div>
             </div>
           </div>
 
-          {/* Descrição */}
           <div className="detalhe-card">
             <h2 className="detalhe-card__titulo-secao">Sobre o projeto</h2>
             <p className="detalhe-card__descricao">{project.description}</p>
           </div>
 
-          {/* Requisitos */}
           <div className="detalhe-card">
             <h2 className="detalhe-card__titulo-secao">Requisitos</h2>
             <div className="detalhe-card__lista-requisitos">
-              {project.requirements.map((req) => (
-                <div key={req} className="detalhe-card__requisito">
-                  <div className="detalhe-card__requisito-icone">
-                    <CheckCircle size={12} style={{ color: "var(--cor-primaria)" }} />
+              {project.requirements.length === 0 ? (
+                <p className="detalhe-card__descricao">A API nao retornou requisitos cadastrados para este projeto.</p>
+              ) : (
+                project.requirements.map((req) => (
+                  <div key={req} className="detalhe-card__requisito">
+                    <div className="detalhe-card__requisito-icone">
+                      <CheckCircle size={12} style={{ color: "var(--cor-primaria)" }} />
+                    </div>
+                    <span className="detalhe-card__requisito-texto">{req}</span>
                   </div>
-                  <span className="detalhe-card__requisito-texto">{req}</span>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
-          {/* Cursos elegíveis */}
           <div className="detalhe-card">
-            <h2 className="detalhe-card__titulo-secao">Cursos elegíveis</h2>
+            <h2 className="detalhe-card__titulo-secao">Cursos elegiveis</h2>
             <div className="detalhe-card__chips">
-              {project.course.map((c) => (
-                <span key={c} className="detalhe-card__chip-curso">{c}</span>
-              ))}
+              {project.courses.length === 0 ? (
+                <span className="detalhe-card__chip-curso">Nao informado</span>
+              ) : (
+                project.courses.map((course) => (
+                  <span key={course} className="detalhe-card__chip-curso">{course}</span>
+                ))
+              )}
             </div>
           </div>
 
-          {/* Tags */}
           <div className="detalhe-card">
-            <h2 className="detalhe-card__titulo-secao">Tecnologias e competências</h2>
+            <h2 className="detalhe-card__titulo-secao">Tecnologias e competencias</h2>
             <div className="detalhe-card__chips">
-              {project.tags.map((tag) => (
-                <span key={tag} className="detalhe-card__chip-tag">{tag}</span>
-              ))}
+              {project.tags.length === 0 ? (
+                <span className="detalhe-card__chip-tag">Nao informado</span>
+              ) : (
+                project.tags.map((tag) => (
+                  <span key={tag} className="detalhe-card__chip-tag">{tag}</span>
+                ))
+              )}
             </div>
           </div>
         </div>
 
-        {/* Sidebar */}
         <div className="pagina-detalhe-projeto__sidebar">
-          {/* Card de inscrição */}
           <div className="card-inscricao">
-            {applied ? (
-              <div className="card-inscricao__enviada">
-                <div className="card-inscricao__icone-sucesso">
-                  <CheckCircle size={28} style={{ color: "var(--cor-sucesso)" }} />
-                </div>
-                <h3 className="card-inscricao__titulo-enviada">Inscrição enviada!</h3>
-                <p className="card-inscricao__texto-enviada">
-                  Aguarde o retorno do orientador. Você receberá uma notificação.
-                </p>
-                <button onClick={() => navigate("/app/applications")} className="card-inscricao__botao-ver">
-                  Ver minhas inscrições
-                </button>
-              </div>
-            ) : (
-              <>
-                <div className="card-inscricao__grade-stats">
-                  {[
-                    { icon: Users,      label: "Vagas disponíveis", value: `${project.slots - project.slotsUsed}/${project.slots}` },
-                    { icon: Clock,      label: "Duração",           value: project.duration },
-                    { icon: DollarSign, label: "Bolsa",             value: project.scholarship },
-                    { icon: BookOpen,   label: "Área",              value: project.area },
-                  ].map((s) => (
-                    <div key={s.label} className="card-inscricao__stat">
-                      <div className="card-inscricao__stat-linha">
-                        <s.icon size={13} className="card-inscricao__stat-icone" />
-                        <span className="card-inscricao__stat-label">{s.label}</span>
-                      </div>
-                      <p className="card-inscricao__stat-valor">{s.value}</p>
-                    </div>
-                  ))}
-                </div>
-
-                {project.status === "open" ? (
-                  <button onClick={() => setShowModal(true)} className="card-inscricao__botao-inscrever">
-                    <Send size={16} />
-                    Inscrever-se
-                  </button>
-                ) : (
-                  <div className="card-inscricao__status-encerrado">
-                    {project.status === "closed" ? "Vagas encerradas" : "Projeto em andamento"}
+            <div className="card-inscricao__grade-stats">
+              {[
+                { icon: Users, label: "Vagas disponiveis", value: `${Math.max(project.slots - project.slotsUsed, 0)}/${project.slots}` },
+                { icon: Clock, label: "Criado em", value: project.createdAt ? new Date(project.createdAt).toLocaleDateString("pt-BR") : "-" },
+                { icon: BookOpen, label: "Area", value: project.area },
+              ].map((item) => (
+                <div key={item.label} className="card-inscricao__stat">
+                  <div className="card-inscricao__stat-linha">
+                    <item.icon size={13} className="card-inscricao__stat-icone" />
+                    <span className="card-inscricao__stat-label">{item.label}</span>
                   </div>
-                )}
+                  <p className="card-inscricao__stat-valor">{item.value}</p>
+                </div>
+              ))}
+            </div>
 
-                <button onClick={() => navigate("/app/chat")} className="card-inscricao__botao-perguntar">
-                  <MessageSquare size={15} />
-                  Perguntar ao orientador
-                </button>
-              </>
+            {project.status === "ABERTO" ? (
+              <button onClick={() => setShowModal(true)} className="card-inscricao__botao-inscrever">
+                <Send size={16} />
+                Inscrever-se
+              </button>
+            ) : (
+              <div className="card-inscricao__status-encerrado">{formatProjectStatus(project.status)}</div>
             )}
+
+            <button onClick={() => navigate("/app/chat")} className="card-inscricao__botao-perguntar">
+              <MessageSquare size={15} />
+              Perguntar ao orientador
+            </button>
           </div>
 
-          {/* Card do orientador */}
           <div className="card-orientador">
             <h3 className="card-orientador__titulo">Orientador do projeto</h3>
             <div className="card-orientador__cabecalho">
               <div className="card-orientador__avatar">
-                <span className="card-orientador__avatar-inicial">{project.advisor.avatar}</span>
+                <span className="card-orientador__avatar-inicial">
+                  {(project.advisor?.name ?? "IC").split(" ").slice(0, 2).map((part) => part[0]).join("")}
+                </span>
               </div>
               <div>
-                <p className="card-orientador__nome">{project.advisor.name}</p>
-                <p className="card-orientador__departamento">{project.advisor.department}</p>
+                <p className="card-orientador__nome">{project.advisor?.name ?? "Sem orientador"}</p>
+                <p className="card-orientador__departamento">{project.advisor?.specialty || project.area}</p>
               </div>
             </div>
 
             <div className="card-orientador__info-lista">
-              {[
-                { label: "Especialidade", value: project.advisor.specialty },
-                { label: "Projetos ativos", value: project.advisor.projects.toString() },
-                { label: "Alunos orientados", value: project.advisor.students.toString() },
-              ].map((s) => (
-                <div key={s.label} className="card-orientador__info-linha">
-                  <span className="card-orientador__info-label">{s.label}</span>
-                  <span className="card-orientador__info-valor">{s.value}</span>
-                </div>
-              ))}
               <div className="card-orientador__info-linha">
-                <span className="card-orientador__info-label">Avaliação</span>
-                <div className="card-orientador__avaliacao">
-                  <Star size={12} className="card-orientador__estrela" />
-                  <span className="card-orientador__info-valor">{project.advisor.rating}</span>
-                </div>
+                <span className="card-orientador__info-label">Email</span>
+                <span className="card-orientador__info-valor">{project.advisor?.email ?? "-"}</span>
+              </div>
+              <div className="card-orientador__info-linha">
+                <span className="card-orientador__info-label">Feedback medio</span>
+                <span className="card-orientador__info-valor">{feedbackAverage}</span>
+              </div>
+              <div className="card-orientador__info-linha">
+                <span className="card-orientador__info-label">Atualizacoes</span>
+                <span className="card-orientador__info-valor">{data.progress.length}</span>
               </div>
             </div>
 
@@ -220,30 +244,29 @@ export default function ProjectDetailPage() {
         </div>
       </div>
 
-      {/* Modal de inscrição */}
       {showModal && (
         <div className="modal-inscricao__sobreposicao">
           <div className="modal-inscricao__painel">
             <div className="modal-inscricao__cabecalho">
-              <h3 className="modal-inscricao__titulo">Inscrição no projeto</h3>
+              <h3 className="modal-inscricao__titulo">Inscricao no projeto</h3>
               <p className="modal-inscricao__subtitulo">{project.title}</p>
             </div>
 
             <div className="modal-inscricao__corpo">
               <div>
-                <label className="modal-inscricao__label">Carta de motivação *</label>
+                <label className="modal-inscricao__label">Carta de motivacao</label>
                 <textarea
                   value={motivation}
                   onChange={(e) => setMotivation(e.target.value)}
                   rows={5}
                   className="modal-inscricao__textarea"
-                  placeholder="Descreva sua motivação, experiências relevantes e por que você é o candidato ideal para este projeto..."
+                  placeholder="Escreva sua motivacao para o projeto..."
                 />
                 <p className="modal-inscricao__contador">{motivation.length}/1000 caracteres</p>
               </div>
 
               <div className="modal-inscricao__dica">
-                <strong>Dica:</strong> Uma boa carta de motivação menciona suas habilidades técnicas relevantes, experiências anteriores e como o projeto se alinha com seus objetivos acadêmicos.
+                <strong>Observacao:</strong> a API atual recebe apenas o identificador do projeto. O texto fica no frontend ate o backend expor esse campo.
               </div>
             </div>
 
@@ -253,17 +276,10 @@ export default function ProjectDetailPage() {
               </button>
               <button
                 onClick={handleApply}
-                disabled={loading || motivation.length < 50}
+                disabled={loadingApply}
                 className="modal-inscricao__botao-enviar"
               >
-                {loading ? (
-                  <div className="modal-inscricao__spinner" />
-                ) : (
-                  <>
-                    <Send size={15} />
-                    Enviar inscrição
-                  </>
-                )}
+                {loadingApply ? <div className="modal-inscricao__spinner" /> : <><Send size={15} /> Enviar inscricao</>}
               </button>
             </div>
           </div>
