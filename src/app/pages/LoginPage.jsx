@@ -39,7 +39,7 @@ export default function LoginPage() {
           <div className="pagina-login__logo-icone-area">
             <FlaskConical size={18} style={{ color: "var(--cor-branco)" }} />
           </div>
-          <span className="pagina-login__logo-nome">IniCiência</span>
+          <span className="pagina-login__logo-nome">CollabResearch</span>
         </Link>
         <div className="pagina-login__conteudo-esquerdo">
           <h2 className="pagina-login__titulo-esquerdo">
@@ -96,7 +96,6 @@ export default function LoginPage() {
             <div>
               <div className="campo-formulario__cabecalho">
                 <label className="campo-formulario__rotulo" style={{ margin: 0 }}>Senha</label>
-                <span className="campo-formulario__link-esqueceu">A autenticação usa a API real</span>
               </div>
               <div className="campo-formulario__area-input">
                 <Lock size={16} className="campo-formulario__icone-esquerda" />

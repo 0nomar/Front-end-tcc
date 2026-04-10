@@ -17,6 +17,6 @@ export const userService = {
     return api.get(`/api/usuarios/${id}/inscricoes`);
   },
   getDocuments(id) {
-    return api.get(`/api/usuarios/${id}/documentos`);
+    return api.get(`/api/documentos/usuario/${id}`);
   },
 };

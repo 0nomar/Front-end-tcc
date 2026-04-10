@@ -68,32 +68,39 @@
 /* ================================================================
    Indicador de progresso
    ================================================================ */
+
 .pagina-cadastro__progresso {
-  display: flex;
+  display: grid;
+  grid-template-columns: 
+  auto 1fr auto 1fr auto;
   align-items: center;
-  justify-content: center;
-  gap: var(--espaco-3);
-  margin-bottom: var(--espaco-8);
+  width: 100%;
+  max-width: 32rem;
+  margin: 0 auto var(--espaco-8);
 }
 
+/* Passo */
 .pagina-cadastro__passo {
   display: flex;
   align-items: center;
   gap: var(--espaco-2);
 }
 
+/* Bolinha (AGORA PERFEITA) */
 .pagina-cadastro__circulo-passo {
-  width: 2rem;
-  height: 2rem;
-  border-radius: var(--raio-completo);
+  width: 2.5rem;
+  height: 2.5rem; /* IGUAL ao width */
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: var(--transicao-normal);
-  font-size: var(--tamanho-base);
+  font-size: 0.95rem;
   font-weight: var(--peso-semi);
+  flex-shrink: 0;
 }
 
+/* Estados */
 .pagina-cadastro__circulo-passo--ativo {
   background-color: var(--cor-primaria);
   color: var(--cor-branco);
@@ -104,31 +111,20 @@
   color: var(--cor-texto-mudo);
 }
 
+/* Texto */
 .pagina-cadastro__label-passo {
   display: none;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
 }
 
 @media (min-width: 640px) {
   .pagina-cadastro__label-passo {
     display: block;
     white-space: nowrap;
-    line-height: 1.1;
-  }
-
-  .pagina-cadastro__passo {
-    min-width: 0;
-  }
-
-  .pagina-cadastro__progresso {
-    gap: var(--espaco-2);
-  }
-
-  .pagina-cadastro__linha-passo {
-    width: 2.5rem;
   }
 }
 
+/* Estados do texto */
 .pagina-cadastro__label-passo--ativo {
   color: var(--cor-primaria);
   font-weight: var(--peso-semi);
@@ -136,14 +132,33 @@
 
 .pagina-cadastro__label-passo--inativo {
   color: var(--cor-texto-mudo);
-  font-weight: var(--peso-normal);
 }
 
+/* Linha (AGORA FLEXÍVEL) */
 .pagina-cadastro__linha-passo {
-  width: 3rem;
   height: 2px;
+  width: 100%;
 }
 
+.pagina-cadastro__linha-passo--ativa {
+  background-color: var(--cor-primaria);
+}
+
+.pagina-cadastro__linha-passo--inativa {
+  background-color: var(--cor-borda);
+}
+
+/* Responsivo */
+@media (max-width: 640px) {
+  .pagina-cadastro__progresso {
+    gap: 0.25rem;
+  }
+
+  .pagina-cadastro__circulo-passo {
+    width: 2.2rem;
+    height: 2.2rem;
+  }
+}
 .pagina-cadastro__linha-passo--ativa  { background-color: var(--cor-primaria); }
 .pagina-cadastro__linha-passo--inativa { background-color: var(--cor-borda); }
 

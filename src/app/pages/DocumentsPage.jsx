@@ -27,28 +27,55 @@ export default function DocumentsPage() {
   const fileInputRef = useRef(null);
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const { data, loading, error, reload, setData } = useAsyncData(
-    async () => {
-      if (!user?.id) return [];
-      const result = await userService.getDocuments(user.id);
-      return Array.isArray(result) ? result.map(mapDocument) : [];
-    },
-    [user?.id],
-    { initialData: [] },
-  );
-  const docs = Array.isArray(data) ? data : [];
+  
+  // 1. NOVO ESTADO: Guarda qual o tipo de documento o usuário quer enviar
+  const [tipoDocumento, setTipoDocumento] = useState("IDENTIDADE");
 
+const { data, loading, error, reload } = useAsyncData(
+    async () => {
+      // Se o user ainda não foi carregado pelo AuthProvider, não faz nada
+      if (!user?.id) {
+        console.log("Aguardando ID do usuário para carregar lista...");
+        return [];
+      }
+      
+      try {
+        console.log("Buscando documentos para o ID:", user.id);
+        const response = await userService.getDocuments(user.id);
+        
+        // Mapeando para o formato que o seu JSX usa
+        return response.data.map(doc => ({
+          id: doc.id,
+          name: doc.nomeArquivo,
+          type: doc.tipo,
+          uploadedAt: doc.dataEnvio,
+          status: doc.status
+        }));
+      } catch (err) {
+        console.error("Erro na busca de documentos:", err);
+        return [];
+      }
+    },
+    [user?.id], // O hook vai "vigiar" o ID. Quando ele mudar de undefined para 1, ele dispara a busca.
+    { initialData: [] }
+  );
+
+  const docs = Array.isArray(data) ? data : [];
+  
   const handleUpload = async (files) => {
     const file = files?.[0];
     if (!file) return;
 
     setUploading(true);
     try {
-      await documentService.upload("CURRICULO", file);
+      // 2. MUDANÇA AQUI: Enviamos a variável "tipoDocumento" em vez de um texto fixo
+      await documentService.upload(tipoDocumento, file);
       toast.success("Documento enviado com sucesso.");
-      await reload();
+      await reload(); // Recarrega a lista automaticamente após o sucesso!
     } catch (err) {
-      toast.error(err.message || "Nao foi possivel enviar o documento.");
+      // Tenta extrair a mensagem de erro que vem do Spring Boot (se houver)
+      const erroBackend = err.response?.data?.message || err.message;
+      toast.error(erroBackend || "Não foi possível enviar o documento.");
     } finally {
       setUploading(false);
     }
@@ -60,7 +87,7 @@ export default function DocumentsPage() {
       setData((prev) => prev.filter((item) => item.id !== id));
       toast.success("Documento removido.");
     } catch (err) {
-      toast.error(err.message || "Nao foi possivel remover o documento.");
+      toast.error(err.message || "Não foi possível remover o documento.");
     }
   };
 
@@ -73,13 +100,13 @@ export default function DocumentsPage() {
   const statValues = useMemo(
     () => ({
       total: docs.length,
-      verified: docs.length,
+      verified: docs.length, // Lógica simulada, futuramente você pode checar se o status === 'VERIFICADO'
     }),
     [docs],
   );
 
   if (loading) {
-    return <StatusView title="Carregando documentos" description="Buscando documentos do usuario na API." />;
+    return <StatusView title="Carregando documentos" description="Buscando documentos do usuário na API." />;
   }
 
   if (error) {
@@ -100,6 +127,25 @@ export default function DocumentsPage() {
         ))}
       </div>
 
+      {/* 3. NOVO ELEMENTO: Select de Tipo de Documento */}
+      <div style={{ marginBottom: "1rem", backgroundColor: "var(--cor-branco)", padding: "1rem", borderRadius: "var(--raio-grande)", border: "1px solid var(--cor-borda-clara)" }}>
+        <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.9rem", color: "var(--cor-texto-secundario)", fontWeight: "600" }}>
+          Selecione o tipo de documento que vai enviar:
+        </label>
+        <select 
+          value={tipoDocumento}
+          onChange={(e) => setTipoDocumento(e.target.value)}
+          style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid var(--cor-borda)", outline: "none", fontSize: "1rem", backgroundColor: "var(--cor-fundo)" }}
+        >
+          {/* Lembre-se: os "values" aqui devem ser IGUAIS ao nome do seu Enum no Spring Boot */}
+          <option value="IDENTIDADE">Documento de Identidade (RG/CPF)</option>
+          <option value="HISTORICO">Histórico Escolar</option>
+          <option value="COMPROVANTE_MATRICULA">Comprovante de Matrícula</option>
+          <option value="CURRICULO">Currículo</option>
+        </select>
+      </div>
+
+      {/* Área de Drop do Arquivo */}
       <div
         onDragOver={(e) => {
           e.preventDefault();
@@ -114,7 +160,7 @@ export default function DocumentsPage() {
           ref={fileInputRef}
           type="file"
           multiple={false}
-          accept=".pdf,.doc,.docx,.png,.jpg,.jpeg"
+          accept=".pdf,.doc,.docx"
           style={{ display: "none" }}
           onChange={(e) => handleUpload(e.target.files)}
         />
@@ -134,11 +180,12 @@ export default function DocumentsPage() {
             <p className="pagina-documentos__upload-titulo">
               {dragging ? "Solte o arquivo aqui" : "Arraste arquivos ou clique para fazer upload"}
             </p>
-            <p className="pagina-documentos__upload-subtitulo">A integração usa o endpoint real de upload da API</p>
+            <p className="pagina-documentos__upload-subtitulo">O arquivo será salvo como: {tipoDocumento}</p>
           </>
         )}
       </div>
 
+      {/* Lista de Documentos */}
       <div className="pagina-documentos__lista">
         <div className="pagina-documentos__cabecalho-lista">
           <h3 className="pagina-documentos__contagem">
@@ -155,7 +202,7 @@ export default function DocumentsPage() {
             <div className="pagina-documentos__icone-vazio">
               <FolderOpen size={22} />
             </div>
-            <p className="pagina-documentos__texto-vazio">Nenhum documento enviado ate o momento</p>
+            <p className="pagina-documentos__texto-vazio">Nenhum documento enviado até o momento</p>
           </div>
         ) : (
           <div>
@@ -177,12 +224,13 @@ export default function DocumentsPage() {
 
                 <div className="documento-item__status" style={{ background: "var(--cor-sucesso-clara)", color: "var(--cor-sucesso-escura)" }}>
                   <CheckCircle size={12} />
-                  Disponivel
+                  {/* Se tiver status no backend, coloque aqui: doc.status */}
+                  Disponível 
                 </div>
 
                 <div className="documento-item__acoes">
-                  <button className="documento-item__botao-acao"><Eye size={15} /></button>
-                  <button onClick={() => handleDelete(doc.id)} className="documento-item__botao-acao documento-item__botao-excluir">
+                  <button className="documento-item__botao-acao" title="Visualizar"><Eye size={15} /></button>
+                  <button onClick={() => handleDelete(doc.id)} className="documento-item__botao-acao documento-item__botao-excluir" title="Excluir">
                     <Trash2 size={15} />
                   </button>
                 </div>

@@ -60,7 +60,7 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
         </div>
         {!collapsed && (
           <div>
-            <p className="barra-lateral__nome-app">IniCiencia</p>
+            <p className="barra-lateral__nome-app">CollabResearch</p>
             <p className="barra-lateral__subtitulo-app">Iniciacao Cientifica</p>
           </div>
         )}
