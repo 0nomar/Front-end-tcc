@@ -3,7 +3,7 @@ import { CheckCircle, Clock, Circle, TrendingUp, Calendar, Plus } from "lucide-r
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { toast } from "sonner";
 import { useAuth } from "../hooks/useAuth";
-import { useAsyncData } from "../hooks/useAsyncData";
+import { useAsyncData } from "../hooks/useAsyncDataHook";
 import { userService } from "../services/userService";
 import { projectService } from "../services/projectService";
 import { mapProject, mapProgressItem } from "../utils/adapters";

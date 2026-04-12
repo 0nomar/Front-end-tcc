@@ -10,7 +10,7 @@ import {
   Calendar,
   ExternalLink,
 } from "lucide-react";
-import { useAsyncData } from "../hooks/useAsyncData";
+import { useAsyncData } from "../hooks/useAsyncDataHook";
 import { applicationService } from "../services/applicationService";
 import { mapApplication } from "../utils/adapters";
 import { formatApplicationStatus } from "../utils/formatters";

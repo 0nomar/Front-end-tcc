@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Star, Send, CheckCircle, MessageSquare, Award } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../hooks/useAuth";
-import { useAsyncData } from "../hooks/useAsyncData";
+import { useAsyncData } from "../hooks/useAsyncDataHook";
 import { feedbackService } from "../services/feedbackService";
 import { userService } from "../services/userService";
 import { mapFeedback, mapProject } from "../utils/adapters";

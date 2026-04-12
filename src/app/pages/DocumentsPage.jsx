@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../hooks/useAuth";
-import { useAsyncData } from "../hooks/useAsyncData";
+import { useAsyncData } from "../hooks/useAsyncDataHook";
 import { userService } from "../services/userService";
 import { documentService } from "../services/documentService";
 import { mapDocument } from "../utils/adapters";
@@ -27,55 +27,51 @@ export default function DocumentsPage() {
   const fileInputRef = useRef(null);
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
-  
+
   // 1. NOVO ESTADO: Guarda qual o tipo de documento o usuário quer enviar
   const [tipoDocumento, setTipoDocumento] = useState("IDENTIDADE");
 
+  // ... dentro do componente DocumentsPage ...
 const { data, loading, error, reload } = useAsyncData(
     async () => {
-      // Se o user ainda não foi carregado pelo AuthProvider, não faz nada
-      if (!user?.id) {
-        console.log("Aguardando ID do usuário para carregar lista...");
-        return [];
-      }
+      if (!user?.id) return [];
       
-      try {
-        console.log("Buscando documentos para o ID:", user.id);
-        const response = await userService.getDocuments(user.id);
-        
-        // Mapeando para o formato que o seu JSX usa
-        return response.data.map(doc => ({
-          id: doc.id,
-          name: doc.nomeArquivo,
-          type: doc.tipo,
-          uploadedAt: doc.dataEnvio,
-          status: doc.status
-        }));
-      } catch (err) {
-        console.error("Erro na busca de documentos:", err);
-        return [];
-      }
+      const response = await documentService.getDocuments(user.id);
+      const listaDocumentos = response?.data || response || [];
+      
+      if (!Array.isArray(listaDocumentos)) return [];
+
+      return listaDocumentos.map(doc => ({
+        id: doc.id,
+        name: doc.nomeArquivo, 
+        type: doc.tipo,
+        uploadedAt: doc.dataEnvio,
+        status: doc.status
+      }));
     },
-    [user?.id], // O hook vai "vigiar" o ID. Quando ele mudar de undefined para 1, ele dispara a busca.
+    [user?.id], 
     { initialData: [] }
-  );
+);
 
   const docs = Array.isArray(data) ? data : [];
-  
+
   const handleUpload = async (files) => {
     const file = files?.[0];
     if (!file) return;
 
     setUploading(true);
     try {
-      // 2. MUDANÇA AQUI: Enviamos a variável "tipoDocumento" em vez de um texto fixo
-      await documentService.upload(tipoDocumento, file);
+      await documentService.upload(user.id, tipoDocumento, file);
+
       toast.success("Documento enviado com sucesso.");
-      await reload(); // Recarrega a lista automaticamente após o sucesso!
-    } catch (err) {
-      // Tenta extrair a mensagem de erro que vem do Spring Boot (se houver)
-      const erroBackend = err.response?.data?.message || err.message;
+      await reload(); // Atualiza a lista
+    } catch (error) { // ⬅️ DECLARAMOS A VARIÁVEL COMO 'error'
+      // ⬅️ USAMOS A MESMA VARIÁVEL 'error' AQUI DENTRO
+      const erroBackend = error.response?.data?.message || error.message;
       toast.error(erroBackend || "Não foi possível enviar o documento.");
+
+      // Coloquei esse console.log para vermos o verdadeiro motivo da falha!
+      console.error("O verdadeiro erro do upload foi:", error);
     } finally {
       setUploading(false);
     }
@@ -84,7 +80,7 @@ const { data, loading, error, reload } = useAsyncData(
   const handleDelete = async (id) => {
     try {
       await documentService.remove(id);
-      setData((prev) => prev.filter((item) => item.id !== id));
+      await reload(); // <-- MUDE AQUI! Recarrega a lista do backend
       toast.success("Documento removido.");
     } catch (err) {
       toast.error(err.message || "Não foi possível remover o documento.");
@@ -132,15 +128,13 @@ const { data, loading, error, reload } = useAsyncData(
         <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.9rem", color: "var(--cor-texto-secundario)", fontWeight: "600" }}>
           Selecione o tipo de documento que vai enviar:
         </label>
-        <select 
+        <select
           value={tipoDocumento}
           onChange={(e) => setTipoDocumento(e.target.value)}
           style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid var(--cor-borda)", outline: "none", fontSize: "1rem", backgroundColor: "var(--cor-fundo)" }}
         >
           {/* Lembre-se: os "values" aqui devem ser IGUAIS ao nome do seu Enum no Spring Boot */}
-          <option value="IDENTIDADE">Documento de Identidade (RG/CPF)</option>
           <option value="HISTORICO">Histórico Escolar</option>
-          <option value="COMPROVANTE_MATRICULA">Comprovante de Matrícula</option>
           <option value="CURRICULO">Currículo</option>
         </select>
       </div>
@@ -205,7 +199,7 @@ const { data, loading, error, reload } = useAsyncData(
             <p className="pagina-documentos__texto-vazio">Nenhum documento enviado até o momento</p>
           </div>
         ) : (
-          <div>
+          <div className="pagina-documentos__grade-itens">
             {docs.map((doc) => (
               <div key={doc.id} className="documento-item">
                 <div className="documento-item__icone-area documento-item__icone-area--pdf">
@@ -213,7 +207,9 @@ const { data, loading, error, reload } = useAsyncData(
                 </div>
 
                 <div className="documento-item__info">
-                  <p className="documento-item__nome">{doc.name}</p>
+                  {/* Puxando o nome. Se vier vazio, coloca um texto padrão */}
+                  <p className="documento-item__nome">{doc.name || "Documento sem nome"}</p>
+
                   <div className="documento-item__meta">
                     <span className="documento-item__data">
                       {doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString("pt-BR") : "-"}
@@ -224,12 +220,13 @@ const { data, loading, error, reload } = useAsyncData(
 
                 <div className="documento-item__status" style={{ background: "var(--cor-sucesso-clara)", color: "var(--cor-sucesso-escura)" }}>
                   <CheckCircle size={12} />
-                  {/* Se tiver status no backend, coloque aqui: doc.status */}
-                  Disponível 
+                  {doc.status || "Disponível"}
                 </div>
 
                 <div className="documento-item__acoes">
-                  <button className="documento-item__botao-acao" title="Visualizar"><Eye size={15} /></button>
+                  <button className="documento-item__botao-acao" title="Visualizar">
+                    <Eye size={15} />
+                  </button>
                   <button onClick={() => handleDelete(doc.id)} className="documento-item__botao-acao documento-item__botao-excluir" title="Excluir">
                     <Trash2 size={15} />
                   </button>

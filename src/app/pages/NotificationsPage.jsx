@@ -10,7 +10,7 @@ import {
   CheckCheck,
 } from "lucide-react";
 import { toast } from "sonner";
-import { useAsyncData } from "../hooks/useAsyncData";
+import { useAsyncData } from "../hooks/useAsyncDataHook";
 import { notificationService } from "../services/notificationService";
 import { mapNotification } from "../utils/adapters";
 import { formatNotificationType } from "../utils/formatters";

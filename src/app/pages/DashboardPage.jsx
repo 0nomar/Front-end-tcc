@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 import { useAuth } from "../hooks/useAuth";
-import { useAsyncData } from "../hooks/useAsyncData";
+import { useAsyncData } from "../hooks/useAsyncDataHook";
 import { projectService } from "../services/projectService";
 import { applicationService } from "../services/applicationService";
 import { notificationService } from "../services/notificationService";

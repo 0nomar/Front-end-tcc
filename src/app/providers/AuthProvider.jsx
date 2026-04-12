@@ -22,6 +22,12 @@ function buildIdentity(token) {
 async function resolveCurrentUser(identity) {
   if (!identity?.email) return null;
 
+  const currentUser = await userService.getCurrentUser().catch(() => null);
+  if (currentUser?.email === identity.email) {
+    return currentUser;
+  }
+
+  // Fallback (se o getCurrentUser falhar ou não retornar o usuário esperado)
   const users = await userService.list().catch(() => []);
   if (Array.isArray(users)) {
     const matchedUser = users.find((item) => item.email === identity.email);

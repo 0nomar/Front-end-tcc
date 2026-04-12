@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Send, Search, Phone, Video, MoreVertical, Smile, Paperclip, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../hooks/useAuth";
-import { useAsyncData } from "../hooks/useAsyncData";
+import { useAsyncData } from "../hooks/useAsyncDataHook";
 import { conversationService } from "../services/conversationService";
 import { StatusView } from "../components/StatusView";
 import "./ChatPage.css";

@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 
+/**
+ * Hook customizado para lidar com chamadas assíncronas (GET)
+ */
 export function useAsyncData(loader, dependencies = [], options = {}) {
   const { immediate = true, initialData = null } = options;
   const [data, setData] = useState(initialData);

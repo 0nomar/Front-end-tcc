@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { User, Mail, BookOpen, Building2, GraduationCap, Edit3, Save, X, Award, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../hooks/useAuth";
-import { useAsyncData } from "../hooks/useAsyncData";
+import { useAsyncData } from "../hooks/useAsyncDataHook";
 import { userService } from "../services/userService";
 import { applicationService } from "../services/applicationService";
 import { mapApplication } from "../utils/adapters";
