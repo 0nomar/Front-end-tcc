@@ -30,7 +30,7 @@ const navItems = [
   { path: "/app/feedback", label: "Feedback", icon: Star },
   { path: "/app/notifications", label: "Notificacoes", icon: Bell },
   { path: "/app/documents", label: "Documentos", icon: Upload },
-  { path: "/app/profile", label: "Meu Perfil", icon: User },
+  // { path: "/app/profile", label: "Meu Perfil", icon: User },
 ];
 
 function getInitials(name) {
@@ -124,7 +124,7 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
           {!collapsed && <span className="barra-lateral__rotulo-nav">Configuracoes</span>}
         </NavLink>
 
-        <motion.button
+        {/* <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.97 }}
           onClick={handleLogout}
@@ -132,9 +132,9 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
         >
           <LogOut size={18} style={{ flexShrink: 0 }} />
           {!collapsed && <span className="barra-lateral__rotulo-nav">Sair</span>}
-        </motion.button>
+        </motion.button> */}
 
-        {!collapsed && (
+        {/* {!collapsed && (
           <div className="barra-lateral__perfil-usuario">
             <div className="barra-lateral__avatar-usuario">
               <span className="barra-lateral__iniciais-usuario">{getInitials(user?.nome)}</span>
@@ -144,7 +144,7 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
               <p className="barra-lateral__tipo-usuario">{formatUserType(user?.tipo)}</p>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
