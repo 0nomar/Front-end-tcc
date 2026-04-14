@@ -36,6 +36,47 @@
   color: var(--cor-texto);
 }
 
+.pagina-projetos__acoes-cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-2);
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .pagina-projetos__acoes-cabecalho {
+    flex-direction: row;
+    width: auto;
+  }
+}
+
+.pagina-projetos__botao-novo {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espaco-2);
+  padding: var(--espaco-2) var(--espaco-4);
+  background-color: var(--cor-primaria);
+  color: var(--cor-branco);
+  border: none;
+  border-radius: var(--raio-medio);
+  cursor: pointer;
+  font-size: var(--tamanho-medio);
+  font-weight: var(--peso-semi);
+  transition: var(--transicao-normal);
+}
+
+.pagina-projetos__botao-novo:hover {
+  background-color: var(--cor-primaria-escura);
+}
+
+@media (min-width: 640px) {
+  .pagina-projetos__botao-novo {
+    width: auto;
+  }
+}
+
 .pagina-projetos__subtitulo {
   font-size: var(--tamanho-base);
   color: var(--cor-texto-mudo);

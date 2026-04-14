@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
-import { Search, FolderOpen, Users, Clock, ChevronRight, SlidersHorizontal, X } from "lucide-react";
+import { Search, FolderOpen, Users, Clock, ChevronRight, SlidersHorizontal, X, Plus } from "lucide-react";
 import { useAsyncData } from "../hooks/useAsyncDataHook";
 import { projectService } from "../services/projectService";
 import { StatusView } from "../components/StatusView";
@@ -66,20 +66,31 @@ export default function ProjectsPage() {
           <h2 className="pagina-projetos__titulo">{filtered.length} projetos encontrados</h2>
           <p className="pagina-projetos__subtitulo">Encontre a oportunidade certa para sua carreira academica</p>
         </div>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={() => setShowFilters(!showFilters)}
-          className={`pagina-projetos__botao-filtros ${showFilters ? "pagina-projetos__botao-filtros--ativo" : "pagina-projetos__botao-filtros--inativo"}`}
-        >
-          <SlidersHorizontal size={16} />
-          Filtros
-          {(selectedArea !== "Todas" || selectedStatus !== "Todos") && (
-            <span className="pagina-projetos__contador-filtros">
-              {(selectedArea !== "Todas" ? 1 : 0) + (selectedStatus !== "Todos" ? 1 : 0)}
-            </span>
-          )}
-        </motion.button>
+        <div className="pagina-projetos__acoes-cabecalho">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => navigate("/app/projects/new")}
+            className="pagina-projetos__botao-novo"
+          >
+            <Plus size={16} />
+            Novo projeto
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.97 }}
+            onClick={() => setShowFilters(!showFilters)}
+            className={`pagina-projetos__botao-filtros ${showFilters ? "pagina-projetos__botao-filtros--ativo" : "pagina-projetos__botao-filtros--inativo"}`}
+          >
+            <SlidersHorizontal size={16} />
+            Filtros
+            {(selectedArea !== "Todas" || selectedStatus !== "Todos") && (
+              <span className="pagina-projetos__contador-filtros">
+                {(selectedArea !== "Todas" ? 1 : 0) + (selectedStatus !== "Todos" ? 1 : 0)}
+              </span>
+            )}
+          </motion.button>
+        </div>
       </div>
 
       <div className="pagina-projetos__busca">

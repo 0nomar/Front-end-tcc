@@ -11,9 +11,20 @@ export function getUserType(user) {
 }
 
 export function mapProject(project) {
+  // ProjetoResponse retorna campos planos (orientadorId, alunoCriadorId)
+  // mas também pode vir com objetos aninhados (legado) — suporta os dois
   const orientadorUsuario = project?.orientador?.usuario ?? null;
   const alunoCriadorUsuario = project?.alunoCriador?.usuario ?? null;
+
+  const orientadorId = project?.orientadorId ?? orientadorUsuario?.id ?? null;
+  const orientadorNome = project?.orientadorNome ?? getUserName(orientadorUsuario) ?? null;
+  const orientadorEmail = project?.orientadorEmail ?? getUserEmail(orientadorUsuario) ?? null;
+
+  const alunoCriadorId = project?.alunoCriadorId ?? alunoCriadorUsuario?.id ?? null;
+  const alunoCriadorNome = project?.alunoCriadorNome ?? getUserName(alunoCriadorUsuario) ?? null;
+
   const vagasTotal =
+    project?.vagas ??
     project?.quantidadeVagas ??
     project?.qtdVagas ??
     project?.slots ??
@@ -28,29 +39,41 @@ export function mapProject(project) {
     id: project?.id,
     title: project?.titulo ?? project?.title ?? "Projeto sem titulo",
     description: project?.descricao ?? project?.description ?? "",
-    requirements: project?.requisitos ?? project?.requirements ?? [],
+    requisitos: project?.requisitos ?? "",
+    requirements: (() => {
+      const r = project?.requisitos ?? project?.requirements;
+      if (!r) return [];
+      if (Array.isArray(r)) return r;
+      return r.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean);
+    })(),
     tags: project?.tags ?? [],
-    courses: project?.cursosAceitos ?? project?.course ?? [],
-    area: project?.area ?? project?.orientador?.areaAtuacao ?? "Pesquisa",
+    courses: project?.cursosAceitos ?? (project?.cursoNome ? [project.cursoNome] : []),
+    area: project?.areaNome ?? project?.area ?? project?.orientador?.areaAtuacao ?? "Pesquisa",
+    areaId: project?.areaId ?? null,
     status: project?.status ?? "ABERTO",
     createdAt: project?.dataCriacao ?? project?.createdAt ?? null,
+    dataInicio: project?.dataInicio ?? null,
+    dataFim: project?.dataFim ?? null,
+    dataLimiteInscricao: project?.dataLimiteInscricao ?? null,
     slots: vagasTotal,
     slotsUsed: vagasOcupadas,
-    advisor: orientadorUsuario
+    ownerId: alunoCriadorId,
+    advisorId: orientadorId,
+    advisor: (orientadorId || orientadorNome)
       ? {
-          id: orientadorUsuario.id,
-          name: getUserName(orientadorUsuario),
-          email: getUserEmail(orientadorUsuario),
-          type: getUserType(orientadorUsuario),
-          specialty: project?.orientador?.areaAtuacao ?? "",
+          id: orientadorId,
+          name: orientadorNome ?? "Orientador",
+          email: orientadorEmail ?? "",
+          type: "ORIENTADOR",
+          specialty: project?.orientador?.areaAtuacao ?? project?.areaNome ?? "",
         }
       : null,
-    owner: alunoCriadorUsuario
+    owner: (alunoCriadorId || alunoCriadorNome)
       ? {
-          id: alunoCriadorUsuario.id,
-          name: getUserName(alunoCriadorUsuario),
-          email: getUserEmail(alunoCriadorUsuario),
-          type: getUserType(alunoCriadorUsuario),
+          id: alunoCriadorId,
+          name: alunoCriadorNome ?? "Aluno",
+          email: "",
+          type: "ALUNO",
         }
       : null,
   };

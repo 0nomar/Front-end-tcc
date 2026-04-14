@@ -15,6 +15,8 @@ import ProfilePage from "./pages/ProfilePage";
 import DocumentsPage from "./pages/DocumentsPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import SettingsPage from "./pages/SettingsPage";
+import CreateProjectPage from "./pages/CreateProjectPage";
+import EditProjectPage from "./pages/EditProjectPage";
 
 export const router = createBrowserRouter([
   {
@@ -39,6 +41,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, Component: DashboardPage },
       { path: "projects", Component: ProjectsPage },
+      { path: "projects/new", Component: CreateProjectPage },
+      { path: "projects/:id/edit", Component: EditProjectPage },
       { path: "projects/:id", Component: ProjectDetailPage },
       { path: "applications", Component: ApplicationsPage },
       { path: "chat", Component: ChatPage },
