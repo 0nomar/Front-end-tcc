@@ -73,6 +73,62 @@
 }
 
 /* ================================================================
+   Seleção de Tipo de Documento (Chips)
+   ================================================================ */
+.pagina-documentos__secao-tipo {
+  background-color: var(--cor-branco);
+  padding: var(--espaco-5);
+  border-radius: var(--raio-grande);
+  border: 1px solid var(--cor-borda-clara);
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-3);
+}
+
+.pagina-documentos__tipo-label {
+  font-size: 0.875rem;
+  color: var(--cor-texto-secundario);
+  font-weight: var(--peso-semi);
+}
+
+.pagina-documentos__tipo-opcoes {
+  display: flex;
+  gap: var(--espaco-3);
+  flex-wrap: wrap;
+}
+
+.pagina-documentos__tipo-botao {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-2);
+  padding: var(--espaco-2) var(--espaco-4);
+  border-radius: var(--raio-grande);
+  font-size: 0.9rem;
+  font-weight: var(--peso-medio);
+  cursor: pointer;
+  transition: var(--transicao-normal);
+  border: 1px solid var(--cor-borda);
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto-secundario);
+}
+
+.pagina-documentos__tipo-botao:hover {
+  border-color: var(--cor-primaria-clara);
+  background-color: var(--cor-primaria-leve);
+}
+
+.pagina-documentos__tipo-botao--ativo {
+  background-color: var(--cor-primaria);
+  color: var(--cor-branco);
+  border-color: var(--cor-primaria);
+}
+
+.pagina-documentos__tipo-botao--ativo:hover {
+  background-color: var(--cor-primaria-escura);
+  border-color: var(--cor-primaria-escura);
+}
+
+/* ================================================================
    Zona de upload
    ================================================================ */
 .pagina-documentos__zona-upload {
@@ -407,6 +463,18 @@
   font-weight: var(--peso-medio);
 }
 
+.documento-item__categoria--historico {
+  background-color: var(--cor-primaria-clara);
+  color: var(--cor-primaria-texto);
+  border-color: var(--cor-primaria-borda);
+}
+
+.documento-item__categoria--curriculo {
+  background-color: var(--cor-sucesso-clara);
+  color: var(--cor-sucesso-texto);
+  border-color: var(--cor-sucesso-borda);
+}
+
 /* Status */
 .documento-item__status {
   display: flex;
@@ -417,6 +485,21 @@
   font-size: 0.72rem;
   font-weight: var(--peso-semi);
   flex-shrink: 0;
+}
+
+.documento-item__status--enviado {
+  background-color: var(--cor-atencao-clara);
+  color: var(--cor-atencao-texto);
+}
+
+.documento-item__status--verificado {
+  background-color: var(--cor-sucesso-clara);
+  color: var(--cor-sucesso-texto);
+}
+
+.documento-item__status--rejeitado {
+  background-color: var(--cor-erro-clara);
+  color: var(--cor-erro-texto);
 }
 
 /* Ações */

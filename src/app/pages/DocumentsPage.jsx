@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { useAuth } from "../hooks/useAuth";
 import { useAsyncData } from "../hooks/useAsyncDataHook";
 import { userService } from "../services/userService";
+import { api } from "../services/api";
 import { documentService } from "../services/documentService";
 import { mapDocument } from "../utils/adapters";
 import { StatusView } from "../components/StatusView";
@@ -28,8 +29,8 @@ export default function DocumentsPage() {
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  // 1. NOVO ESTADO: Guarda qual o tipo de documento o usuário quer enviar
-  const [tipoDocumento, setTipoDocumento] = useState("IDENTIDADE");
+  // 1. ESTADO: Guarda qual o tipo de documento o usuário quer enviar
+  const [tipoDocumento, setTipoDocumento] = useState("HISTORICO");
 
   // ... dentro do componente DocumentsPage ...
 const { data, loading, error, reload } = useAsyncData(
@@ -63,15 +64,12 @@ const { data, loading, error, reload } = useAsyncData(
     try {
       await documentService.upload(user.id, tipoDocumento, file);
 
-      toast.success("Documento enviado com sucesso.");
+      toast.success(`${tipoDocumento === "HISTORICO" ? "Histórico" : "Currículo"} enviado com sucesso.`);
       await reload(); // Atualiza a lista
-    } catch (error) { // ⬅️ DECLARAMOS A VARIÁVEL COMO 'error'
-      // ⬅️ USAMOS A MESMA VARIÁVEL 'error' AQUI DENTRO
+    } catch (error) {
       const erroBackend = error.response?.data?.message || error.message;
       toast.error(erroBackend || "Não foi possível enviar o documento.");
-
-      // Coloquei esse console.log para vermos o verdadeiro motivo da falha!
-      console.error("O verdadeiro erro do upload foi:", error);
+      console.error("Erro no upload:", error);
     } finally {
       setUploading(false);
     }
@@ -80,7 +78,7 @@ const { data, loading, error, reload } = useAsyncData(
   const handleDelete = async (id) => {
     try {
       await documentService.remove(id);
-      await reload(); // <-- MUDE AQUI! Recarrega a lista do backend
+      await reload(); 
       toast.success("Documento removido.");
     } catch (err) {
       toast.error(err.message || "Não foi possível remover o documento.");
@@ -96,7 +94,7 @@ const { data, loading, error, reload } = useAsyncData(
   const statValues = useMemo(
     () => ({
       total: docs.length,
-      verified: docs.length, // Lógica simulada, futuramente você pode checar se o status === 'VERIFICADO'
+      verified: docs.filter(d => d.status === "VERIFICADO" || d.status === "ATIVO" || !d.status).length, 
     }),
     [docs],
   );
@@ -123,20 +121,25 @@ const { data, loading, error, reload } = useAsyncData(
         ))}
       </div>
 
-      {/* 3. NOVO ELEMENTO: Select de Tipo de Documento */}
-      <div style={{ marginBottom: "1rem", backgroundColor: "var(--cor-branco)", padding: "1rem", borderRadius: "var(--raio-grande)", border: "1px solid var(--cor-borda-clara)" }}>
-        <label style={{ display: "block", marginBottom: "0.5rem", fontSize: "0.9rem", color: "var(--cor-texto-secundario)", fontWeight: "600" }}>
-          Selecione o tipo de documento que vai enviar:
-        </label>
-        <select
-          value={tipoDocumento}
-          onChange={(e) => setTipoDocumento(e.target.value)}
-          style={{ width: "100%", padding: "0.75rem", borderRadius: "8px", border: "1px solid var(--cor-borda)", outline: "none", fontSize: "1rem", backgroundColor: "var(--cor-fundo)" }}
-        >
-          {/* Lembre-se: os "values" aqui devem ser IGUAIS ao nome do seu Enum no Spring Boot */}
-          <option value="HISTORICO">Histórico Escolar</option>
-          <option value="CURRICULO">Currículo</option>
-        </select>
+      {/* Seleção de Tipo de Documento com Chips */}
+      <div className="pagina-documentos__secao-tipo">
+        <p className="pagina-documentos__tipo-label">Selecione o que deseja enviar:</p>
+        <div className="pagina-documentos__tipo-opcoes">
+          <button 
+            onClick={() => setTipoDocumento("HISTORICO")}
+            className={`pagina-documentos__tipo-botao ${tipoDocumento === "HISTORICO" ? "pagina-documentos__tipo-botao--ativo" : ""}`}
+          >
+            <FileText size={16} />
+            Histórico Escolar
+          </button>
+          <button 
+            onClick={() => setTipoDocumento("CURRICULO")}
+            className={`pagina-documentos__tipo-botao ${tipoDocumento === "CURRICULO" ? "pagina-documentos__tipo-botao--ativo" : ""}`}
+          >
+            <FileText size={16} />
+            Currículo (Lattes/PDF)
+          </button>
+        </div>
       </div>
 
       {/* Área de Drop do Arquivo */}
@@ -164,7 +167,7 @@ const { data, loading, error, reload } = useAsyncData(
             <div className="pagina-documentos__upload-icone-animado">
               <Upload size={20} />
             </div>
-            <p className="pagina-documentos__upload-label">Enviando arquivo...</p>
+            <p className="pagina-documentos__upload-label">Enviando {tipoDocumento === "HISTORICO" ? "Histórico" : "Currículo"}...</p>
           </div>
         ) : (
           <>
@@ -172,9 +175,11 @@ const { data, loading, error, reload } = useAsyncData(
               <Upload size={22} className={dragging ? "pagina-documentos__upload-icone--arrastando" : "pagina-documentos__upload-icone--normal"} />
             </div>
             <p className="pagina-documentos__upload-titulo">
-              {dragging ? "Solte o arquivo aqui" : "Arraste arquivos ou clique para fazer upload"}
+              {dragging ? "Solte o arquivo aqui" : "Clique ou arraste seu arquivo aqui"}
             </p>
-            <p className="pagina-documentos__upload-subtitulo">O arquivo será salvo como: {tipoDocumento}</p>
+            <p className="pagina-documentos__upload-subtitulo">
+              Formatos aceitos: PDF, DOC, DOCX
+            </p>
           </>
         )}
       </div>
@@ -207,26 +212,33 @@ const { data, loading, error, reload } = useAsyncData(
                 </div>
 
                 <div className="documento-item__info">
-                  {/* Puxando o nome. Se vier vazio, coloca um texto padrão */}
                   <p className="documento-item__nome">{doc.name || "Documento sem nome"}</p>
 
                   <div className="documento-item__meta">
                     <span className="documento-item__data">
                       {doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString("pt-BR") : "-"}
                     </span>
-                    <span className="documento-item__categoria">{doc.type}</span>
+                    <span className={`documento-item__categoria documento-item__categoria--${doc.type?.toLowerCase()}`}>
+                      {doc.type === "HISTORICO" ? "Histórico Escolar" : "Currículo"}
+                    </span>
                   </div>
                 </div>
 
-                <div className="documento-item__status" style={{ background: "var(--cor-sucesso-clara)", color: "var(--cor-sucesso-escura)" }}>
+                <div className={`documento-item__status documento-item__status--${doc.status?.toLowerCase() || "enviado"}`}>
                   <CheckCircle size={12} />
-                  {doc.status || "Disponível"}
+                  {doc.status || "Enviado"}
                 </div>
 
                 <div className="documento-item__acoes">
-                  <button className="documento-item__botao-acao" title="Visualizar">
+                  <a 
+                    href={`${api.baseUrl}/api/documentos/${doc.id}/preview`} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="documento-item__botao-acao" 
+                    title="Visualizar"
+                  >
                     <Eye size={15} />
-                  </button>
+                  </a>
                   <button onClick={() => handleDelete(doc.id)} className="documento-item__botao-acao documento-item__botao-excluir" title="Excluir">
                     <Trash2 size={15} />
                   </button>
