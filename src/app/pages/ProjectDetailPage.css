@@ -116,6 +116,39 @@
   margin-bottom: var(--espaco-4);
 }
 
+.detalhe-card__titulo-secao--inline {
+  margin-bottom: 0;
+}
+
+.detalhe-card__linha-inscricoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-3);
+  margin-bottom: var(--espaco-4);
+}
+
+.detalhe-card__link-gerir-inscricoes {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-2);
+  padding: var(--espaco-2) var(--espaco-4);
+  border-radius: var(--raio-grande);
+  border: 1px solid var(--cor-primaria-borda);
+  background-color: var(--cor-primaria-clara);
+  color: var(--cor-primaria);
+  font-size: var(--tamanho-base);
+  font-weight: var(--peso-semi);
+  cursor: pointer;
+  font-family: var(--fonte-principal);
+  transition: var(--transicao-normal);
+}
+
+.detalhe-card__link-gerir-inscricoes:hover {
+  background-color: var(--cor-primaria-leve);
+}
+
 /* ================================================================
    Card de cabeçalho do projeto
    ================================================================ */

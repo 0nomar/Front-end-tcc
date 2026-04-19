@@ -7,6 +7,7 @@ import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
 import ProjectsPage from "./pages/ProjectsPage";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
+import ProjectApplicationsPage from "./pages/ProjectApplicationsPage";
 import ApplicationsPage from "./pages/ApplicationsPage";
 import ChatPage from "./pages/ChatPage";
 import ProgressPage from "./pages/ProgressPage";
@@ -43,6 +44,7 @@ export const router = createBrowserRouter([
       { path: "projects", Component: ProjectsPage },
       { path: "projects/new", Component: CreateProjectPage },
       { path: "projects/:id/edit", Component: EditProjectPage },
+      { path: "projects/:id/applications", Component: ProjectApplicationsPage },
       { path: "projects/:id", Component: ProjectDetailPage },
       { path: "applications", Component: ApplicationsPage },
       { path: "chat", Component: ChatPage },

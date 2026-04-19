@@ -99,7 +99,7 @@ export default function ProjectDetailPage() {
   const handleApply = async () => {
     setLoadingApply(true);
     try {
-      await applicationService.create(id);
+      await applicationService.create(id, motivation.trim());
       toast.success("Inscricao enviada com sucesso.");
       setShowModal(false);
       setMotivation("");
@@ -109,6 +109,11 @@ export default function ProjectDetailPage() {
     } finally {
       setLoadingApply(false);
     }
+  };
+
+  const closeApplyModal = () => {
+    setShowModal(false);
+    setMotivation("");
   };
 
   const handleDelete = async () => {
@@ -160,7 +165,7 @@ export default function ProjectDetailPage() {
     c?.usuario?.id ?? c?.usuarioId ?? c?.id;
 
   const getInscricaoName = (i) =>
-    i?.aluno?.usuario?.nome ?? i?.usuario?.nome ?? i?.nome ?? `Inscricao #${i?.id}`;
+    i?.alunoNome ?? i?.aluno?.usuario?.nome ?? i?.usuario?.nome ?? i?.nome ?? `Inscricao #${i?.id}`;
 
   if (loading) {
     return <StatusView title="Carregando projeto" description="Buscando detalhes do projeto na API." />;
@@ -283,7 +288,16 @@ export default function ProjectDetailPage() {
           {/* Inscricoes pendentes (apenas dono) */}
           {isOwner && (
             <div className="detalhe-card">
-              <h2 className="detalhe-card__titulo-secao">Inscricoes pendentes</h2>
+              <div className="detalhe-card__linha-inscricoes">
+                <h2 className="detalhe-card__titulo-secao detalhe-card__titulo-secao--inline">Inscricoes pendentes</h2>
+                <button
+                  type="button"
+                  onClick={() => navigate(`/app/projects/${id}/applications`)}
+                  className="detalhe-card__link-gerir-inscricoes"
+                >
+                  <Users size={15} /> Gerenciar inscricoes
+                </button>
+              </div>
               {inscricoes.length === 0 ? (
                 <p className="detalhe-card__descricao">Nenhuma inscricao pendente.</p>
               ) : (
@@ -415,7 +429,11 @@ export default function ProjectDetailPage() {
 
       {/* ── Modal inscrição ── */}
       {showModal && (
-        <div className="modal-inscricao__sobreposicao">
+        <div
+          className="modal-inscricao__sobreposicao"
+          role="presentation"
+          onClick={(e) => e.target === e.currentTarget && !loadingApply && closeApplyModal()}
+        >
           <div className="modal-inscricao__painel">
             <div className="modal-inscricao__cabecalho">
               <h3 className="modal-inscricao__titulo">Inscricao no projeto</h3>
@@ -424,17 +442,22 @@ export default function ProjectDetailPage() {
             <div className="modal-inscricao__corpo">
               <div>
                 <label className="modal-inscricao__label">Carta de motivacao</label>
-                <textarea value={motivation} onChange={(e) => setMotivation(e.target.value)}
-                  rows={5} className="modal-inscricao__textarea"
-                  placeholder="Escreva sua motivacao para o projeto..." />
-                <p className="modal-inscricao__contador">{motivation.length}/1000 caracteres</p>
+                <textarea
+                  value={motivation}
+                  onChange={(e) => setMotivation(e.target.value)}
+                  rows={5}
+                  maxLength={1500}
+                  className="modal-inscricao__textarea"
+                  placeholder="Escreva sua motivacao para o projeto..."
+                />
+                <p className="modal-inscricao__contador">{motivation.length}/1500 caracteres</p>
               </div>
             </div>
             <div className="modal-inscricao__rodape">
-              <button onClick={() => setShowModal(false)} className="modal-inscricao__botao-cancelar">
+              <button type="button" onClick={closeApplyModal} className="modal-inscricao__botao-cancelar" disabled={loadingApply}>
                 Cancelar
               </button>
-              <button onClick={handleApply} disabled={loadingApply} className="modal-inscricao__botao-enviar">
+              <button type="button" onClick={handleApply} disabled={loadingApply} className="modal-inscricao__botao-enviar">
                 {loadingApply ? <div className="modal-inscricao__spinner" /> : <><Send size={15} /> Enviar inscricao</>}
               </button>
             </div>

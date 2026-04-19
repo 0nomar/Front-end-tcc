@@ -198,6 +198,18 @@
   cursor: pointer;
 }
 
+.inscricao-card__cabecalho--botao {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  color: inherit;
+}
+
 .inscricao-card__linha-principal {
   display: flex;
   align-items: flex-start;
@@ -384,4 +396,14 @@
 
 .inscricao-card__botao--progresso:hover {
   background-color: var(--cor-sucesso-leve);
+}
+
+.inscricao-card__botao--cancelar {
+  background-color: var(--cor-erro-clara);
+  border-color: var(--cor-erro-borda);
+  color: var(--cor-erro-escura);
+}
+
+.inscricao-card__botao--cancelar:hover {
+  background-color: rgba(239, 68, 68, 0.14);
 }

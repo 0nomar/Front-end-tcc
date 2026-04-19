@@ -9,13 +9,16 @@ import {
   MessageSquare,
   Calendar,
   ExternalLink,
+  Loader2,
 } from "lucide-react";
+import { toast } from "sonner";
 import { useAsyncData } from "../hooks/useAsyncDataHook";
 import { applicationService } from "../services/applicationService";
 import { mapApplication } from "../utils/adapters";
 import { formatApplicationStatus } from "../utils/formatters";
 import { StatusView } from "../components/StatusView";
 import "./ApplicationsPage.css";
+import "./ProjectDetailPage.css";
 
 const statusConfig = {
   APROVADO: {
@@ -24,6 +27,7 @@ const statusConfig = {
     iconeColor: "var(--cor-sucesso)",
     etiquetaClass: "inscricao-card__etiqueta-status--aprovado",
     expandidaClass: "inscricao-card__conteudo-expandido--aprovado",
+    textoMotivacaoClass: "inscricao-card__texto-motivacao--aprovado",
   },
   PENDENTE: {
     icon: Clock,
@@ -31,6 +35,7 @@ const statusConfig = {
     iconeColor: "var(--cor-atencao)",
     etiquetaClass: "inscricao-card__etiqueta-status--pendente",
     expandidaClass: "inscricao-card__conteudo-expandido--pendente",
+    textoMotivacaoClass: "inscricao-card__texto-motivacao--pendente",
   },
   REJEITADO: {
     icon: XCircle,
@@ -38,15 +43,25 @@ const statusConfig = {
     iconeColor: "var(--cor-erro)",
     etiquetaClass: "inscricao-card__etiqueta-status--rejeitado",
     expandidaClass: "inscricao-card__conteudo-expandido--rejeitado",
+    textoMotivacaoClass: "inscricao-card__texto-motivacao--rejeitado",
   },
 };
 
+function mapMine(raw) {
+  const base = mapApplication(raw);
+  return {
+    ...base,
+    motivation: raw.motivacao ?? "",
+    advisorFeedback: raw.parecerOrientador ?? "",
+  };
+}
+
 export default function ApplicationsPage() {
   const navigate = useNavigate();
-  const { data, loading, error } = useAsyncData(
+  const { data, setData, loading, error } = useAsyncData(
     async () => {
       const result = await applicationService.listMine();
-      return Array.isArray(result) ? result.map(mapApplication) : [];
+      return Array.isArray(result) ? result.map(mapMine) : [];
     },
     [],
     { initialData: [] },
@@ -54,6 +69,8 @@ export default function ApplicationsPage() {
   const applications = Array.isArray(data) ? data : [];
   const [filter, setFilter] = useState("all");
   const [expandedId, setExpandedId] = useState(null);
+  const [cancelTargetId, setCancelTargetId] = useState(null);
+  const [cancelSubmitting, setCancelSubmitting] = useState(false);
 
   const filtered = useMemo(
     () => (filter === "all" ? applications : applications.filter((item) => item.status === filter)),
@@ -69,6 +86,22 @@ export default function ApplicationsPage() {
     }),
     [applications],
   );
+
+  const handleConfirmCancel = async () => {
+    if (cancelTargetId == null) return;
+    setCancelSubmitting(true);
+    try {
+      await applicationService.cancel(cancelTargetId);
+      setData((prev) => (Array.isArray(prev) ? prev.filter((a) => a.id !== cancelTargetId) : prev));
+      toast.success("Inscricao cancelada.");
+      setCancelTargetId(null);
+      if (expandedId === cancelTargetId) setExpandedId(null);
+    } catch (err) {
+      toast.error(err.message || "Nao foi possivel cancelar a inscricao.");
+    } finally {
+      setCancelSubmitting(false);
+    }
+  };
 
   if (loading) {
     return <StatusView title="Carregando inscricoes" description="Buscando suas inscricoes na API." />;
@@ -89,6 +122,7 @@ export default function ApplicationsPage() {
         ].map(([status, label]) => (
           <button
             key={status}
+            type="button"
             onClick={() => setFilter(status)}
             className={`resumo-inscricao ${filter === status ? "resumo-inscricao--ativo" : "resumo-inscricao--inativo"}`}
           >
@@ -106,6 +140,7 @@ export default function ApplicationsPage() {
         {["all", "APROVADO", "PENDENTE", "REJEITADO"].map((status) => (
           <button
             key={status}
+            type="button"
             onClick={() => setFilter(status)}
             className={`pagina-inscricoes__aba ${filter === status ? "pagina-inscricoes__aba--ativa" : "pagina-inscricoes__aba--inativa"}`}
           >
@@ -119,9 +154,15 @@ export default function ApplicationsPage() {
           <div className="pagina-inscricoes__icone-vazio">
             <FileText size={24} style={{ color: "var(--cor-texto-mudo)" }} />
           </div>
-          <h3 className="pagina-inscricoes__titulo-vazio">Nenhuma inscricao encontrada</h3>
-          <p className="pagina-inscricoes__descricao-vazio">Quando existir historico real de inscricoes, ele aparecera aqui.</p>
-          <button onClick={() => navigate("/app/projects")} className="pagina-inscricoes__botao-explorar">
+          <h3 className="pagina-inscricoes__titulo-vazio">
+            {applications.length === 0 ? "Nenhuma inscricao encontrada" : "Nenhuma inscricao neste filtro"}
+          </h3>
+          <p className="pagina-inscricoes__descricao-vazio">
+            {applications.length === 0
+              ? "Explore projetos abertos e envie sua primeira inscricao com uma carta de motivacao."
+              : "Tente outro filtro ou volte para ver todas as inscricoes."}
+          </p>
+          <button type="button" onClick={() => navigate("/app/projects")} className="pagina-inscricoes__botao-explorar">
             Explorar projetos
           </button>
         </div>
@@ -130,10 +171,15 @@ export default function ApplicationsPage() {
           {filtered.map((application) => {
             const cfg = statusConfig[application.status] ?? statusConfig.PENDENTE;
             const isExpanded = expandedId === application.id;
+            const projectId = application.project?.id;
 
             return (
               <div key={application.id} className="inscricao-card">
-                <div className="inscricao-card__cabecalho" onClick={() => setExpandedId(isExpanded ? null : application.id)}>
+                <button
+                  type="button"
+                  className="inscricao-card__cabecalho inscricao-card__cabecalho--botao"
+                  onClick={() => setExpandedId(isExpanded ? null : application.id)}
+                >
                   <div className="inscricao-card__linha-principal">
                     <div className={`inscricao-card__icone-status ${cfg.iconeClass}`}>
                       <cfg.icon size={20} style={{ color: cfg.iconeColor }} />
@@ -164,31 +210,48 @@ export default function ApplicationsPage() {
                       className={`inscricao-card__icone-expansao ${isExpanded ? "inscricao-card__icone-expansao--expandido" : ""}`}
                     />
                   </div>
-                </div>
+                </button>
 
                 {isExpanded && (
                   <div className={`inscricao-card__conteudo-expandido ${cfg.expandidaClass}`}>
                     <div className="inscricao-card__secao-expandida">
-                      <div>
-                        <h4 className="inscricao-card__rotulo-secao">Detalhes</h4>
-                        <p className="inscricao-card__feedback">
-                          Esta inscricao foi carregada da API real. O backend atual ainda nao expõe carta de motivacao nem resposta textual do orientador.
-                        </p>
-                      </div>
+                      {application.motivation?.trim() ? (
+                        <div>
+                          <h4 className="inscricao-card__rotulo-secao">Minha motivacao:</h4>
+                          <p className={`inscricao-card__texto-motivacao ${cfg.textoMotivacaoClass ?? ""}`}>
+                            {application.motivation}
+                          </p>
+                        </div>
+                      ) : null}
+
+                      {application.advisorFeedback?.trim() ? (
+                        <div>
+                          <h4 className="inscricao-card__rotulo-secao">Parecer do orientador:</h4>
+                          <p className="inscricao-card__feedback">{application.advisorFeedback}</p>
+                        </div>
+                      ) : null}
 
                       <div className="inscricao-card__botoes-acao">
                         <button
-                          onClick={() => navigate(`/app/projects/${application.project?.id}`)}
+                          type="button"
+                          onClick={() => projectId != null && navigate(`/app/projects/${projectId}`)}
+                          disabled={projectId == null}
                           className="inscricao-card__botao inscricao-card__botao--neutro"
                         >
                           <ExternalLink size={13} /> Ver projeto
                         </button>
-                        <button
-                          onClick={() => navigate("/app/chat")}
-                          className="inscricao-card__botao inscricao-card__botao--mensagem"
-                        >
+                        <button type="button" onClick={() => navigate("/app/chat")} className="inscricao-card__botao inscricao-card__botao--mensagem">
                           <MessageSquare size={13} /> Enviar mensagem
                         </button>
+                        {application.status === "PENDENTE" && (
+                          <button
+                            type="button"
+                            onClick={() => setCancelTargetId(application.id)}
+                            className="inscricao-card__botao inscricao-card__botao--cancelar"
+                          >
+                            <XCircle size={13} /> Cancelar inscricao
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -196,6 +259,39 @@ export default function ApplicationsPage() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {cancelTargetId != null && (
+        <div
+          className="modal-inscricao__sobreposicao"
+          role="presentation"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !cancelSubmitting) setCancelTargetId(null);
+          }}
+        >
+          <div className="modal-inscricao__painel modal-confirmacao">
+            <h3 className="modal-inscricao__titulo">Cancelar inscricao</h3>
+            <p className="modal-confirmacao__texto">Tem certeza que deseja cancelar esta inscricao?</p>
+            <div className="modal-inscricao__rodape">
+              <button
+                type="button"
+                onClick={() => setCancelTargetId(null)}
+                className="modal-inscricao__botao-cancelar"
+                disabled={cancelSubmitting}
+              >
+                Voltar
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmCancel}
+                disabled={cancelSubmitting}
+                className="modal-confirmacao__botao-confirmar"
+              >
+                {cancelSubmitting ? <Loader2 size={15} className="girando" /> : "Confirmar cancelamento"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
