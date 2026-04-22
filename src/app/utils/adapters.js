@@ -10,6 +10,35 @@ export function getUserType(user) {
   return user?.tipo ?? user?.type ?? user?.usuario?.tipo ?? "";
 }
 
+function toNumber(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function getProjectParticipants(project) {
+  if (Array.isArray(project?.participantes_aprovados)) return project.participantes_aprovados;
+  if (Array.isArray(project?.participantesAprovados)) return project.participantesAprovados;
+  if (Array.isArray(project?.participantes)) return project.participantes;
+  if (Array.isArray(project?.colaboradores)) return project.colaboradores;
+  return [];
+}
+
+function getProjectCollaborators(project) {
+  if (Array.isArray(project?.colaboradores)) return project.colaboradores;
+  if (Array.isArray(project?.participantes_aprovados)) return project.participantes_aprovados;
+  if (Array.isArray(project?.participantesAprovados)) return project.participantesAprovados;
+  return [];
+}
+
+function hasExplicitParticipants(project) {
+  return (
+    Array.isArray(project?.participantes_aprovados) ||
+    Array.isArray(project?.participantesAprovados) ||
+    Array.isArray(project?.participantes) ||
+    Array.isArray(project?.colaboradores)
+  );
+}
+
 export function mapProject(project) {
   // ProjetoResponse retorna campos planos (orientadorId, alunoCriadorId)
   // mas também pode vir com objetos aninhados (legado) — suporta os dois
@@ -23,17 +52,26 @@ export function mapProject(project) {
   const alunoCriadorId = project?.alunoCriadorId ?? alunoCriadorUsuario?.id ?? null;
   const alunoCriadorNome = project?.alunoCriadorNome ?? getUserName(alunoCriadorUsuario) ?? null;
 
+  const participantes = getProjectParticipants(project);
+  const colaboradores = getProjectCollaborators(project);
+  const colaboradoresAceitos = colaboradores.filter((colaborador) => colaborador?.status === "ACEITO");
   const vagasTotal =
-    project?.vagas ??
-    project?.quantidadeVagas ??
-    project?.qtdVagas ??
-    project?.slots ??
+    toNumber(project?.limite_vagas) ??
+    toNumber(project?.limiteVagas) ??
+    toNumber(project?.limite_participantes) ??
+    toNumber(project?.limiteParticipantes) ??
+    toNumber(project?.vagas) ??
+    toNumber(project?.quantidadeVagas) ??
+    toNumber(project?.qtdVagas) ??
+    toNumber(project?.slots) ??
     0;
   const vagasOcupadas =
-    project?.quantidadeVagasPreenchidas ??
-    project?.slotsUsed ??
-    project?.colaboradores?.length ??
-    0;
+    hasExplicitParticipants(project)
+      ? participantes.length
+      : toNumber(project?.quantidadeVagasPreenchidas) ??
+        toNumber(project?.slotsUsed) ??
+        0;
+  const vagasRestantes = Math.max(vagasTotal - vagasOcupadas, 0);
 
   return {
     id: project?.id,
@@ -57,6 +95,11 @@ export function mapProject(project) {
     dataLimiteInscricao: project?.dataLimiteInscricao ?? null,
     slots: vagasTotal,
     slotsUsed: vagasOcupadas,
+    slotsRemaining: vagasRestantes,
+    participants: participantes,
+    approvedParticipants: participantes,
+    collaborators: colaboradores,
+    acceptedCollaborators: colaboradoresAceitos,
     ownerId: alunoCriadorId,
     advisorId: orientadorId,
     advisor: (orientadorId || orientadorNome)

@@ -263,6 +263,31 @@
 }
 
 /* ================================================================
+   Curso filter input
+   ================================================================ */
+.pagina-projetos__input-filtro {
+  margin-top: 0.5rem;
+}
+
+.pagina-projetos__input-filtro-curso {
+  width: 100%;
+  padding: 0.75rem var(--espaco-3);
+  background-color: var(--cor-branco);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-grande);
+  font-size: 0.9rem;
+  color: var(--cor-texto);
+  transition: var(--transicao-normal);
+  outline: none;
+  box-shadow: var(--sombra-minima);
+}
+
+.pagina-projetos__input-filtro-curso:focus {
+  border-color: transparent;
+  box-shadow: 0 0 0 2px var(--cor-primaria);
+}
+
+/* ================================================================
    Filtros rápidos por área
    ================================================================ */
 .pagina-projetos__filtros-rapidos {

@@ -11,10 +11,8 @@ import {
 import { toast } from "sonner";
 import { useAuth } from "../hooks/useAuth";
 import { useAsyncData } from "../hooks/useAsyncDataHook";
-import { userService } from "../services/userService";
 import { api } from "../services/api";
 import { documentService } from "../services/documentService";
-import { mapDocument } from "../utils/adapters";
 import { StatusView } from "../components/StatusView";
 import "./DocumentsPage.css";
 
@@ -23,36 +21,49 @@ const statItems = [
   { key: "verified", label: "Verificados", icon: CheckCircle, areaClass: "resumo-documentos__icone-area--verde", iconClass: "resumo-documentos__icone--verde" },
 ];
 
+function normalizeDocument(doc) {
+  return {
+    id: doc?.id,
+    name: doc?.nomeArquivo ?? doc?.name ?? "Documento",
+    type: doc?.tipo ?? doc?.type ?? "CURRICULO",
+    uploadedAt: doc?.dataEnvio ?? doc?.uploadedAt ?? null,
+    status: doc?.status ?? "ENVIADO",
+    previewUrl: doc?.previewUrl ?? `/api/documentos/${doc?.id}/preview`,
+  };
+}
+
+function buildPreviewUrl(doc) {
+  if (!doc?.previewUrl) {
+    return `${api.baseUrl}/api/documentos/${doc.id}/preview`;
+  }
+
+  if (doc.previewUrl.startsWith("http")) {
+    return doc.previewUrl;
+  }
+
+  return `${api.baseUrl}${doc.previewUrl}`;
+}
+
 export default function DocumentsPage() {
   const { user } = useAuth();
   const fileInputRef = useRef(null);
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
-
-  // 1. ESTADO: Guarda qual o tipo de documento o usuário quer enviar
   const [tipoDocumento, setTipoDocumento] = useState("HISTORICO");
-
-  // ... dentro do componente DocumentsPage ...
-const { data, loading, error, reload } = useAsyncData(
+  const { data, loading, error, reload } = useAsyncData(
     async () => {
       if (!user?.id) return [];
-      
+
       const response = await documentService.getDocuments(user.id);
       const listaDocumentos = response?.data || response || [];
-      
+
       if (!Array.isArray(listaDocumentos)) return [];
 
-      return listaDocumentos.map(doc => ({
-        id: doc.id,
-        name: doc.nomeArquivo, 
-        type: doc.tipo,
-        uploadedAt: doc.dataEnvio,
-        status: doc.status
-      }));
+      return listaDocumentos.map(normalizeDocument);
     },
-    [user?.id], 
-    { initialData: [] }
-);
+    [user?.id],
+    { initialData: [] },
+  );
 
   const docs = Array.isArray(data) ? data : [];
 
@@ -63,13 +74,10 @@ const { data, loading, error, reload } = useAsyncData(
     setUploading(true);
     try {
       await documentService.upload(user.id, tipoDocumento, file);
-
       toast.success(`${tipoDocumento === "HISTORICO" ? "Histórico" : "Currículo"} enviado com sucesso.`);
-      await reload(); // Atualiza a lista
-    } catch (error) {
-      const erroBackend = error.response?.data?.message || error.message;
-      toast.error(erroBackend || "Não foi possível enviar o documento.");
-      console.error("Erro no upload:", error);
+      await reload();
+    } catch (uploadError) {
+      toast.error(uploadError.message || "Não foi possível enviar o documento.");
     } finally {
       setUploading(false);
     }
@@ -78,23 +86,23 @@ const { data, loading, error, reload } = useAsyncData(
   const handleDelete = async (id) => {
     try {
       await documentService.remove(id);
-      await reload(); 
+      await reload();
       toast.success("Documento removido.");
-    } catch (err) {
-      toast.error(err.message || "Não foi possível remover o documento.");
+    } catch (removeError) {
+      toast.error(removeError.message || "Não foi possível remover o documento.");
     }
   };
 
-  const handleDrop = (e) => {
-    e.preventDefault();
+  const handleDrop = (event) => {
+    event.preventDefault();
     setDragging(false);
-    handleUpload(e.dataTransfer.files);
+    handleUpload(event.dataTransfer.files);
   };
 
   const statValues = useMemo(
     () => ({
       total: docs.length,
-      verified: docs.filter(d => d.status === "VERIFICADO" || d.status === "ATIVO" || !d.status).length, 
+      verified: docs.filter((doc) => doc.status === "VERIFICADO" || doc.status === "ATIVO" || !doc.status).length,
     }),
     [docs],
   );
@@ -121,18 +129,17 @@ const { data, loading, error, reload } = useAsyncData(
         ))}
       </div>
 
-      {/* Seleção de Tipo de Documento com Chips */}
       <div className="pagina-documentos__secao-tipo">
         <p className="pagina-documentos__tipo-label">Selecione o que deseja enviar:</p>
         <div className="pagina-documentos__tipo-opcoes">
-          <button 
+          <button
             onClick={() => setTipoDocumento("HISTORICO")}
             className={`pagina-documentos__tipo-botao ${tipoDocumento === "HISTORICO" ? "pagina-documentos__tipo-botao--ativo" : ""}`}
           >
             <FileText size={16} />
             Histórico Escolar
           </button>
-          <button 
+          <button
             onClick={() => setTipoDocumento("CURRICULO")}
             className={`pagina-documentos__tipo-botao ${tipoDocumento === "CURRICULO" ? "pagina-documentos__tipo-botao--ativo" : ""}`}
           >
@@ -142,10 +149,9 @@ const { data, loading, error, reload } = useAsyncData(
         </div>
       </div>
 
-      {/* Área de Drop do Arquivo */}
       <div
-        onDragOver={(e) => {
-          e.preventDefault();
+        onDragOver={(event) => {
+          event.preventDefault();
           setDragging(true);
         }}
         onDragLeave={() => setDragging(false)}
@@ -159,7 +165,7 @@ const { data, loading, error, reload } = useAsyncData(
           multiple={false}
           accept=".pdf,.doc,.docx"
           style={{ display: "none" }}
-          onChange={(e) => handleUpload(e.target.files)}
+          onChange={(event) => handleUpload(event.target.files)}
         />
 
         {uploading ? (
@@ -184,7 +190,6 @@ const { data, loading, error, reload } = useAsyncData(
         )}
       </div>
 
-      {/* Lista de Documentos */}
       <div className="pagina-documentos__lista">
         <div className="pagina-documentos__cabecalho-lista">
           <h3 className="pagina-documentos__contagem">
@@ -230,11 +235,11 @@ const { data, loading, error, reload } = useAsyncData(
                 </div>
 
                 <div className="documento-item__acoes">
-                  <a 
-                    href={`${api.baseUrl}/api/documentos/${doc.id}/preview`} 
-                    target="_blank" 
+                  <a
+                    href={buildPreviewUrl(doc)}
+                    target="_blank"
                     rel="noreferrer"
-                    className="documento-item__botao-acao" 
+                    className="documento-item__botao-acao"
                     title="Visualizar"
                   >
                     <Eye size={15} />

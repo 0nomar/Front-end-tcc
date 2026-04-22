@@ -97,13 +97,12 @@ export default function ProjectApplicationsPage() {
     });
   }, []);
 
-  const mergeApplication = useCallback((raw) => {
-    const mapped = mapProjectApplication(raw);
+  const removeApplication = useCallback((applicationId) => {
     setData((prev) => {
       const base = prev ?? { project: null, applications: [] };
       return {
         ...base,
-        applications: (base.applications ?? []).map((a) => (a.id === mapped.id ? { ...a, ...mapped } : a)),
+        applications: (base.applications ?? []).filter((application) => application.id !== applicationId),
       };
     });
   }, [setData]);
@@ -135,12 +134,12 @@ export default function ProjectApplicationsPage() {
     setCardActionLoadingId(applicationId);
     try {
       if (type === "approve") {
-        const raw = await applicationService.approve(applicationId, parecer);
-        mergeApplication(raw);
+        await applicationService.approve(applicationId, parecer);
+        removeApplication(applicationId);
         toast.success("Inscricao aprovada.");
       } else {
-        const raw = await applicationService.reject(applicationId, parecer);
-        mergeApplication(raw);
+        await applicationService.reject(applicationId, parecer);
+        removeApplication(applicationId);
         toast.success("Inscricao rejeitada.");
       }
       closeActionModal();

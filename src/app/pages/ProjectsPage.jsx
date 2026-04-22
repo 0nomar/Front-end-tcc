@@ -7,29 +7,44 @@ import { projectService } from "../services/projectService";
 import { StatusView } from "../components/StatusView";
 import { mapProject } from "../utils/adapters";
 import { formatProjectStatus } from "../utils/formatters";
+import { AREAS_ESTUDO } from "../utils/constants";
 import "./ProjectsPage.css";
+
+function normalizeValue(value) {
+  return String(value ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
 
 export default function ProjectsPage() {
   const navigate = useNavigate();
-  const { data, loading, error } = useAsyncData(
-    async () => {
-      const result = await projectService.list();
-      return Array.isArray(result) ? result.map(mapProject) : [];
-    },
-    [],
-    { initialData: [] },
-  );
-  const projects = Array.isArray(data) ? data : [];
   const [search, setSearch] = useState("");
+  const [courseInput, setCourseInput] = useState("");
+  const [selectedCourse, setSelectedCourse] = useState("");
   const [selectedArea, setSelectedArea] = useState("Todas");
   const [selectedStatus, setSelectedStatus] = useState("Todos");
   const [showFilters, setShowFilters] = useState(false);
-
-  const areas = useMemo(
-    () => ["Todas", ...new Set(projects.map((project) => project.area).filter(Boolean))],
-    [projects],
+  const { data, loading, error } = useAsyncData(
+    async () => {
+      const result = await projectService.list({
+        curso: selectedCourse,
+      });
+      return Array.isArray(result) ? result.map(mapProject) : [];
+    },
+    [selectedCourse],
+    { initialData: [] },
   );
+  const projects = Array.isArray(data) ? data : [];
+
+  const areas = ["Todas", ...AREAS_ESTUDO];
+  const cursos = ["Todos", ...AREAS_ESTUDO];
   const statuses = ["Todos", "ABERTO", "EM_ANDAMENTO", "FINALIZADO"];
+
+  const applyCourseFilter = () => {
+    setSelectedCourse(courseInput === "Todos" ? "" : courseInput);
+  };
 
   const filtered = useMemo(
     () =>
@@ -39,7 +54,9 @@ export default function ProjectsPage() {
           project.title.toLowerCase().includes(term) ||
           project.description.toLowerCase().includes(term) ||
           project.tags.some((tag) => tag.toLowerCase().includes(term));
-        const matchArea = selectedArea === "Todas" || project.area === selectedArea;
+        const matchArea =
+          selectedArea === "Todas" ||
+          normalizeValue(project.area) === normalizeValue(selectedArea);
         const matchStatus = selectedStatus === "Todos" || project.status === selectedStatus;
         return matchSearch && matchArea && matchStatus;
       }),
@@ -127,6 +144,29 @@ export default function ProjectsPage() {
               </div>
             </div>
             <div>
+              <label className="pagina-projetos__rotulo-filtro">Curso</label>
+              <div className="pagina-projetos__input-filtro">
+                <select
+                  value={courseInput || "Todos"}
+                  onChange={(e) => setCourseInput(e.target.value)}
+                  onBlur={applyCourseFilter}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      applyCourseFilter();
+                    }
+                  }}
+                  className="pagina-projetos__input-filtro-curso"
+                >
+                  {cursos.map((curso) => (
+                    <option key={curso} value={curso}>
+                      {curso}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div>
               <label className="pagina-projetos__rotulo-filtro">Status</label>
               <div className="pagina-projetos__chips-filtro">
                 {statuses.map((status) => (
@@ -179,67 +219,77 @@ export default function ProjectsPage() {
         </div>
       ) : (
         <div className="pagina-projetos__grade">
-          {filtered.map((project, index) => (
-            <motion.div
-              key={project.id}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: index * 0.04 }}
-              whileHover={{ scale: 1.03, boxShadow: "0 18px 30px rgba(37,99,235,0.14)" }}
-              onClick={() => navigate(`/app/projects/${project.id}`)}
-              className="projeto-card"
-            >
-              <div className="projeto-card__barra-topo" />
-              <div className="projeto-card__corpo">
-                <div className="projeto-card__cabecalho">
-                  <span className="projeto-card__status projeto-card__status--aberto">
-                    {formatProjectStatus(project.status)}
-                  </span>
-                </div>
+          {filtered.map((project, index) => {
+            const acceptedCollaborators = Array.isArray(project.collaborators)
+              ? project.collaborators.filter((collaborator) => collaborator?.status === "ACEITO")
+              : [];
+            const slotsUsed = acceptedCollaborators.length;
+            const slots = Math.max(project.slots ?? 0, 0);
+            const remainingSlots = slots - slotsUsed;
+            const isFull = remainingSlots <= 0;
 
-                <h3 className="projeto-card__titulo">{project.title}</h3>
-                <p className="projeto-card__descricao">{project.description}</p>
-
-                <div className="projeto-card__tags">
-                  {project.tags.slice(0, 3).map((tag) => (
-                    <span key={tag} className="projeto-card__etiqueta">{tag}</span>
-                  ))}
-                </div>
-
-                <div className="projeto-card__informacoes">
-                  <div className="projeto-card__info-item">
-                    <div className="projeto-card__info-icone"><Users size={12} /></div>
-                    <p className="projeto-card__info-valor">{Math.max(project.slots - project.slotsUsed, 0)}/{project.slots}</p>
-                    <p className="projeto-card__info-rotulo">vagas</p>
-                  </div>
-                  <div className="projeto-card__info-item">
-                    <div className="projeto-card__info-icone"><Clock size={12} /></div>
-                    <p className="projeto-card__info-valor">{project.createdAt ? new Date(project.createdAt).toLocaleDateString("pt-BR") : "-"}</p>
-                    <p className="projeto-card__info-rotulo">publicado</p>
-                  </div>
-                  <div className="projeto-card__info-item">
-                    <div className="projeto-card__info-icone"><FolderOpen size={12} /></div>
-                    <p className="projeto-card__info-valor">{project.area}</p>
-                    <p className="projeto-card__info-rotulo">area</p>
-                  </div>
-                </div>
-
-                <div className="projeto-card__orientador">
-                  <div className="projeto-card__orientador-dados">
-                    <div className="projeto-card__avatar-orientador">
-                      <span className="projeto-card__iniciais-orientador">
-                        {(project.advisor?.name ?? "IC").split(" ").slice(0, 2).map((part) => part[0]).join("")}
-                      </span>
-                    </div>
-                    <span className="projeto-card__nome-orientador">
-                      {project.advisor?.name ?? "Sem orientador"}
+            return (
+              <motion.div
+                key={project.id}
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.04 }}
+                whileHover={{ scale: 1.03, boxShadow: "0 18px 30px rgba(37,99,235,0.14)" }}
+                onClick={() => navigate(`/app/projects/${project.id}`)}
+                className="projeto-card"
+              >
+                <div className="projeto-card__barra-topo" />
+                <div className="projeto-card__corpo">
+                  <div className="projeto-card__cabecalho">
+                    <span className={`projeto-card__status ${isFull ? "projeto-card__status--encerrado" : "projeto-card__status--aberto"}`}>
+                      {isFull ? "Cheio" : formatProjectStatus(project.status)}
                     </span>
                   </div>
-                  <ChevronRight size={14} className="projeto-card__seta-acesso" />
+
+                  <h3 className="projeto-card__titulo">{project.title}</h3>
+                  <p className="projeto-card__descricao">{project.description}</p>
+
+                  <div className="projeto-card__tags">
+                    {project.tags.slice(0, 3).map((tag) => (
+                      <span key={tag} className="projeto-card__etiqueta">{tag}</span>
+                    ))}
+                  </div>
+
+                  <div className="projeto-card__informacoes">
+                    <div className="projeto-card__info-item">
+                      <div className="projeto-card__info-icone"><Users size={12} /></div>
+                      <p className="projeto-card__info-valor">{`${slotsUsed} / ${slots}`}</p>
+                      <p className="projeto-card__info-rotulo">vagas ocupadas</p>
+                    </div>
+                    <div className="projeto-card__info-item">
+                      <div className="projeto-card__info-icone"><Clock size={12} /></div>
+                      <p className="projeto-card__info-valor">{project.createdAt ? new Date(project.createdAt).toLocaleDateString("pt-BR") : "-"}</p>
+                      <p className="projeto-card__info-rotulo">publicado</p>
+                    </div>
+                    <div className="projeto-card__info-item">
+                      <div className="projeto-card__info-icone"><FolderOpen size={12} /></div>
+                      <p className="projeto-card__info-valor">{project.area}</p>
+                      <p className="projeto-card__info-rotulo">area</p>
+                    </div>
+                  </div>
+
+                  <div className="projeto-card__orientador">
+                    <div className="projeto-card__orientador-dados">
+                      <div className="projeto-card__avatar-orientador">
+                        <span className="projeto-card__iniciais-orientador">
+                          {(project.advisor?.name ?? "IC").split(" ").slice(0, 2).map((part) => part[0]).join("")}
+                        </span>
+                      </div>
+                      <span className="projeto-card__nome-orientador">
+                        {project.advisor?.name ?? "Sem orientador"}
+                      </span>
+                    </div>
+                    <ChevronRight size={14} className="projeto-card__seta-acesso" />
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            );
+          })}
         </div>
       )}
     </motion.div>

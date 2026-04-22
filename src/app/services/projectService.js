@@ -1,4 +1,5 @@
 import { api } from "./api";
+import { AREAS_ESTUDO_OPTIONS } from "../utils/constants";
 
 function buildQs(params = {}) {
   const qs = new URLSearchParams();
@@ -7,6 +8,27 @@ function buildQs(params = {}) {
   });
   const s = qs.toString();
   return s ? `?${s}` : "";
+}
+
+function normalizeAreaCollection(payload) {
+  const list = Array.isArray(payload) ? payload : payload?.content ?? payload?.data ?? [];
+
+  if (!Array.isArray(list)) {
+    return [];
+  }
+
+  return list
+    .map((area, index) => {
+      if (typeof area === "string") {
+        return { id: index + 1, nome: area };
+      }
+
+      const id = area?.id ?? area?.areaId ?? area?.id_area;
+      const nome = area?.nome ?? area?.areaNome ?? area?.descricao;
+
+      return id != null && nome ? { id, nome } : null;
+    })
+    .filter(Boolean);
 }
 
 export const projectService = {
@@ -43,6 +65,24 @@ export const projectService = {
   // findByBusca
   findByBusca(busca) {
     return api.get(`/api/projetos${buildQs({ busca })}`);
+  },
+
+  async getStudyAreas() {
+    const endpoints = ["/api/areas-pesquisa", "/api/areas", "/api/area-pesquisa"];
+
+    for (const endpoint of endpoints) {
+      try {
+        const response = await api.get(endpoint);
+        const areas = normalizeAreaCollection(response);
+        if (areas.length > 0) {
+          return areas;
+        }
+      } catch {
+        // Usa fallback padrao quando o backend nao expor um endpoint dedicado.
+      }
+    }
+
+    return AREAS_ESTUDO_OPTIONS;
   },
 
   // create

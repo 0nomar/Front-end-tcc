@@ -2,27 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
 import { ArrowLeft, FolderPlus, Loader2 } from "lucide-react";
+import { AREAS_ESTUDO_OPTIONS } from "../utils/constants";
 import { projectService } from "../services/projectService";
 import "./CreateProjectPage.css";
-
-const AREAS_FALLBACK = [
-  { id: 1,  nome: "Ciencia da Computacao" },
-  { id: 2,  nome: "Engenharia de Software" },
-  { id: 3,  nome: "Sistemas de Informacao" },
-  { id: 4,  nome: "Engenharia Eletrica" },
-  { id: 5,  nome: "Engenharia Civil" },
-  { id: 6,  nome: "Medicina" },
-  { id: 7,  nome: "Enfermagem" },
-  { id: 8,  nome: "Administracao" },
-  { id: 9,  nome: "Direito" },
-  { id: 10, nome: "Pedagogia" },
-  { id: 11, nome: "Matematica" },
-  { id: 12, nome: "Fisica" },
-  { id: 13, nome: "Quimica" },
-  { id: 14, nome: "Biologia" },
-  { id: 15, nome: "Psicologia" },
-  { id: 16, nome: "Arquitetura" },
-];
 
 const INITIAL_FORM = {
   titulo: "",
@@ -35,16 +17,6 @@ const INITIAL_FORM = {
   dataLimiteInscricao: "",
 };
 
-function extractAreas(projects) {
-  const map = new Map();
-  (Array.isArray(projects) ? projects : []).forEach((p) => {
-    const id = p?.areaId ?? p?.area_id;
-    const nome = p?.areaNome ?? p?.area_nome ?? p?.area;
-    if (id != null && nome) map.set(id, nome);
-  });
-  return Array.from(map.entries()).map(([id, nome]) => ({ id, nome }));
-}
-
 export default function CreateProjectPage() {
   const navigate = useNavigate();
   const [form, setForm] = useState(INITIAL_FORM);
@@ -55,15 +27,8 @@ export default function CreateProjectPage() {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    projectService
-      .listRaw()
-      .then((data) => {
-        const list = Array.isArray(data) ? data : (data?.content ?? []);
-        const fromApi = extractAreas(list);
-        setAreas(fromApi.length > 0 ? fromApi : AREAS_FALLBACK);
-      })
-      .catch(() => setAreas(AREAS_FALLBACK))
-      .finally(() => setAreasLoading(false));
+    setAreas(AREAS_ESTUDO_OPTIONS);
+    setAreasLoading(false);
   }, []);
 
   function handleChange(e) {
