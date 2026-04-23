@@ -7,7 +7,7 @@ import { projectService } from "../services/projectService";
 import { StatusView } from "../components/StatusView";
 import { mapProject } from "../utils/adapters";
 import { formatProjectStatus } from "../utils/formatters";
-import { AREAS_ESTUDO } from "../utils/constants";
+import { AREAS_ESTUDO, CURSOS } from "../utils/constants";
 import "./ProjectsPage.css";
 
 function normalizeValue(value) {
@@ -21,7 +21,6 @@ function normalizeValue(value) {
 export default function ProjectsPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [courseInput, setCourseInput] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
   const [selectedArea, setSelectedArea] = useState("Todas");
   const [selectedStatus, setSelectedStatus] = useState("Todos");
@@ -39,12 +38,8 @@ export default function ProjectsPage() {
   const projects = Array.isArray(data) ? data : [];
 
   const areas = ["Todas", ...AREAS_ESTUDO];
-  const cursos = ["Todos", ...AREAS_ESTUDO];
+  const cursos = ["Todos", ...CURSOS];
   const statuses = ["Todos", "ABERTO", "EM_ANDAMENTO", "FINALIZADO"];
-
-  const applyCourseFilter = () => {
-    setSelectedCourse(courseInput === "Todos" ? "" : courseInput);
-  };
 
   const filtered = useMemo(
     () =>
@@ -147,15 +142,8 @@ export default function ProjectsPage() {
               <label className="pagina-projetos__rotulo-filtro">Curso</label>
               <div className="pagina-projetos__input-filtro">
                 <select
-                  value={courseInput || "Todos"}
-                  onChange={(e) => setCourseInput(e.target.value)}
-                  onBlur={applyCourseFilter}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      applyCourseFilter();
-                    }
-                  }}
+                  value={selectedCourse || "Todos"}
+                  onChange={(e) => setSelectedCourse(e.target.value === "Todos" ? "" : e.target.value)}
                   className="pagina-projetos__input-filtro-curso"
                 >
                   {cursos.map((curso) => (

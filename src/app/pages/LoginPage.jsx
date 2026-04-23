@@ -59,7 +59,7 @@ export default function LoginPage() {
             ))}
           </div>
         </div>
-        <p className="pagina-login__rodape-esquerdo">© 2026 IniCiência. Todos os direitos reservados.</p>
+        <p className="pagina-login__rodape-esquerdo">© 2026 CollabResearch. Todos os direitos reservados.</p>
       </div>
 
       <div className="pagina-login__painel-direito">
@@ -68,7 +68,7 @@ export default function LoginPage() {
             <div className="pagina-login__logo-icone-mobile">
               <FlaskConical size={18} style={{ color: "var(--cor-branco)" }} />
             </div>
-            <span className="pagina-login__logo-nome-mobile">IniCiência</span>
+            <span className="pagina-login__logo-nome-mobile">CollabResearch</span>
           </Link>
 
           <div className="pagina-login__cabecalho">

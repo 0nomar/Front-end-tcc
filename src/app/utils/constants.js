@@ -6,6 +6,14 @@ export const AREAS_ESTUDO = [
   "Engenharia Elétrica",
 ];
 
+export const CURSOS = [
+  "Ciência da Computação",
+  "Engenharia de Computação",
+  "Sistemas de Informação",
+  "Licenciatura em Computação",
+  "Engenharia Elétrica",
+];
+
 export const AREAS_ESTUDO_OPTIONS = AREAS_ESTUDO.map((nome, index) => ({
   id: index + 1,
   nome,

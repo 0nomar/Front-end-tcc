@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
 import { ArrowLeft, FolderPlus, Loader2 } from "lucide-react";
-import { AREAS_ESTUDO_OPTIONS } from "../utils/constants";
+import { AREAS_ESTUDO_OPTIONS, CURSOS } from "../utils/constants";
 import { projectService } from "../services/projectService";
 import "./CreateProjectPage.css";
 
@@ -11,6 +11,7 @@ const INITIAL_FORM = {
   descricao: "",
   requisitos: "",
   areaId: "",
+  curso: "",
   vagas: "",
   dataInicio: "",
   dataFim: "",
@@ -42,6 +43,7 @@ export default function CreateProjectPage() {
 
     if (!form.titulo.trim()) { setError("O titulo e obrigatorio."); return; }
     if (!form.areaId) { setError("Selecione uma area de pesquisa."); return; }
+    if (!form.curso) { setError("Selecione um curso."); return; }
     if (!form.vagas || Number(form.vagas) < 1) { setError("Informe o numero de vagas (minimo 1)."); return; }
 
     setLoading(true);
@@ -53,6 +55,7 @@ export default function CreateProjectPage() {
         descricao: form.descricao.trim() || undefined,
         requisitos: form.requisitos.trim() || undefined,
         areaId: Number(form.areaId),
+        curso: form.curso,
         vagas: Number(form.vagas),
         dataInicio: form.dataInicio || undefined,
         dataFim: form.dataFim || undefined,
@@ -155,8 +158,8 @@ export default function CreateProjectPage() {
             />
           </div>
 
-          {/* Area + Vagas */}
-          <div className="formulario-projeto__grade-2">
+          {/* Area + Curso + Vagas */}
+          <div className="formulario-projeto__grade-3">
             <div className="formulario-projeto__campo">
               <label htmlFor="areaId" className="formulario-projeto__rotulo">
                 Area de pesquisa <span className="formulario-projeto__obrigatorio">*</span>
@@ -172,6 +175,23 @@ export default function CreateProjectPage() {
                 </option>
                 {areas.map((a) => (
                   <option key={a.id} value={a.id}>{a.nome}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="formulario-projeto__campo">
+              <label htmlFor="curso" className="formulario-projeto__rotulo">
+                Curso <span className="formulario-projeto__obrigatorio">*</span>
+              </label>
+              <select
+                id="curso" name="curso"
+                value={form.curso} onChange={handleChange}
+                className="formulario-projeto__select"
+                disabled={isDisabled}
+              >
+                <option value="">Selecione um curso</option>
+                {CURSOS.map((c) => (
+                  <option key={c} value={c}>{c}</option>
                 ))}
               </select>
             </div>
