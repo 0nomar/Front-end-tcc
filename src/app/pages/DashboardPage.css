@@ -16,12 +16,17 @@
    Banner de boas-vindas
    ================================================================ */
 .painel__banner-boas-vindas {
-  background: var(--gradiente-primario);
+  background:
+    radial-gradient(circle at top right, rgba(96, 165, 250, 0.22), transparent 28%),
+    radial-gradient(circle at 78% 100%, rgba(168, 85, 247, 0.18), transparent 24%),
+    linear-gradient(135deg, #0f172a 0%, #111827 45%, #1e1b4b 100%);
   border-radius: var(--raio-grande);
   padding: var(--espaco-4);
-  color: var(--cor-branco);
+  color: #f8fafc;
   position: relative;
   overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow: 0 24px 48px rgba(2, 6, 23, 0.34);
 }
 
 @media (min-width: 768px) {
@@ -36,7 +41,7 @@
   top: 0;
   width: 16rem;
   height: 100%;
-  opacity: 0.1;
+  opacity: 0.9;
 }
 
 .painel__decoracao-circulo-topo {
@@ -45,9 +50,10 @@
   right: 0;
   width: 12rem;
   height: 12rem;
-  background-color: var(--cor-branco);
+  background: rgba(96, 165, 250, 0.16);
   border-radius: var(--raio-completo);
   transform: translateY(-33%);
+  filter: blur(14px);
 }
 
 .painel__decoracao-circulo-base {
@@ -56,9 +62,10 @@
   right: 2.5rem;
   width: 8rem;
   height: 8rem;
-  background-color: var(--cor-branco);
+  background: rgba(168, 85, 247, 0.16);
   border-radius: var(--raio-completo);
   transform: translateY(33%);
+  filter: blur(16px);
 }
 
 .painel__conteudo-banner {
@@ -68,24 +75,32 @@
 
 .painel__data-banner {
   font-size: var(--tamanho-medio);
-  color: rgba(219, 234, 254, 0.9);
+  color: rgba(226, 232, 240, 0.78);
   margin-bottom: var(--espaco-1);
+  text-transform: capitalize;
+  letter-spacing: 0.01em;
 }
 
 .painel__titulo-banner {
   font-size: var(--tamanho-display);
   font-weight: var(--peso-negrito);
-  color: var(--cor-branco);
-  margin-bottom: var(--espaco-1);
+  color: #f8fafc;
+  margin-bottom: var(--espaco-2);
+}
+
+.painel__titulo-destaque {
+  color: #60a5fa;
 }
 
 .painel__descricao-banner {
   font-size: var(--tamanho-medio);
-  color: rgba(219, 234, 254, 0.9);
+  color: rgba(226, 232, 240, 0.9);
+  max-width: 42rem;
+  line-height: 1.75;
 }
 
 .painel__destaque-banner {
-  color: var(--cor-branco);
+  color: #60a5fa;
   font-weight: var(--peso-negrito);
 }
 
@@ -109,19 +124,43 @@
   justify-content: center;
   gap: var(--espaco-2);
   padding: var(--espaco-2) var(--espaco-4);
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(15, 23, 42, 0.7);
   border-radius: var(--raio-medio);
-  color: var(--cor-branco);
-  border: none;
+  color: #e5eefb;
+  border: 1px solid rgba(148, 163, 184, 0.2);
   cursor: pointer;
   font-size: var(--tamanho-base);
-  font-weight: var(--peso-medio);
-  backdrop-filter: blur(4px);
+  font-weight: var(--peso-semi);
   transition: var(--transicao-normal);
+  box-shadow: 0 10px 22px rgba(2, 6, 23, 0.18);
+  backdrop-filter: blur(10px);
 }
 
 .painel__botao-banner:hover {
-  background-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(2, 6, 23, 0.24);
+}
+
+.painel__botao-banner--primario {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: #eff6ff;
+  border-color: rgba(96, 165, 250, 0.45);
+}
+
+.painel__botao-banner--primario:hover {
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  border-color: rgba(147, 197, 253, 0.58);
+}
+
+.painel__botao-banner--secundario {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  border-color: rgba(148, 163, 184, 0.24);
+}
+
+.painel__botao-banner--secundario:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(191, 219, 254, 0.36);
 }
 
 @media (min-width: 640px) {
