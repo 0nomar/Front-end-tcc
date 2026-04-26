@@ -17,8 +17,8 @@
   top: 0;
   left: 0;
   height: 100%;
-  background-color: var(--cor-branco);
-  border-right: 1px solid var(--cor-borda-clara);
+  background-color: var(--cor-superficie);
+  border-right: 1px solid var(--cor-separador-suave);
   z-index: 30;
   width: var(--largura-sidebar);
   transition: var(--transicao-lenta);
@@ -42,8 +42,8 @@
   top: 3.7rem;
   width: 2rem;
   height: 2rem;
-  background-color: var(--cor-branco);
-  border: 1px solid var(--cor-borda);
+  background-color: var(--cor-superficie-3);
+  border: 1px solid var(--cor-input-borda);
   border-radius: var(--raio-completo);
   display: flex;
   align-items: center;
@@ -73,7 +73,7 @@
   align-items: center;
   gap: var(--espaco-3);
   padding: var(--espaco-5) var(--espaco-4);
-  border-bottom: 1px solid var(--cor-borda-clara);
+  border-bottom: 1px solid var(--cor-separador-suave);
 }
 
 .barra-lateral__cabecalho--centralizado {
@@ -138,7 +138,7 @@
 }
 
 .barra-lateral__item-nav:hover {
-  background-color: var(--cor-fundo);
+  background-color: var(--cor-superficie-brand);
   color: var(--cor-texto);
 }
 
@@ -211,7 +211,7 @@
 /* ---- Rodapé ---- */
 .barra-lateral__rodape {
   padding: var(--espaco-3);
-  border-top: 1px solid var(--cor-borda-clara);
+  border-top: 1px solid var(--cor-separador-suave);
   padding-top: var(--espaco-3);
   display: flex;
   flex-direction: column;
@@ -232,7 +232,7 @@
 }
 
 .barra-lateral__item-configuracoes:hover {
-  background-color: var(--cor-fundo);
+  background-color: var(--cor-superficie-brand);
   color: var(--cor-texto);
 }
 
@@ -251,12 +251,13 @@
   top: 0;
   left: 0;
   height: 100%;
-  background-color: var(--cor-branco);
-  border-right: 1px solid var(--cor-borda-clara);
+  background-color: var(--cor-superficie);
+  border-right: 1px solid var(--cor-separador-suave);
   z-index: 50;
   width: 16rem;
   display: flex;
   flex-direction: column;
+  box-shadow: var(--sombra-extra);
 }
 
 @media (min-width: 1024px) {

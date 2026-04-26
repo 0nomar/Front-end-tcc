@@ -13,10 +13,11 @@
    Seção genérica de configurações
    ================================================================ */
 .secao-config {
-  background-color: var(--cor-branco);
-  border: 1px solid var(--cor-borda-clara);
+  background-color: var(--cor-superficie);
+  border: 1px solid var(--cor-separador-suave);
   border-radius: var(--raio-grande);
   padding: var(--espaco-5);
+  box-shadow: var(--sombra-pequena);
 }
 
 @media (min-width: 768px) {
@@ -72,8 +73,8 @@
   width: 100%;
   padding: 0.625rem 0.875rem;
   border-radius: var(--raio-grande);
-  border: 1px solid var(--cor-borda);
-  background-color: var(--cor-branco);
+  border: 1px solid var(--cor-input-borda);
+  background-color: var(--cor-input);
   color: var(--cor-texto);
   font-size: var(--tamanho-medio);
   font-family: var(--fonte-principal);
@@ -99,6 +100,12 @@
 .secao-config__toggle-label {
   font-size: var(--tamanho-medio);
   color: var(--cor-texto-medio);
+}
+
+.secao-config__toggle-ajuda {
+  margin-top: 0.3rem;
+  font-size: var(--tamanho-base);
+  color: var(--cor-texto-fraco);
 }
 
 .toggle {
@@ -158,18 +165,18 @@
 }
 
 .secao-config__botao--neutro {
-  border: 1px solid var(--cor-borda);
-  background-color: var(--cor-branco);
+  border: 1px solid var(--cor-input-borda);
+  background-color: var(--cor-superficie-3);
   color: var(--cor-texto-secundario);
 }
 
 .secao-config__botao--neutro:hover {
-  background-color: var(--cor-fundo);
+  background-color: var(--cor-superficie-brand);
 }
 
 .secao-config__botao--perigo {
   border: 1px solid var(--cor-erro-borda);
-  background-color: var(--cor-branco);
+  background-color: var(--cor-superficie-3);
   color: var(--cor-erro);
 }
 
@@ -207,8 +214,8 @@
 }
 
 .pagina-configuracoes__skeleton {
-  background-color: var(--cor-branco);
-  border: 1px solid var(--cor-borda-clara);
+  background-color: var(--cor-superficie);
+  border: 1px solid var(--cor-separador-suave);
   border-radius: var(--raio-grande);
 }
 
@@ -235,10 +242,11 @@
 .modal-senha__painel {
   width: 100%;
   max-width: 28rem;
-  background-color: var(--cor-branco);
+  background-color: var(--cor-superficie);
   border-radius: var(--raio-grande);
-  border: 1px solid var(--cor-borda-clara);
+  border: 1px solid var(--cor-separador-suave);
   padding: var(--espaco-5);
+  box-shadow: var(--sombra-extra);
 }
 
 @media (min-width: 768px) {
@@ -269,10 +277,11 @@
   width: 100%;
   padding: 0.625rem 0.875rem;
   border-radius: var(--raio-grande);
-  border: 1px solid var(--cor-borda);
+  border: 1px solid var(--cor-input-borda);
   font-size: var(--tamanho-medio);
   font-family: var(--fonte-principal);
   color: var(--cor-texto);
+  background-color: var(--cor-input);
   outline: none;
   transition: var(--transicao-normal);
 }
@@ -299,8 +308,8 @@
   width: 100%;
   padding: 0.625rem var(--espaco-4);
   border-radius: var(--raio-grande);
-  border: 1px solid var(--cor-borda);
-  background-color: var(--cor-branco);
+  border: 1px solid var(--cor-input-borda);
+  background-color: var(--cor-superficie-3);
   color: var(--cor-texto-secundario);
   cursor: pointer;
   font-size: var(--tamanho-medio);
@@ -309,7 +318,7 @@
 }
 
 .modal-senha__botao-cancelar:hover {
-  background-color: var(--cor-fundo);
+  background-color: var(--cor-superficie-brand);
 }
 
 @media (min-width: 640px) {

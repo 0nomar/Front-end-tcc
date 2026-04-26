@@ -29,7 +29,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="pagina-login">
+    <div className="pagina-login tema-fixo-claro">
       <div className="pagina-login__painel-esquerdo">
         <div className="pagina-login__decoracao-esquerda">
           <div className="pagina-login__decoracao-circulo-topo" />

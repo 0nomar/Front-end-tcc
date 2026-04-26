@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { toast } from "sonner";
 import { Bell, Shield, User, GraduationCap, Briefcase, Palette, LogOut, Lock } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
+import { useTheme } from "../providers/ThemeProvider";
 import { userService } from "../services/userService";
 import { StatusView } from "../components/StatusView";
 import "./SettingsPage.css";
@@ -15,10 +16,10 @@ const cardEnter = {
 
 export default function SettingsPage() {
   const { user, logout, refreshUser } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const [loading, setLoading] = useState(true);
   const [openPasswordModal, setOpenPasswordModal] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [darkTheme, setDarkTheme] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     nome: "",
@@ -170,9 +171,12 @@ export default function SettingsPage() {
           <h3 className="secao-config__titulo">Aparencia</h3>
         </div>
         <div className="secao-config__toggle-linha">
-          <p className="secao-config__toggle-label">Tema escuro (opcional)</p>
-          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} onClick={() => setDarkTheme((prev) => !prev)} className={`toggle ${darkTheme ? "toggle--ativo" : "toggle--inativo"}`}>
-            <span className={`toggle__bolinha ${darkTheme ? "toggle__bolinha--ativa" : "toggle__bolinha--inativa"}`} />
+          <div>
+            <p className="secao-config__toggle-label">Modo escuro</p>
+            <p className="secao-config__toggle-ajuda">A preferencia fica salva no navegador e continua apos login e logout.</p>
+          </div>
+          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} onClick={toggleTheme} className={`toggle ${isDark ? "toggle--ativo" : "toggle--inativo"}`} aria-pressed={isDark} aria-label="Alternar modo escuro">
+            <span className={`toggle__bolinha ${isDark ? "toggle__bolinha--ativa" : "toggle__bolinha--inativa"}`} />
           </motion.button>
         </div>
       </motion.section>
