@@ -28,11 +28,14 @@ export default function ProjectsPage() {
   const { data, loading, error } = useAsyncData(
     async () => {
       const result = await projectService.list({
-        curso: selectedCourse,
+        curso: selectedCourse === "Todos" ? "" : selectedCourse,
+        area: selectedArea === "Todas" ? "" : selectedArea,
+        status: selectedStatus === "Todos" ? "" : selectedStatus,
+        busca: search,
       });
       return Array.isArray(result) ? result.map(mapProject) : [];
     },
-    [selectedCourse],
+    [selectedCourse, selectedArea, selectedStatus, search],
     { initialData: [] },
   );
   const projects = Array.isArray(data) ? data : [];
@@ -45,17 +48,15 @@ export default function ProjectsPage() {
     () =>
       projects.filter((project) => {
         const term = search.toLowerCase();
-        const matchSearch =
+        // Mantemos a busca no cliente tambem para cobrir descricao e tags,
+        // ja que a API foca apenas no titulo por padrao.
+        return (
           project.title.toLowerCase().includes(term) ||
           project.description.toLowerCase().includes(term) ||
-          project.tags.some((tag) => tag.toLowerCase().includes(term));
-        const matchArea =
-          selectedArea === "Todas" ||
-          normalizeValue(project.area) === normalizeValue(selectedArea);
-        const matchStatus = selectedStatus === "Todos" || project.status === selectedStatus;
-        return matchSearch && matchArea && matchStatus;
+          project.tags.some((tag) => tag.toLowerCase().includes(term))
+        );
       }),
-    [projects, search, selectedArea, selectedStatus],
+    [projects, search],
   );
 
   if (loading) {
