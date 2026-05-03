@@ -71,6 +71,16 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(Boolean(token));
 
   useEffect(() => {
+    function handleUnauthorized() {
+      clearStoredToken();
+      setToken(null);
+    }
+
+    window.addEventListener("auth:unauthorized", handleUnauthorized);
+    return () => window.removeEventListener("auth:unauthorized", handleUnauthorized);
+  }, []);
+
+  useEffect(() => {
     if (!token) {
       setIdentity(null);
       setUser(null);
@@ -79,6 +89,12 @@ export function AuthProvider({ children }) {
     }
 
     const nextIdentity = buildIdentity(token);
+    if (nextIdentity?.exp && Number(nextIdentity.exp) * 1000 <= Date.now()) {
+      clearStoredToken();
+      setToken(null);
+      setLoading(false);
+      return;
+    }
     setIdentity(nextIdentity);
     setLoading(true);
 

@@ -1,4 +1,4 @@
-import { getStoredToken } from "../utils/storage";
+import { clearStoredToken, getStoredToken } from "../utils/storage";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8080";
 
@@ -33,6 +33,13 @@ async function request(path, options = {}) {
     : await response.text();
 
   if (!response.ok) {
+    if (response.status === 401) {
+      clearStoredToken();
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("auth:unauthorized"));
+      }
+    }
+
     const message =
       typeof payload === "string"
         ? payload

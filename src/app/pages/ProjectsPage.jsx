@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Search, FolderOpen, Users, Clock, ChevronRight, SlidersHorizontal, X, Plus } from "lucide-react";
 import { useAsyncData } from "../hooks/useAsyncDataHook";
 import { projectService } from "../services/projectService";
+import { courseService } from "../services/courseService";
 import { StatusView } from "../components/StatusView";
 import { mapProject } from "../utils/adapters";
 import { formatProjectStatus } from "../utils/formatters";
@@ -25,6 +26,27 @@ export default function ProjectsPage() {
   const [selectedArea, setSelectedArea] = useState("Todas");
   const [selectedStatus, setSelectedStatus] = useState("Todos");
   const [showFilters, setShowFilters] = useState(false);
+
+  const { data: areaNames } = useAsyncData(
+    async () => {
+      const payload = await projectService.getStudyAreas().catch(() => []);
+      const names = Array.isArray(payload) ? payload.map((a) => a?.nome).filter(Boolean) : [];
+      return names.length ? names : AREAS_ESTUDO;
+    },
+    [],
+    { initialData: AREAS_ESTUDO },
+  );
+
+  const { data: courseNames } = useAsyncData(
+    async () => {
+      const payload = await courseService.list().catch(() => []);
+      const names = Array.isArray(payload) ? payload.map((c) => c?.nome).filter(Boolean) : [];
+      return names.length ? names : CURSOS;
+    },
+    [],
+    { initialData: CURSOS },
+  );
+
   const { data, loading, error } = useAsyncData(
     async () => {
       const result = await projectService.list({
@@ -40,8 +62,8 @@ export default function ProjectsPage() {
   );
   const projects = Array.isArray(data) ? data : [];
 
-  const areas = ["Todas", ...AREAS_ESTUDO];
-  const cursos = ["Todos", ...CURSOS];
+  const areas = ["Todas", ...(Array.isArray(areaNames) ? areaNames : AREAS_ESTUDO)];
+  const cursos = ["Todos", ...(Array.isArray(courseNames) ? courseNames : CURSOS)];
   const statuses = ["Todos", "ABERTO", "EM_ANDAMENTO", "FINALIZADO"];
 
   const filtered = useMemo(

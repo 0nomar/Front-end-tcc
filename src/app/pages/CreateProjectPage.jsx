@@ -3,6 +3,8 @@ import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
 import { ArrowLeft, FolderPlus, Loader2 } from "lucide-react";
 import { AREAS_ESTUDO_OPTIONS, CURSOS } from "../utils/constants";
+import { areaService } from "../services/areaService";
+import { courseService } from "../services/courseService";
 import { projectService } from "../services/projectService";
 import "./CreateProjectPage.css";
 
@@ -23,13 +25,53 @@ export default function CreateProjectPage() {
   const [form, setForm] = useState(INITIAL_FORM);
   const [areas, setAreas] = useState([]);
   const [areasLoading, setAreasLoading] = useState(true);
+  const [courses, setCourses] = useState([]);
+  const [coursesLoading, setCoursesLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    setAreas(AREAS_ESTUDO_OPTIONS);
-    setAreasLoading(false);
+    let alive = true;
+
+    setAreasLoading(true);
+    areaService
+      .list()
+      .then((payload) => {
+        if (!alive) return;
+        const next = Array.isArray(payload) ? payload : [];
+        setAreas(next.length ? next : AREAS_ESTUDO_OPTIONS);
+      })
+      .catch(() => {
+        if (!alive) return;
+        setAreas(AREAS_ESTUDO_OPTIONS);
+      })
+      .finally(() => {
+        if (!alive) return;
+        setAreasLoading(false);
+      });
+
+    setCoursesLoading(true);
+    courseService
+      .list()
+      .then((payload) => {
+        if (!alive) return;
+        const list = Array.isArray(payload) ? payload : [];
+        const nomes = list.map((c) => c?.nome).filter(Boolean);
+        setCourses(nomes.length ? nomes : CURSOS);
+      })
+      .catch(() => {
+        if (!alive) return;
+        setCourses(CURSOS);
+      })
+      .finally(() => {
+        if (!alive) return;
+        setCoursesLoading(false);
+      });
+
+    return () => {
+      alive = false;
+    };
   }, []);
 
   function handleChange(e) {
@@ -187,10 +229,10 @@ export default function CreateProjectPage() {
                 id="curso" name="curso"
                 value={form.curso} onChange={handleChange}
                 className="formulario-projeto__select"
-                disabled={isDisabled}
+                disabled={isDisabled || coursesLoading}
               >
-                <option value="">Selecione um curso</option>
-                {CURSOS.map((c) => (
+                <option value="">{coursesLoading ? "Carregando..." : "Selecione um curso"}</option>
+                {courses.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>
