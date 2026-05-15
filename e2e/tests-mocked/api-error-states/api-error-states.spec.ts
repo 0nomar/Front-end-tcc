@@ -1,5 +1,6 @@
-import { test, expect } from "@playwright/test";
-import { authenticateAs, mockUsers, setupApiMock } from "../helpers/api-mock.helper";
+import { test } from "@playwright/test";
+import { mockUsers } from "../../helpers/api-mock.helper";
+import { runApiErrorScenario } from "./api-error-states.robot";
 
 const cases = [
   {
@@ -44,12 +45,7 @@ const cases = [
 test.describe("estados tristes de API", () => {
   for (const scenario of cases) {
     test(`${scenario.name} mostra erro controlado`, async ({ page }) => {
-      const user = scenario.user ?? mockUsers.student;
-      await setupApiMock(page, { user, fail: [scenario.fail] });
-      await authenticateAs(page, user);
-
-      await page.goto(scenario.path);
-      await expect(page.getByText(scenario.expected)).toBeVisible();
+      await runApiErrorScenario(page, scenario);
     });
   }
 });
