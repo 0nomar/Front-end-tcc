@@ -1,6 +1,6 @@
 import { getStoredToken } from "../utils/storage";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8080";
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 async function request(path, options = {}) {
   const token = getStoredToken();
