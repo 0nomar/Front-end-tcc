@@ -163,4 +163,108 @@
   --largura-sidebar:          15rem;  /* 240px / w-60 */
   --largura-sidebar-recolhida: 4rem;  /*  64px / w-16 */
   --altura-topbar:             4rem;  /*  64px / h-16 */
+
+  /* ------------------------------------------
+     Superficies compartilhadas
+  ------------------------------------------ */
+  --cor-superficie:       var(--cor-branco);
+  --cor-superficie-2:     #f8fafc;
+  --cor-superficie-3:     #f1f5f9;
+  --cor-superficie-brand: rgba(37, 99, 235, 0.08);
+  --cor-sobreposicao:     rgba(15, 23, 42, 0.55);
+  --cor-input:            var(--cor-branco);
+  --cor-input-borda:      var(--cor-borda);
+  --cor-separador-suave:  var(--cor-borda-clara);
+}
+
+.dark {
+  --cor-fundo:          #07111f;
+  --cor-branco:         #0f172a;
+  --cor-borda-clara:    #1e293b;
+  --cor-borda:          #334155;
+  --cor-borda-media:    #475569;
+  --cor-texto-mudo:     #94a3b8;
+  --cor-texto-fraco:    #cbd5e1;
+  --cor-texto-medio:    #dbe4f0;
+  --cor-texto-secundario: #e2e8f0;
+  --cor-texto-forte:    #f8fafc;
+  --cor-texto:          #f8fafc;
+  --cor-fundo-leve:     #111c30;
+  --cor-fundo-medio:    #162338;
+
+  --cor-primaria-clara:  rgba(59, 130, 246, 0.16);
+  --cor-primaria-leve:   rgba(96, 165, 250, 0.2);
+  --cor-primaria-borda:  rgba(96, 165, 250, 0.28);
+  --cor-primaria-texto:  #93c5fd;
+  --cor-secundaria-clara: rgba(139, 92, 246, 0.16);
+  --cor-secundaria-leve:  rgba(167, 139, 250, 0.22);
+  --cor-secundaria-borda: rgba(167, 139, 250, 0.28);
+  --cor-sucesso-clara:   rgba(34, 197, 94, 0.12);
+  --cor-sucesso-leve:    rgba(34, 197, 94, 0.2);
+  --cor-sucesso-borda:   rgba(74, 222, 128, 0.28);
+  --cor-atencao-clara:   rgba(250, 204, 21, 0.12);
+  --cor-atencao-leve:    rgba(250, 204, 21, 0.2);
+  --cor-alerta-clara:    rgba(245, 158, 11, 0.14);
+  --cor-laranja-clara:   rgba(249, 115, 22, 0.12);
+  --cor-laranja-leve:    rgba(249, 115, 22, 0.22);
+  --cor-laranja-borda:   rgba(251, 146, 60, 0.3);
+  --cor-erro-clara:      rgba(239, 68, 68, 0.12);
+  --cor-erro-leve:       rgba(239, 68, 68, 0.2);
+  --cor-erro-borda:      rgba(248, 113, 113, 0.28);
+  --cor-esmeralda-clara: rgba(16, 185, 129, 0.12);
+  --cor-rosa-clara:      rgba(236, 72, 153, 0.12);
+
+  --cor-superficie:       rgba(15, 23, 42, 0.88);
+  --cor-superficie-2:     rgba(15, 23, 42, 0.72);
+  --cor-superficie-3:     rgba(30, 41, 59, 0.92);
+  --cor-superficie-brand: rgba(59, 130, 246, 0.14);
+  --cor-sobreposicao:     rgba(2, 6, 23, 0.72);
+  --cor-input:            rgba(15, 23, 42, 0.95);
+  --cor-input-borda:      #334155;
+  --cor-separador-suave:  rgba(148, 163, 184, 0.16);
+
+  --sombra-minima:    0 1px 2px rgba(2, 6, 23, 0.35);
+  --sombra-pequena:   0 10px 24px rgba(2, 6, 23, 0.18);
+  --sombra-media:     0 18px 36px rgba(2, 6, 23, 0.22);
+  --sombra-grande:    0 24px 48px rgba(2, 6, 23, 0.3);
+  --sombra-extra:     0 32px 80px rgba(2, 6, 23, 0.42);
+  --sombra-primaria:  0 12px 32px rgba(37, 99, 235, 0.26);
+  --sombra-primaria-leve: 0 8px 22px rgba(37, 99, 235, 0.18);
+  --sombra-azul-card: 0 18px 40px rgba(37, 99, 235, 0.22);
+
+  --gradiente-suave:        linear-gradient(to bottom right, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
+}
+
+.tema-fixo-claro {
+  --cor-fundo:          #f9fafb;
+  --cor-branco:         #ffffff;
+  --cor-borda-clara:    #f3f4f6;
+  --cor-borda:          #e5e7eb;
+  --cor-borda-media:    #d1d5db;
+  --cor-texto-mudo:     #9ca3af;
+  --cor-texto-fraco:    #6b7280;
+  --cor-texto-medio:    #4b5563;
+  --cor-texto-secundario: #374151;
+  --cor-texto-forte:    #1f2937;
+  --cor-texto:          #111827;
+  --cor-fundo-leve:     #f3f4f6;
+  --cor-fundo-medio:    #e5e7eb;
+
+  --cor-superficie:       #ffffff;
+  --cor-superficie-2:     #f8fafc;
+  --cor-superficie-3:     #f1f5f9;
+  --cor-superficie-brand: rgba(37, 99, 235, 0.08);
+  --cor-sobreposicao:     rgba(15, 23, 42, 0.55);
+  --cor-input:            #ffffff;
+  --cor-input-borda:      #e5e7eb;
+  --cor-separador-suave:  #f3f4f6;
+
+  --sombra-minima:    0 1px 2px rgba(0, 0, 0, 0.05);
+  --sombra-pequena:   0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --sombra-media:     0 4px 12px rgba(0, 0, 0, 0.08);
+  --sombra-grande:    0 8px 24px rgba(0, 0, 0, 0.12);
+  --sombra-extra:     0 20px 40px rgba(0, 0, 0, 0.15);
+  --sombra-primaria:  0 8px 24px rgba(37, 99, 235, 0.2);
+  --sombra-primaria-leve: 0 4px 16px rgba(37, 99, 235, 0.12);
+  --sombra-azul-card: 0 16px 30px rgba(37, 99, 235, 0.18);
 }

@@ -149,17 +149,23 @@ export default function DashboardPage() {
             {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}
           </p>
           <h2 className="painel__titulo-banner">
-            Ola, {user?.nome?.split(" ")[0] ?? "pesquisador"}!
+            <span className="painel__titulo-destaque">Ola, {user?.nome?.split(" ")[0] ?? "pesquisador"}!</span>
           </h2>
           <p className="painel__descricao-banner">
             Você tem <strong className="painel__destaque-banner">{derived.unreadNotifications} notificações</strong> pendentes
             e <strong className="painel__destaque-banner"> {derived.recentApplications.length} inscrições</strong> vinculadas ao seu perfil.
           </p>
           <div className="painel__botoes-banner">
-            <button onClick={() => navigate("/app/projects")} className="painel__botao-banner">
+            <button
+              onClick={() => navigate("/app/projects")}
+              className="painel__botao-banner painel__botao-banner--primario"
+            >
               <FolderOpen size={14} /> Buscar projetos
             </button>
-            <button onClick={() => navigate("/app/progress")} className="painel__botao-banner">
+            <button
+              onClick={() => navigate("/app/progress")}
+              className="painel__botao-banner painel__botao-banner--secundario"
+            >
               <TrendingUp size={14} /> Ver progresso
             </button>
           </div>

@@ -4,10 +4,11 @@ import { motion } from "framer-motion";
 import { Search, FolderOpen, Users, Clock, ChevronRight, SlidersHorizontal, X, Plus } from "lucide-react";
 import { useAsyncData } from "../hooks/useAsyncDataHook";
 import { projectService } from "../services/projectService";
+import { courseService } from "../services/courseService";
 import { StatusView } from "../components/StatusView";
 import { mapProject } from "../utils/adapters";
 import { formatProjectStatus } from "../utils/formatters";
-import { AREAS_ESTUDO } from "../utils/constants";
+import { AREAS_ESTUDO, CURSOS } from "../utils/constants";
 import "./ProjectsPage.css";
 
 function normalizeValue(value) {
@@ -21,46 +22,63 @@ function normalizeValue(value) {
 export default function ProjectsPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [courseInput, setCourseInput] = useState("");
   const [selectedCourse, setSelectedCourse] = useState("");
   const [selectedArea, setSelectedArea] = useState("Todas");
   const [selectedStatus, setSelectedStatus] = useState("Todos");
   const [showFilters, setShowFilters] = useState(false);
+
+  const { data: areaNames } = useAsyncData(
+    async () => {
+      const payload = await projectService.getStudyAreas().catch(() => []);
+      const names = Array.isArray(payload) ? payload.map((a) => a?.nome).filter(Boolean) : [];
+      return names.length ? names : AREAS_ESTUDO;
+    },
+    [],
+    { initialData: AREAS_ESTUDO },
+  );
+
+  const { data: courseNames } = useAsyncData(
+    async () => {
+      const payload = await courseService.list().catch(() => []);
+      const names = Array.isArray(payload) ? payload.map((c) => c?.nome).filter(Boolean) : [];
+      return names.length ? names : CURSOS;
+    },
+    [],
+    { initialData: CURSOS },
+  );
+
   const { data, loading, error } = useAsyncData(
     async () => {
       const result = await projectService.list({
-        curso: selectedCourse,
+        curso: selectedCourse === "Todos" ? "" : selectedCourse,
+        area: selectedArea === "Todas" ? "" : selectedArea,
+        status: selectedStatus === "Todos" ? "" : selectedStatus,
+        busca: search,
       });
       return Array.isArray(result) ? result.map(mapProject) : [];
     },
-    [selectedCourse],
+    [selectedCourse, selectedArea, selectedStatus, search],
     { initialData: [] },
   );
   const projects = Array.isArray(data) ? data : [];
 
-  const areas = ["Todas", ...AREAS_ESTUDO];
-  const cursos = ["Todos", ...AREAS_ESTUDO];
+  const areas = ["Todas", ...(Array.isArray(areaNames) ? areaNames : AREAS_ESTUDO)];
+  const cursos = ["Todos", ...(Array.isArray(courseNames) ? courseNames : CURSOS)];
   const statuses = ["Todos", "ABERTO", "EM_ANDAMENTO", "FINALIZADO"];
-
-  const applyCourseFilter = () => {
-    setSelectedCourse(courseInput === "Todos" ? "" : courseInput);
-  };
 
   const filtered = useMemo(
     () =>
       projects.filter((project) => {
         const term = search.toLowerCase();
-        const matchSearch =
+        // Mantemos a busca no cliente tambem para cobrir descricao e tags,
+        // ja que a API foca apenas no titulo por padrao.
+        return (
           project.title.toLowerCase().includes(term) ||
           project.description.toLowerCase().includes(term) ||
-          project.tags.some((tag) => tag.toLowerCase().includes(term));
-        const matchArea =
-          selectedArea === "Todas" ||
-          normalizeValue(project.area) === normalizeValue(selectedArea);
-        const matchStatus = selectedStatus === "Todos" || project.status === selectedStatus;
-        return matchSearch && matchArea && matchStatus;
+          project.tags.some((tag) => tag.toLowerCase().includes(term))
+        );
       }),
-    [projects, search, selectedArea, selectedStatus],
+    [projects, search],
   );
 
   if (loading) {
@@ -147,15 +165,8 @@ export default function ProjectsPage() {
               <label className="pagina-projetos__rotulo-filtro">Curso</label>
               <div className="pagina-projetos__input-filtro">
                 <select
-                  value={courseInput || "Todos"}
-                  onChange={(e) => setCourseInput(e.target.value)}
-                  onBlur={applyCourseFilter}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      applyCourseFilter();
-                    }
-                  }}
+                  value={selectedCourse || "Todos"}
+                  onChange={(e) => setSelectedCourse(e.target.value === "Todos" ? "" : e.target.value)}
                   className="pagina-projetos__input-filtro-curso"
                 >
                   {cursos.map((curso) => (

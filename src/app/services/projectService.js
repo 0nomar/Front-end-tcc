@@ -68,7 +68,7 @@ export const projectService = {
   },
 
   async getStudyAreas() {
-    const endpoints = ["/api/areas-pesquisa", "/api/areas", "/api/area-pesquisa"];
+    const endpoints = ["/api/areas"];
 
     for (const endpoint of endpoints) {
       try {

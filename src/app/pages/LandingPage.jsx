@@ -100,7 +100,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="landing">
+    <div className="landing tema-fixo-claro">
       {/* Navbar */}
       <motion.nav
         initial={{ opacity: 0, y: -12 }}
