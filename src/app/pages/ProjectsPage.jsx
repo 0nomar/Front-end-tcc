@@ -6,6 +6,7 @@ import { useAsyncData } from "../hooks/useAsyncDataHook";
 import { projectService } from "../services/projectService";
 import { courseService } from "../services/courseService";
 import { StatusView } from "../components/StatusView";
+import ProjectCardSkeleton from "../components/ProjectCardSkeleton";
 import { mapProject } from "../utils/adapters";
 import { formatProjectStatus } from "../utils/formatters";
 import { AREAS_ESTUDO, CURSOS } from "../utils/constants";
@@ -80,10 +81,6 @@ export default function ProjectsPage() {
       }),
     [projects, search],
   );
-
-  if (loading) {
-    return <StatusView title="Carregando projetos" description="Consultando a API para listar os projetos." />;
-  }
 
   if (error) {
     return <StatusView title="Falha ao carregar projetos" description={error.message} />;
@@ -220,7 +217,15 @@ export default function ProjectsPage() {
         </div>
       )}
 
-      {filtered.length === 0 ? (
+      {loading && (
+        <div className="pagina-projetos__grade">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <ProjectCardSkeleton key={i} index={i} />
+          ))}
+        </div>
+      )}
+
+      {!loading && filtered.length === 0 && (
         <div className="pagina-projetos__estado-vazio">
           <div className="pagina-projetos__icone-vazio">
             <Search size={24} style={{ color: "var(--cor-texto-mudo)" }} />
@@ -228,7 +233,9 @@ export default function ProjectsPage() {
           <h3 className="pagina-projetos__titulo-vazio">Nenhum projeto encontrado</h3>
           <p className="pagina-projetos__descricao-vazio">Tente ajustar os filtros ou o termo de busca.</p>
         </div>
-      ) : (
+      )}
+
+      {!loading && filtered.length > 0 && (
         <div className="pagina-projetos__grade">
           {filtered.map((project, index) => {
             const acceptedCollaborators = Array.isArray(project.collaborators)
