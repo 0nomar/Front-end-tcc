@@ -70,15 +70,33 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(Boolean(token));
 
+  // Logout automático via evento 401 da API
   useEffect(() => {
     function handleUnauthorized() {
       clearStoredToken();
       setToken(null);
     }
-
     window.addEventListener("auth:unauthorized", handleUnauthorized);
     return () => window.removeEventListener("auth:unauthorized", handleUnauthorized);
   }, []);
+
+  // Auto-logout quando o token expira enquanto o usuário navega
+  useEffect(() => {
+    if (!token) return;
+
+    const payload = decodeJwt(token);
+    if (!payload?.exp) return;
+
+    const msUntilExpiry = Number(payload.exp) * 1000 - Date.now();
+    if (msUntilExpiry <= 0) return; // já expirado, o outro useEffect trata
+
+    const timer = setTimeout(() => {
+      clearStoredToken();
+      setToken(null);
+    }, msUntilExpiry);
+
+    return () => clearTimeout(timer);
+  }, [token]);
 
   useEffect(() => {
     if (!token) {

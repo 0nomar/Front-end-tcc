@@ -1,17 +1,26 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router";
+import { useNavigate, useLocation, Link } from "react-router";
 import { FlaskConical, Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import "./LoginPage.css";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
+  // Se o usuário foi redirecionado para /login vindo de uma rota protegida,
+  // após o login voltamos para onde ele tentou ir.
+  const redirectTo = location.state?.from?.pathname ?? "/app";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const handleLoginTeste = () => {
+    setEmail(import.meta.env.VITE_DEV_EMAIL ?? "");
+    setPassword(import.meta.env.VITE_DEV_SENHA ?? "");
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -20,7 +29,7 @@ export default function LoginPage() {
 
     try {
       await login({ email, senha: password });
-      navigate("/app");
+      navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(err.message || "Nao foi possivel entrar. Verifique suas credenciais.");
     } finally {
@@ -137,6 +146,26 @@ export default function LoginPage() {
               )}
             </button>
           </form>
+
+          {import.meta.env.DEV && (
+            <button
+              type="button"
+              onClick={handleLoginTeste}
+              style={{
+                width: "100%",
+                marginTop: 8,
+                padding: "10px",
+                border: "1.5px dashed var(--cor-borda-media)",
+                borderRadius: "var(--raio-medio)",
+                background: "transparent",
+                color: "var(--cor-texto-fraco)",
+                fontSize: "var(--tamanho-base)",
+                cursor: "pointer",
+              }}
+            >
+              🧪 Preencher credenciais de teste
+            </button>
+          )}
 
           <p className="pagina-login__link-cadastro">
             Não tem conta?{" "}
