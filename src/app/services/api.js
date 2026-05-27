@@ -1,6 +1,16 @@
 import { clearStoredToken, getStoredToken } from "../utils/storage";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+
+function buildRequestUrl(path) {
+  const requestPath = path.startsWith("/") ? path : `/${path}`;
+
+  if (API_BASE_URL.endsWith("/api") && requestPath.startsWith("/api/")) {
+    return `${API_BASE_URL}${requestPath.slice(4)}`;
+  }
+
+  return `${API_BASE_URL}${requestPath}`;
+}
 
 async function request(path, options = {}) {
   const token = getStoredToken();
@@ -18,7 +28,7 @@ async function request(path, options = {}) {
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(buildRequestUrl(path), {
     ...options,
     headers,
   });

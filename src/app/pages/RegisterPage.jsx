@@ -29,7 +29,7 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const { register } = useAuth();
   const [step, setStep] = useState(1);
-  const userType = "student";
+  const [userType, setUserType] = useState("student");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -41,6 +41,8 @@ export default function RegisterPage() {
     institution: "",
     semester: "",
     ra: "",
+    department: "",
+    academicTitle: "",
   });
 
   const update = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
@@ -49,6 +51,10 @@ export default function RegisterPage() {
     setError("");
     if (step === 2 && form.password !== form.confirmPassword) {
       setError("As senhas nao coincidem.");
+      return;
+    }
+    if (step === 2 && userType === "student" && !form.ra.trim()) {
+      setError("Informe o RA para continuar.");
       return;
     }
     if (step < 3) setStep(step + 1);
@@ -62,18 +68,34 @@ export default function RegisterPage() {
       setError("As senhas nao coincidem.");
       return;
     }
+    if (userType === "student" && !form.ra.trim()) {
+      setError("Informe o RA para criar sua conta.");
+      return;
+    }
+    if (userType === "advisor" && (!form.department.trim() || !form.academicTitle.trim())) {
+      setError("Informe departamento e titulacao para criar a conta de orientador.");
+      return;
+    }
     setLoading(true);
 
     try {
-      await register({
+      const payload = {
         nome: form.name,
         email: form.email,
         senha: form.password,
-        ra: form.ra,
-        tipo: "ALUNO",
-        semestre: form.semester ? Number(form.semester) : undefined,
         instituicao: form.institution,
-      });
+        tipo: userType === "advisor" ? "ORIENTADOR" : "ALUNO",
+      };
+
+      if (userType === "advisor") {
+        payload.departamento = form.department;
+        payload.titulacao = form.academicTitle;
+      } else {
+        payload.ra = form.ra;
+        payload.semestre = form.semester ? Number(form.semester) : undefined;
+      }
+
+      await register(payload);
       navigate("/app");
     } catch (err) {
       setError(err.message || "Nao foi possivel criar a conta.");
@@ -103,7 +125,7 @@ export default function RegisterPage() {
                 {s < step ? <CheckCircle size={14} /> : s}
               </div>
               <span className={`pagina-cadastro__label-passo ${s === step ? "pagina-cadastro__label-passo--ativo" : "pagina-cadastro__label-passo--inativo"}`}>
-                {s === 1 ? "Tipo de conta" : s === 2 ? "Dados pessoais" : "Informacoes academicas"}
+                {s === 1 ? "Tipo de conta" : s === 2 ? "Dados pessoais" : userType === "advisor" ? "Dados profissionais" : "Informacoes academicas"}
               </span>
               {s < 3 && <div className={`pagina-cadastro__linha-passo ${s < step ? "pagina-cadastro__linha-passo--ativa" : "pagina-cadastro__linha-passo--inativa"}`} />}
             </div>
@@ -117,10 +139,11 @@ export default function RegisterPage() {
                 <h2 className="cadastro-step__titulo">Como voce vai usar a plataforma?</h2>
                 <p className="cadastro-step__subtitulo">Escolha o tipo de conta que melhor descreve seu papel.</p>
                 <div className="cadastro-tipo__grade">
-                  {["student"].map((type) => (
+                  {["student", "advisor"].map((type) => (
                     <button
                       key={type}
                       type="button"
+                      onClick={() => setUserType(type)}
                       className={`cadastro-tipo__opcao ${userType === type ? "cadastro-tipo__opcao--selecionado" : "cadastro-tipo__opcao--disponivel"}`}
                     >
                       <span className="cadastro-tipo__icone" aria-hidden="true">
@@ -135,7 +158,6 @@ export default function RegisterPage() {
                     </button>
                   ))}
                 </div>
-                <p className="cadastro-step__subtitulo">Contas de orientador sao cadastradas pela administracao.</p>
                 <button type="button" onClick={handleNext} className="cadastro-step__botao-continuar">
                   Continuar <ArrowRight size={16} />
                 </button>
@@ -179,20 +201,22 @@ export default function RegisterPage() {
                     </div>
                   </div>
 
-                  <div className="campo-cadastro">
-                    <label className="campo-cadastro__label">RA</label>
-                    <div className="campo-cadastro__wrapper">
-                      <Hash size={16} className="campo-cadastro__icone-esquerda" />
-                      <input
-                        type="text"
-                        value={form.ra}
-                        onChange={(e) => update("ra", e.target.value)}
-                        className="campo-cadastro__input"
-                        placeholder="Seu registro academico"
-                        required
-                      />
+                  {userType === "student" && (
+                    <div className="campo-cadastro">
+                      <label className="campo-cadastro__label">RA</label>
+                      <div className="campo-cadastro__wrapper">
+                        <Hash size={16} className="campo-cadastro__icone-esquerda" />
+                        <input
+                          type="text"
+                          value={form.ra}
+                          onChange={(e) => update("ra", e.target.value)}
+                          className="campo-cadastro__input"
+                          placeholder="Seu registro academico"
+                          required
+                        />
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   <div className="campo-cadastro">
                     <label className="campo-cadastro__label">Senha</label>
@@ -245,8 +269,14 @@ export default function RegisterPage() {
 
             {step === 3 && (
               <div>
-                <h2 className="cadastro-step__titulo">Informacoes academicas</h2>
-                <p className="cadastro-step__subtitulo">Esses dados ajudam na organizacao do perfil.</p>
+                <h2 className="cadastro-step__titulo">
+                  {userType === "advisor" ? "Dados profissionais" : "Informacoes academicas"}
+                </h2>
+                <p className="cadastro-step__subtitulo">
+                  {userType === "advisor"
+                    ? "Esses dados identificam sua area de orientacao."
+                    : "Esses dados ajudam na organizacao do perfil."}
+                </p>
                 <div className="cadastro-campos">
                   <div className="campo-cadastro">
                     <label className="campo-cadastro__label">Instituicao de ensino</label>
@@ -259,22 +289,51 @@ export default function RegisterPage() {
                     </div>
                   </div>
 
-                  <div className="campo-cadastro campo-cadastro--largura-total">
-                    <p className="cadastro-step__subtitulo">
-                      O curso sera definido pela administracao apos a criacao da conta.
-                    </p>
-                  </div>
+                  {userType === "advisor" ? (
+                    <>
+                      <div className="campo-cadastro">
+                        <label className="campo-cadastro__label">Departamento</label>
+                        <div className="campo-cadastro__wrapper">
+                          <Building2 size={16} className="campo-cadastro__icone-esquerda" />
+                          <input
+                            type="text"
+                            value={form.department}
+                            onChange={(e) => update("department", e.target.value)}
+                            className="campo-cadastro__input"
+                            placeholder="Ex: Computacao"
+                            required
+                          />
+                        </div>
+                      </div>
 
-                  {userType === "student" && (
-                    <div className="campo-cadastro">
-                      <label className="campo-cadastro__label">Semestre atual</label>
-                      <select value={form.semester} onChange={(e) => update("semester", e.target.value)} className="campo-cadastro__select--sem-icone">
-                        <option value="">Selecione o semestre</option>
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((semester) => (
-                          <option key={semester} value={semester}>{semester}o Semestre</option>
-                        ))}
-                      </select>
-                    </div>
+                      <div className="campo-cadastro">
+                        <label className="campo-cadastro__label">Titulacao</label>
+                        <select value={form.academicTitle} onChange={(e) => update("academicTitle", e.target.value)} className="campo-cadastro__select--sem-icone" required>
+                          <option value="">Selecione a titulacao</option>
+                          {["Especialista", "Mestre", "Doutor", "Pos-doutor"].map((title) => (
+                            <option key={title} value={title}>{title}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="campo-cadastro campo-cadastro--largura-total">
+                        <p className="cadastro-step__subtitulo">
+                          O curso sera definido pela administracao apos a criacao da conta.
+                        </p>
+                      </div>
+
+                      <div className="campo-cadastro">
+                        <label className="campo-cadastro__label">Semestre atual</label>
+                        <select value={form.semester} onChange={(e) => update("semester", e.target.value)} className="campo-cadastro__select--sem-icone">
+                          <option value="">Selecione o semestre</option>
+                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((semester) => (
+                            <option key={semester} value={semester}>{semester}o Semestre</option>
+                          ))}
+                        </select>
+                      </div>
+                    </>
                   )}
 
                   <div className="campo-cadastro__termos campo-cadastro--largura-total">
