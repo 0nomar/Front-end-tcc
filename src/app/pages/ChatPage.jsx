@@ -38,6 +38,59 @@ function formatarDia(data) {
   });
 }
 
+function ChatSkeleton() {
+  const Sk = ({ w = "100%", h = 14, r = "0.5rem" }) => (
+    <div className="skeleton" style={{ width: w, height: h, borderRadius: r }} />
+  );
+  return (
+    <div className="pagina-chat">
+      {/* lista de conversas */}
+      <div className="pagina-chat__lista-conversas pagina-chat__lista-conversas--visivel">
+        <div style={{ padding: "var(--espaco-4)", borderBottom: "1px solid var(--cor-borda-clara)" }}>
+          <Sk w="55%" h={18} mb={12} />
+          <Sk w="100%" h={38} r="var(--raio-medio)" />
+        </div>
+        <div style={{ padding: "var(--espaco-2)" }}>
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} style={{ display: "flex", gap: 12, alignItems: "center", padding: "var(--espaco-3)", borderRadius: "var(--raio-medio)", marginBottom: 4 }}>
+              <Sk w={44} h={44} r="50%" />
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 7 }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <Sk w="55%" h={13} />
+                  <Sk w={35} h={11} />
+                </div>
+                <Sk w="75%" h={12} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* área de mensagens */}
+      <div className="pagina-chat__area-mensagens" style={{ display: "flex", flexDirection: "column" }}>
+        <div style={{ padding: "var(--espaco-4)", borderBottom: "1px solid var(--cor-borda-clara)", display: "flex", alignItems: "center", gap: 12 }}>
+          <Sk w={40} h={40} r="50%" />
+          <div style={{ flex: 1 }}>
+            <Sk w="40%" h={14} mb={6} />
+            <Sk w="25%" h={12} />
+          </div>
+        </div>
+        <div style={{ flex: 1, padding: "var(--espaco-4)", display: "flex", flexDirection: "column", gap: 16 }}>
+          {[120, 200, 80, 160, 100, 240, 90].map((w, i) => (
+            <div key={i} style={{ display: "flex", justifyContent: i % 2 === 0 ? "flex-start" : "flex-end" }}>
+              <Sk w={w} h={38} r="var(--raio-grande)" />
+            </div>
+          ))}
+        </div>
+        <div style={{ padding: "var(--espaco-4)", borderTop: "1px solid var(--cor-borda-clara)", display: "flex", gap: 10 }}>
+          <Sk w="100%" h={44} r="var(--raio-medio)" />
+          <Sk w={44} h={44} r="var(--raio-medio)" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ChatPage() {
   const { user } = useAuth();
   const messagesEndRef = useRef(null);
@@ -201,7 +254,7 @@ export default function ChatPage() {
     }
   };
 
-  if (loading) return <StatusView title="Carregando..." description="Buscando conversas" />;
+  if (loading) return <ChatSkeleton />;
   if (error) return <StatusView title="Erro" description="Falha ao carregar" />;
 
   return (
