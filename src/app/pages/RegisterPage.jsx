@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router";
 import {
   FlaskConical,
@@ -15,23 +15,8 @@ import {
   Hash,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
+import { courseService } from "../services/courseService";
 import "./RegisterPage.css";
-
-const courses = [
-  "Ciencia da Computacao",
-  "Sistemas de Informacao",
-  "Engenharia de Computacao",
-  "Engenharia Eletrica",
-  "Fisica",
-  "Matematica",
-  "Biologia",
-  "Biomedicina",
-  "Medicina",
-  "Quimica",
-  "Psicologia",
-  "Administracao",
-  "Outro",
-];
 
 const institutions = [
   "Universidade Federal do Brasil (UFB)",
@@ -46,21 +31,32 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const { register } = useAuth();
   const [step, setStep] = useState(1);
-  const [userType, setUserType] = useState("student");
+  const userType = "student";
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [courses, setCourses] = useState([]);
+  const [coursesLoading, setCoursesLoading] = useState(true);
+  const [courseError, setCourseError] = useState("");
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
-    course: "",
+    courseId: "",
     institution: "",
     semester: "",
     department: "",
     ra: "",
   });
+
+  useEffect(() => {
+    courseService
+      .list()
+      .then((payload) => setCourses(Array.isArray(payload) ? payload : []))
+      .catch(() => setCourseError("Nao foi possivel carregar os cursos cadastrados."))
+      .finally(() => setCoursesLoading(false));
+  }, []);
 
   const update = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
 
@@ -81,6 +77,10 @@ export default function RegisterPage() {
       setError("As senhas nao coincidem.");
       return;
     }
+    if (!form.courseId || !courses.some((course) => String(course.id) === form.courseId)) {
+      setError("Selecione um curso cadastrado.");
+      return;
+    }
 
     setLoading(true);
 
@@ -90,6 +90,10 @@ export default function RegisterPage() {
         email: form.email,
         senha: form.password,
         ra: form.ra,
+        tipo: "ALUNO",
+        cursoId: Number(form.courseId),
+        semestre: form.semester ? Number(form.semester) : undefined,
+        instituicao: form.institution,
       });
       navigate("/app");
     } catch (err) {
@@ -134,11 +138,10 @@ export default function RegisterPage() {
                 <h2 className="cadastro-step__titulo">Como voce vai usar a plataforma?</h2>
                 <p className="cadastro-step__subtitulo">Escolha o tipo de conta que melhor descreve seu papel.</p>
                 <div className="cadastro-tipo__grade">
-                  {["student", "advisor"].map((type) => (
+                  {["student"].map((type) => (
                     <button
                       key={type}
                       type="button"
-                      onClick={() => setUserType(type)}
                       className={`cadastro-tipo__opcao ${userType === type ? "cadastro-tipo__opcao--selecionado" : "cadastro-tipo__opcao--disponivel"}`}
                     >
                       <span className="cadastro-tipo__icone" aria-hidden="true">
@@ -153,6 +156,7 @@ export default function RegisterPage() {
                     </button>
                   ))}
                 </div>
+                <p className="cadastro-step__subtitulo">Contas de orientador sao cadastradas pela administracao.</p>
                 <button type="button" onClick={handleNext} className="cadastro-step__botao-continuar">
                   Continuar <ArrowRight size={16} />
                 </button>
@@ -281,13 +285,14 @@ export default function RegisterPage() {
                     <div className="campo-cadastro__wrapper">
                       <BookOpen size={16} className="campo-cadastro__icone-esquerda" />
                       <select
-                        value={userType === "student" ? form.course : form.department}
-                        onChange={(e) => update(userType === "student" ? "course" : "department", e.target.value)}
+                        value={form.courseId}
+                        onChange={(e) => update("courseId", e.target.value)}
                         className="campo-cadastro__select"
+                        disabled={coursesLoading || courses.length === 0}
                         required
                       >
-                        <option value="">Selecione {userType === "student" ? "o curso" : "o departamento"}</option>
-                        {courses.map((course) => <option key={course} value={course}>{course}</option>)}
+                        <option value="">{coursesLoading ? "Carregando cursos..." : "Selecione o curso"}</option>
+                        {courses.map((course) => <option key={course.id} value={course.id}>{course.nome}</option>)}
                       </select>
                     </div>
                   </div>
@@ -315,10 +320,15 @@ export default function RegisterPage() {
                 {error ? (
                   <p className="cadastro-step__subtitulo" style={{ color: "var(--cor-erro)" }}>{error}</p>
                 ) : null}
+                {courseError || (!coursesLoading && courses.length === 0) ? (
+                  <p className="cadastro-step__subtitulo" style={{ color: "var(--cor-erro)" }}>
+                    {courseError || "Nenhum curso cadastrado. Solicite o cadastro antes de criar uma conta."}
+                  </p>
+                ) : null}
 
                 <div className="cadastro-step__acoes">
                   <button type="button" onClick={() => setStep(2)} className="cadastro-step__botao-voltar">Voltar</button>
-                  <button type="submit" disabled={loading} className="cadastro-step__botao-enviar">
+                  <button type="submit" disabled={loading || coursesLoading || courses.length === 0} className="cadastro-step__botao-enviar">
                     {loading ? <div className="cadastro-step__spinner" /> : <>Criar conta <ArrowRight size={15} /></>}
                   </button>
                 </div>
