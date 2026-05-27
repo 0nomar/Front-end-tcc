@@ -8,7 +8,6 @@ import { courseService } from "../services/courseService";
 import { StatusView } from "../components/StatusView";
 import { mapProject } from "../utils/adapters";
 import { formatProjectStatus } from "../utils/formatters";
-import { AREAS_ESTUDO, CURSOS } from "../utils/constants";
 import "./ProjectsPage.css";
 
 function normalizeValue(value) {
@@ -31,20 +30,20 @@ export default function ProjectsPage() {
     async () => {
       const payload = await projectService.getStudyAreas().catch(() => []);
       const names = Array.isArray(payload) ? payload.map((a) => a?.nome).filter(Boolean) : [];
-      return names.length ? names : AREAS_ESTUDO;
+      return names;
     },
     [],
-    { initialData: AREAS_ESTUDO },
+    { initialData: [] },
   );
 
   const { data: courseNames } = useAsyncData(
     async () => {
       const payload = await courseService.list().catch(() => []);
       const names = Array.isArray(payload) ? payload.map((c) => c?.nome).filter(Boolean) : [];
-      return names.length ? names : CURSOS;
+      return names;
     },
     [],
-    { initialData: CURSOS },
+    { initialData: [] },
   );
 
   const { data, loading, error } = useAsyncData(
@@ -62,8 +61,8 @@ export default function ProjectsPage() {
   );
   const projects = Array.isArray(data) ? data : [];
 
-  const areas = ["Todas", ...(Array.isArray(areaNames) ? areaNames : AREAS_ESTUDO)];
-  const cursos = ["Todos", ...(Array.isArray(courseNames) ? courseNames : CURSOS)];
+  const areas = ["Todas", ...(Array.isArray(areaNames) ? areaNames : [])];
+  const cursos = ["Todos", ...(Array.isArray(courseNames) ? courseNames : [])];
   const statuses = ["Todos", "ABERTO", "EM_ANDAMENTO", "FINALIZADO"];
 
   const filtered = useMemo(

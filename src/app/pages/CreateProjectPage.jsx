@@ -2,10 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
 import { ArrowLeft, FolderPlus, Loader2 } from "lucide-react";
-import { AREAS_ESTUDO_OPTIONS, CURSOS } from "../utils/constants";
 import { areaService } from "../services/areaService";
-import { courseService } from "../services/courseService";
 import { projectService } from "../services/projectService";
+import { validateProjectDates } from "../utils/projectFormValidation";
 import "./CreateProjectPage.css";
 
 const INITIAL_FORM = {
@@ -13,7 +12,6 @@ const INITIAL_FORM = {
   descricao: "",
   requisitos: "",
   areaId: "",
-  curso: "",
   vagas: "",
   dataInicio: "",
   dataFim: "",
@@ -25,8 +23,7 @@ export default function CreateProjectPage() {
   const [form, setForm] = useState(INITIAL_FORM);
   const [areas, setAreas] = useState([]);
   const [areasLoading, setAreasLoading] = useState(true);
-  const [courses, setCourses] = useState([]);
-  const [coursesLoading, setCoursesLoading] = useState(true);
+  const [areasError, setAreasError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -40,33 +37,16 @@ export default function CreateProjectPage() {
       .then((payload) => {
         if (!alive) return;
         const next = Array.isArray(payload) ? payload : [];
-        setAreas(next.length ? next : AREAS_ESTUDO_OPTIONS);
+        setAreas(next);
       })
       .catch(() => {
         if (!alive) return;
-        setAreas(AREAS_ESTUDO_OPTIONS);
+        setAreas([]);
+        setAreasError("Nao foi possivel carregar as areas cadastradas.");
       })
       .finally(() => {
         if (!alive) return;
         setAreasLoading(false);
-      });
-
-    setCoursesLoading(true);
-    courseService
-      .list()
-      .then((payload) => {
-        if (!alive) return;
-        const list = Array.isArray(payload) ? payload : [];
-        const nomes = list.map((c) => c?.nome).filter(Boolean);
-        setCourses(nomes.length ? nomes : CURSOS);
-      })
-      .catch(() => {
-        if (!alive) return;
-        setCourses(CURSOS);
-      })
-      .finally(() => {
-        if (!alive) return;
-        setCoursesLoading(false);
       });
 
     return () => {
@@ -85,8 +65,10 @@ export default function CreateProjectPage() {
 
     if (!form.titulo.trim()) { setError("O titulo e obrigatorio."); return; }
     if (!form.areaId) { setError("Selecione uma area de pesquisa."); return; }
-    if (!form.curso) { setError("Selecione um curso."); return; }
+    if (!areas.some((area) => String(area.id) === form.areaId)) { setError("Selecione uma area cadastrada."); return; }
     if (!form.vagas || Number(form.vagas) < 1) { setError("Informe o numero de vagas (minimo 1)."); return; }
+    const dateError = validateProjectDates(form);
+    if (dateError) { setError(dateError); return; }
 
     setLoading(true);
     setError(null);
@@ -97,7 +79,6 @@ export default function CreateProjectPage() {
         descricao: form.descricao.trim() || undefined,
         requisitos: form.requisitos.trim() || undefined,
         areaId: Number(form.areaId),
-        curso: form.curso,
         vagas: Number(form.vagas),
         dataInicio: form.dataInicio || undefined,
         dataFim: form.dataFim || undefined,
@@ -118,7 +99,8 @@ export default function CreateProjectPage() {
     }
   }
 
-  const isDisabled = loading || success;
+  const areasUnavailable = !areasLoading && areas.length === 0;
+  const isDisabled = loading || success || areasUnavailable;
 
   return (
     <motion.div
@@ -162,6 +144,12 @@ export default function CreateProjectPage() {
             </motion.div>
           )}
 
+          {areasUnavailable && (
+            <div className="formulario-projeto__alerta formulario-projeto__alerta--erro" role="alert">
+              {areasError ?? "Nenhuma area de pesquisa cadastrada. Solicite ao administrador o cadastro de uma area antes de criar projetos."}
+            </div>
+          )}
+
           {/* Titulo */}
           <div className="formulario-projeto__campo">
             <label htmlFor="titulo" className="formulario-projeto__rotulo">
@@ -200,8 +188,8 @@ export default function CreateProjectPage() {
             />
           </div>
 
-          {/* Area + Curso + Vagas */}
-          <div className="formulario-projeto__grade-3">
+          {/* Area + Vagas */}
+          <div className="formulario-projeto__grade-2">
             <div className="formulario-projeto__campo">
               <label htmlFor="areaId" className="formulario-projeto__rotulo">
                 Area de pesquisa <span className="formulario-projeto__obrigatorio">*</span>
@@ -213,27 +201,10 @@ export default function CreateProjectPage() {
                 disabled={isDisabled || areasLoading}
               >
                 <option value="">
-                  {areasLoading ? "Carregando..." : "Selecione uma area"}
+                  {areasLoading ? "Carregando..." : areasUnavailable ? "Nenhuma area cadastrada" : "Selecione uma area"}
                 </option>
                 {areas.map((a) => (
                   <option key={a.id} value={a.id}>{a.nome}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="formulario-projeto__campo">
-              <label htmlFor="curso" className="formulario-projeto__rotulo">
-                Curso <span className="formulario-projeto__obrigatorio">*</span>
-              </label>
-              <select
-                id="curso" name="curso"
-                value={form.curso} onChange={handleChange}
-                className="formulario-projeto__select"
-                disabled={isDisabled || coursesLoading}
-              >
-                <option value="">{coursesLoading ? "Carregando..." : "Selecione um curso"}</option>
-                {courses.map((c) => (
-                  <option key={c} value={c}>{c}</option>
                 ))}
               </select>
             </div>

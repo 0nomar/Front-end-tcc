@@ -1,5 +1,4 @@
 import { api } from "./api";
-import { AREAS_ESTUDO_OPTIONS } from "../utils/constants";
 
 function buildQs(params = {}) {
   const qs = new URLSearchParams();
@@ -82,7 +81,7 @@ export const projectService = {
       }
     }
 
-    return AREAS_ESTUDO_OPTIONS;
+    return [];
   },
 
   // create
