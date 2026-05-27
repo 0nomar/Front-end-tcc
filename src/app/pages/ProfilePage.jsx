@@ -10,6 +10,74 @@ import { formatApplicationStatus, formatUserType } from "../utils/formatters";
 import { StatusView } from "../components/StatusView";
 import "./ProfilePage.css";
 
+function ProfileSkeleton() {
+  const Sk = ({ w = "100%", h = 14, r = "0.5rem" }) => (
+    <div className="skeleton" style={{ width: w, height: h, borderRadius: r }} />
+  );
+  return (
+    <div className="pagina-perfil">
+      <div className="pagina-perfil__grade">
+        <div className="cartao-perfil">
+          <div className="cartao-perfil__capa skeleton" style={{ borderRadius: "var(--raio-grande) var(--raio-grande) 0 0" }} />
+          <div className="cartao-perfil__corpo" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+            <Sk w={80} h={80} r="50%" />
+            <Sk w="60%" h={18} />
+            <Sk w="40%" h={13} />
+            <Sk w="55%" h={13} />
+            <div style={{ display: "flex", gap: 24, margin: "8px 0" }}>
+              {[1, 2, 3].map((i) => (
+                <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                  <Sk w={30} h={18} />
+                  <Sk w={50} h={11} />
+                </div>
+              ))}
+            </div>
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} style={{ display: "flex", gap: 10, alignItems: "center", width: "100%" }}>
+                <Sk w={16} h={16} r="50%" />
+                <Sk w="75%" h={13} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="pagina-perfil__conteudo-principal">
+          <div className="secao-perfil">
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "var(--espaco-4)" }}>
+              <Sk w={180} h={16} />
+              <Sk w={100} h={32} r="var(--raio-medio)" />
+            </div>
+            <div className="secao-perfil__grade-campos">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  <Sk w="35%" h={13} />
+                  <Sk w="100%" h={40} r="var(--raio-medio)" />
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: "var(--espaco-4)", display: "flex", flexDirection: "column", gap: 6 }}>
+              <Sk w="20%" h={13} />
+              <Sk w="100%" h={72} r="var(--raio-medio)" />
+            </div>
+          </div>
+          <div className="secao-perfil">
+            <Sk w={160} h={16} mb={16} />
+            {[1, 2, 3].map((i) => (
+              <div key={i} style={{ display: "flex", gap: 12, alignItems: "center", padding: "12px 0", borderBottom: "1px solid var(--cor-borda-clara)" }}>
+                <Sk w={36} h={36} r="var(--raio-medio)" />
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
+                  <Sk w="55%" h={14} />
+                  <Sk w="40%" h={12} />
+                </div>
+                <Sk w={70} h={22} r="var(--raio-completo)" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ProfilePage() {
   const { user, refreshUser } = useAuth();
   const { data, loading, error } = useAsyncData(async () => {
@@ -69,9 +137,7 @@ export default function ProfilePage() {
     }
   };
 
-  if (loading) {
-    return <StatusView title="Carregando perfil" description="Buscando suas informacoes na API." />;
-  }
+  if (loading) return <ProfileSkeleton />;
 
   if (error || !data?.profile) {
     return <StatusView title="Falha ao carregar perfil" description={error?.message || "Perfil indisponivel."} />;

@@ -8,6 +8,47 @@ import { userService } from "../services/userService";
 import { StatusView } from "../components/StatusView";
 import "./SettingsPage.css";
 
+function SettingsSkeleton() {
+  const Sk = ({ w = "100%", h = 14, r = "0.5rem" }) => (
+    <div className="skeleton" style={{ width: w, height: h, borderRadius: r }} />
+  );
+  const Section = ({ rows = 4, iconW = 18 }) => (
+    <div style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", border: "1px solid var(--cor-borda-clara)", padding: "var(--espaco-5)", marginBottom: "var(--espaco-4)" }}>
+      <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: "var(--espaco-4)" }}>
+        <Sk w={iconW} h={iconW} r="50%" />
+        <Sk w={100} h={16} />
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--espaco-4)" }}>
+        {Array.from({ length: rows }).map((_, i) => (
+          <div key={i} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <Sk w="40%" h={12} />
+            <Sk w="100%" h={40} r="var(--raio-medio)" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+  return (
+    <div style={{ padding: "var(--espaco-4)" }}>
+      <Section rows={4} />
+      <Section rows={2} />
+      <div style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", border: "1px solid var(--cor-borda-clara)", padding: "var(--espaco-5)", marginBottom: "var(--espaco-4)" }}>
+        <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: "var(--espaco-4)" }}>
+          <Sk w={18} h={18} r="50%" />
+          <Sk w={120} h={16} />
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <Sk w={160} h={14} />
+            <Sk w={120} h={12} />
+          </div>
+          <Sk w={48} h={26} r="var(--raio-completo)" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const cardEnter = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },
@@ -90,9 +131,7 @@ export default function SettingsPage() {
     setOpenPasswordModal(false);
   };
 
-  if (loading) {
-    return <StatusView title="Carregando configuracoes" description="Buscando preferencias e perfil na API." />;
-  }
+  if (loading) return <SettingsSkeleton />;
 
   return (
     <div className="pagina-configuracoes">

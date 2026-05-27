@@ -17,14 +17,23 @@
    ================================================================ */
 .painel__banner-boas-vindas {
   background:
-    radial-gradient(circle at top right, rgba(96, 165, 250, 0.22), transparent 28%),
-    radial-gradient(circle at 78% 100%, rgba(168, 85, 247, 0.18), transparent 24%),
-    linear-gradient(135deg, #0f172a 0%, #111827 45%, #1e1b4b 100%);
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 30%),
+    radial-gradient(circle at 80% 100%, rgba(124, 58, 237, 0.22), transparent 28%),
+    linear-gradient(135deg, #1d4ed8 0%, #2563eb 50%, #4f46e5 100%);
   border-radius: var(--raio-grande);
   padding: var(--espaco-4);
   color: #f8fafc;
   position: relative;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(37, 99, 235, 0.28);
+}
+
+.dark .painel__banner-boas-vindas {
+  background:
+    radial-gradient(circle at top right, rgba(96, 165, 250, 0.22), transparent 28%),
+    radial-gradient(circle at 78% 100%, rgba(168, 85, 247, 0.18), transparent 24%),
+    linear-gradient(135deg, #0f172a 0%, #111827 45%, #1e1b4b 100%);
   border: 1px solid rgba(148, 163, 184, 0.16);
   box-shadow: 0 24px 48px rgba(2, 6, 23, 0.34);
 }
@@ -194,7 +203,7 @@
 
 /* ---- Cartão de resumo ---- */
 .cartao-resumo {
-  background-color: var(--cor-branco);
+  background-color: var(--cor-superficie);
   border-radius: var(--raio-grande);
   padding: var(--espaco-5);
   border: 1px solid;
@@ -303,7 +312,7 @@
    Cartões internos (projeto, inscrições, notificações)
    ================================================================ */
 .painel__card {
-  background-color: var(--cor-branco);
+  background-color: var(--cor-superficie);
   border-radius: var(--raio-grande);
   border: 1px solid var(--cor-borda-clara);
   overflow: hidden;
@@ -550,7 +559,7 @@
    Gráfico de atividade
    ================================================================ */
 .painel__card-grafico {
-  background-color: var(--cor-branco);
+  background-color: var(--cor-superficie);
   border-radius: var(--raio-grande);
   border: 1px solid var(--cor-borda-clara);
   padding: var(--espaco-4);

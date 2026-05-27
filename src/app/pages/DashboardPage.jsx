@@ -40,6 +40,74 @@ function buildActivityData(projects, applications) {
   return Object.entries(grouped).map(([month, atividade]) => ({ month, atividade }));
 }
 
+const Sk = ({ w = "100%", h = 14, r = "0.5rem", mb = 0 }) => (
+  <div className="skeleton" style={{ width: w, height: h, borderRadius: r, marginBottom: mb || undefined }} />
+);
+
+function CardRow({ lines = 2 }) {
+  return (
+    <div style={{ display: "flex", gap: 10, alignItems: "center", padding: "10px 0", borderBottom: "1px solid var(--cor-borda-clara)" }}>
+      <Sk w={32} h={32} r="var(--raio-pequeno)" />
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 5 }}>
+        <Sk w="60%" h={13} />
+        {lines > 1 && <Sk w="40%" h={11} />}
+      </div>
+      <Sk w={60} h={22} r="var(--raio-completo)" />
+    </div>
+  );
+}
+
+function InnerCard({ rows = 3, titleW = 120 }) {
+  return (
+    <div style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", border: "1px solid var(--cor-borda-clara)", overflow: "hidden" }}>
+      <div style={{ padding: "var(--espaco-4)", borderBottom: "1px solid var(--cor-borda-clara)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Sk w={titleW} h={15} />
+        <Sk w={75} h={13} />
+      </div>
+      <div style={{ padding: "0 var(--espaco-4)" }}>
+        {Array.from({ length: rows }).map((_, i) => <CardRow key={i} />)}
+      </div>
+    </div>
+  );
+}
+
+function DashboardSkeleton() {
+  return (
+    <div className="painel">
+      <Sk w="100%" h={176} r="var(--raio-grande)" mb={24} />
+      <div className="painel__grade-resumos">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", padding: "var(--espaco-5)", border: "1px solid var(--cor-borda-clara)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "var(--espaco-4)" }}>
+              <Sk w={40} h={40} r="var(--raio-medio)" />
+              <Sk w={14} h={14} />
+            </div>
+            <Sk w="45%" h={28} mb={8} />
+            <Sk w="65%" h={13} />
+          </div>
+        ))}
+      </div>
+      <div className="painel__grade-principal" style={{ marginTop: "var(--espaco-6)" }}>
+        <div className="painel__coluna-esquerda">
+          <InnerCard rows={3} titleW={130} />
+          <InnerCard rows={4} titleW={115} />
+          <div style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", border: "1px solid var(--cor-borda-clara)", padding: "var(--espaco-5)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "var(--espaco-4)" }}>
+              <Sk w={130} h={15} />
+              <Sk w={75} h={13} />
+            </div>
+            <Sk w="100%" h={120} r="var(--raio-medio)" />
+          </div>
+        </div>
+        <div className="painel__coluna-direita">
+          <InnerCard rows={3} titleW={140} />
+          <InnerCard rows={4} titleW={110} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const statusClassMap = {
   APROVADO: "inscricao-item__status--aprovado",
   PENDENTE: "inscricao-item__status--pendente",
@@ -85,9 +153,7 @@ export default function DashboardPage() {
     };
   }, [data]);
 
-  if (loading) {
-    return <StatusView title="Carregando dashboard" description="Buscando dados reais da API." />;
-  }
+  if (loading) return <DashboardSkeleton />;
 
   if (error) {
     return <StatusView title="Falha ao carregar" description={error.message} />;

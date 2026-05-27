@@ -47,6 +47,46 @@ const statusConfig = {
   },
 };
 
+function ApplicationsSkeleton() {
+  const Sk = ({ w = "100%", h = 14, r = "0.5rem" }) => (
+    <div className="skeleton" style={{ width: w, height: h, borderRadius: r }} />
+  );
+  return (
+    <div className="pagina-inscricoes">
+      <div className="pagina-inscricoes__grade-resumos">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", padding: "var(--espaco-5)", border: "1px solid var(--cor-borda-clara)", display: "flex", flexDirection: "column", gap: 8 }}>
+            <Sk w="40%" h={26} />
+            <Sk w="65%" h={13} />
+          </div>
+        ))}
+      </div>
+      <div style={{ display: "flex", gap: 8, marginBottom: "var(--espaco-4)", marginTop: "var(--espaco-2)" }}>
+        {[1, 2, 3, 4].map((i) => <Sk key={i} w={90} h={32} r="var(--raio-completo)" />)}
+      </div>
+      <div className="pagina-inscricoes__lista">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", border: "1px solid var(--cor-borda-clara)", padding: "var(--espaco-4)", display: "flex", alignItems: "center", gap: 14 }}>
+            <Sk w={40} h={40} r="50%" />
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <Sk w="45%" h={15} />
+                <Sk w={72} h={22} r="var(--raio-completo)" />
+              </div>
+              <Sk w="35%" h={12} />
+              <div style={{ display: "flex", gap: 12 }}>
+                <Sk w={110} h={11} />
+                <Sk w={110} h={11} />
+              </div>
+            </div>
+            <Sk w={16} h={16} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function mapMine(raw) {
   const base = mapApplication(raw);
   return {
@@ -103,9 +143,7 @@ export default function ApplicationsPage() {
     }
   };
 
-  if (loading) {
-    return <StatusView title="Carregando inscricoes" description="Buscando suas inscricoes na API." />;
-  }
+  if (loading) return <ApplicationsSkeleton />;
 
   if (error) {
     return <StatusView title="Falha ao carregar inscricoes" description={error.message} />;

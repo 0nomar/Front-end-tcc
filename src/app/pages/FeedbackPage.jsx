@@ -9,6 +9,46 @@ import { mapFeedback, mapProject } from "../utils/adapters";
 import { StatusView } from "../components/StatusView";
 import "./FeedbackPage.css";
 
+function FeedbackSkeleton() {
+  const Sk = ({ w = "100%", h = 14, r = "0.5rem" }) => (
+    <div className="skeleton" style={{ width: w, height: h, borderRadius: r }} />
+  );
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--espaco-5)", padding: "var(--espaco-4)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "var(--espaco-4)" }}>
+        {[1, 2, 3].map((i) => (
+          <div key={i} style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", border: "1px solid var(--cor-borda-clara)", padding: "var(--espaco-5)", display: "flex", gap: 14, alignItems: "center" }}>
+            <Sk w={44} h={44} r="var(--raio-medio)" />
+            <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+              <Sk w={40} h={20} />
+              <Sk w={100} h={12} />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--espaco-4)" }}>
+        {[1, 2, 3].map((i) => (
+          <div key={i} style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", border: "1px solid var(--cor-borda-clara)", padding: "var(--espaco-5)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14 }}>
+              <Sk w="45%" h={15} />
+              <div style={{ display: "flex", gap: 4 }}>
+                {[1, 2, 3, 4, 5].map((j) => <Sk key={j} w={20} h={20} r="50%" />)}
+              </div>
+            </div>
+            <Sk w="100%" h={13} mb={6} />
+            <Sk w="80%" h={13} mb={6} />
+            <Sk w="60%" h={13} />
+            <div style={{ marginTop: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <Sk w={100} h={12} />
+              <Sk w={70} h={22} r="var(--raio-completo)" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function StarRating({ value, onChange, readOnly = false }) {
   const [hovered, setHovered] = useState(0);
   return (
@@ -88,9 +128,7 @@ export default function FeedbackPage() {
     }
   };
 
-  if (loading) {
-    return <StatusView title="Carregando feedbacks" description="Buscando avaliacoes reais da API." />;
-  }
+  if (loading) return <FeedbackSkeleton />;
 
   if (error) {
     return <StatusView title="Falha ao carregar feedbacks" description={error.message} />;
