@@ -127,15 +127,24 @@ export function AuthProvider({ children }) {
 
   const login = async (payload) => {
     const response = await authService.login(payload);
-    setStoredToken(response.token);
-    setToken(response.token);
+    // Suporta diferentes nomes de campo que o backend pode retornar
+    const jwt = response?.token ?? response?.accessToken ?? response?.jwt ?? response?.tokenJWT;
+    if (!jwt) {
+      throw new Error("O servidor nao retornou um token valido. Verifique se o backend esta rodando.");
+    }
+    setStoredToken(jwt);
+    setToken(jwt);
     return response;
   };
 
   const register = async (payload) => {
     const response = await authService.register(payload);
-    setStoredToken(response.token);
-    setToken(response.token);
+    const jwt = response?.token ?? response?.accessToken ?? response?.jwt ?? response?.tokenJWT;
+    if (!jwt) {
+      throw new Error("Conta criada, mas nao foi possivel autenticar. Tente fazer login.");
+    }
+    setStoredToken(jwt);
+    setToken(jwt);
     return response;
   };
 
