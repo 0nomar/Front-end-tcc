@@ -34,11 +34,8 @@ async function request(path, options = {}) {
 
   if (!response.ok) {
     if (response.status === 401) {
-      // Só dispara o logout automático se havia uma sessão ativa.
-      // Isso evita interferir em tentativas de login com credenciais erradas.
-      const hadSession = Boolean(getStoredToken());
       clearStoredToken();
-      if (hadSession && typeof window !== "undefined") {
+      if (typeof window !== "undefined") {
         window.dispatchEvent(new Event("auth:unauthorized"));
       }
     }

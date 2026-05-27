@@ -6,7 +6,6 @@ export function getStoredToken() {
 }
 
 export function setStoredToken(token) {
-  if (!token) return;
   localStorage.setItem(TOKEN_KEY, token);
 }
 

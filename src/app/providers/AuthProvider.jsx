@@ -70,33 +70,15 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(Boolean(token));
 
-  // Logout automático via evento 401 da API
   useEffect(() => {
     function handleUnauthorized() {
       clearStoredToken();
       setToken(null);
     }
+
     window.addEventListener("auth:unauthorized", handleUnauthorized);
     return () => window.removeEventListener("auth:unauthorized", handleUnauthorized);
   }, []);
-
-  // Auto-logout quando o token expira enquanto o usuário navega
-  useEffect(() => {
-    if (!token) return;
-
-    const payload = decodeJwt(token);
-    if (!payload?.exp) return;
-
-    const msUntilExpiry = Number(payload.exp) * 1000 - Date.now();
-    if (msUntilExpiry <= 0) return; // já expirado, o outro useEffect trata
-
-    const timer = setTimeout(() => {
-      clearStoredToken();
-      setToken(null);
-    }, msUntilExpiry);
-
-    return () => clearTimeout(timer);
-  }, [token]);
 
   useEffect(() => {
     if (!token) {
@@ -127,24 +109,15 @@ export function AuthProvider({ children }) {
 
   const login = async (payload) => {
     const response = await authService.login(payload);
-    // Suporta diferentes nomes de campo que o backend pode retornar
-    const jwt = response?.token ?? response?.accessToken ?? response?.jwt ?? response?.tokenJWT;
-    if (!jwt) {
-      throw new Error("O servidor nao retornou um token valido. Verifique se o backend esta rodando.");
-    }
-    setStoredToken(jwt);
-    setToken(jwt);
+    setStoredToken(response.token);
+    setToken(response.token);
     return response;
   };
 
   const register = async (payload) => {
     const response = await authService.register(payload);
-    const jwt = response?.token ?? response?.accessToken ?? response?.jwt ?? response?.tokenJWT;
-    if (!jwt) {
-      throw new Error("Conta criada, mas nao foi possivel autenticar. Tente fazer login.");
-    }
-    setStoredToken(jwt);
-    setToken(jwt);
+    setStoredToken(response.token);
+    setToken(response.token);
     return response;
   };
 
