@@ -54,6 +54,44 @@ function mapProjectApplication(raw) {
   };
 }
 
+function ProjectApplicationsSkeleton() {
+  const Sk = ({ w = "100%", h = 14, r = "0.5rem" }) => (
+    <div className="skeleton" style={{ width: w, height: h, borderRadius: r }} />
+  );
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--espaco-5)", padding: "var(--espaco-4)" }}>
+      <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: "var(--espaco-2)" }}>
+        <Sk w={32} h={32} r="var(--raio-medio)" />
+        <Sk w={200} h={16} />
+      </div>
+      <div style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", border: "1px solid var(--cor-borda-clara)", padding: "var(--espaco-5)" }}>
+        <Sk w="60%" h={18} mb={10} />
+        <Sk w="100%" h={13} mb={6} />
+        <Sk w="75%" h={13} mb={16} />
+        <div style={{ display: "flex", gap: 10 }}>
+          {[1, 2, 3].map((i) => <Sk key={i} w={70} h={24} r="var(--raio-completo)" />)}
+        </div>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--espaco-3)" }}>
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", border: "1px solid var(--cor-borda-clara)", padding: "var(--espaco-4)", display: "flex", alignItems: "center", gap: 14 }}>
+            <Sk w={44} h={44} r="50%" />
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}>
+              <Sk w="45%" h={15} />
+              <Sk w="35%" h={12} />
+              <Sk w="60%" h={11} />
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <Sk w={80} h={34} r="var(--raio-medio)" />
+              <Sk w={80} h={34} r="var(--raio-medio)" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function ProjectApplicationsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -150,9 +188,7 @@ export default function ProjectApplicationsPage() {
     }
   };
 
-  if (loading) {
-    return <StatusView title="Carregando inscricoes" description="Buscando dados do projeto e candidatos." />;
-  }
+  if (loading) return <ProjectApplicationsSkeleton />;
 
   if (error || !project) {
     return (

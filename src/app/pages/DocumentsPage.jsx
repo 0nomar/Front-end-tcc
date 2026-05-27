@@ -44,6 +44,49 @@ function buildPreviewUrl(doc) {
   return `${api.baseUrl}${doc.previewUrl}`;
 }
 
+function DocumentsSkeleton() {
+  const Sk = ({ w = "100%", h = 14, r = "0.5rem" }) => (
+    <div className="skeleton" style={{ width: w, height: h, borderRadius: r }} />
+  );
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--espaco-5)", padding: "var(--espaco-4)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: "var(--espaco-4)" }}>
+        {[1, 2].map((i) => (
+          <div key={i} style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", border: "1px solid var(--cor-borda-clara)", padding: "var(--espaco-5)", display: "flex", gap: 14, alignItems: "center" }}>
+            <Sk w={44} h={44} r="var(--raio-medio)" />
+            <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+              <Sk w={40} h={20} />
+              <Sk w={110} h={12} />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", border: "2px dashed var(--cor-borda-media)", padding: "var(--espaco-8)", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+        <Sk w={48} h={48} r="50%" />
+        <Sk w={180} h={16} />
+        <Sk w={240} h={13} />
+        <Sk w={130} h={36} r="var(--raio-medio)" />
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--espaco-3)" }}>
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", border: "1px solid var(--cor-borda-clara)", padding: "var(--espaco-4)", display: "flex", alignItems: "center", gap: 14 }}>
+            <Sk w={40} h={40} r="var(--raio-medio)" />
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 7 }}>
+              <Sk w="50%" h={14} />
+              <Sk w="35%" h={12} />
+            </div>
+            <Sk w={72} h={22} r="var(--raio-completo)" />
+            <div style={{ display: "flex", gap: 6 }}>
+              <Sk w={32} h={32} r="var(--raio-medio)" />
+              <Sk w={32} h={32} r="var(--raio-medio)" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function DocumentsPage() {
   const { user } = useAuth();
   const fileInputRef = useRef(null);
@@ -107,9 +150,7 @@ export default function DocumentsPage() {
     [docs],
   );
 
-  if (loading) {
-    return <StatusView title="Carregando documentos" description="Buscando documentos do usuário na API." />;
-  }
+  if (loading) return <DocumentsSkeleton />;
 
   if (error) {
     return <StatusView title="Falha ao carregar documentos" description={error.message} />;

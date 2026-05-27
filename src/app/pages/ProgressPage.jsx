@@ -10,6 +10,52 @@ import { mapProject, mapProgressItem } from "../utils/adapters";
 import { StatusView } from "../components/StatusView";
 import "./ProgressPage.css";
 
+function ProgressSkeleton() {
+  const Sk = ({ w = "100%", h = 14, r = "0.5rem" }) => (
+    <div className="skeleton" style={{ width: w, height: h, borderRadius: r }} />
+  );
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--espaco-6)", padding: "var(--espaco-4)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <Sk w={200} h={18} />
+        <Sk w={180} h={38} r="var(--raio-medio)" />
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: "var(--espaco-5)" }}>
+        <div style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", border: "1px solid var(--cor-borda-clara)", padding: "var(--espaco-5)", display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
+          <Sk w={130} h={15} />
+          <Sk w={140} h={140} r="50%" />
+          <Sk w="60%" h={14} />
+          <Sk w="45%" h={22} r="var(--raio-completo)" />
+          <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 8 }}>
+            {[1, 2, 3].map((i) => (
+              <div key={i} style={{ display: "flex", justifyContent: "space-between" }}>
+                <Sk w="45%" h={12} />
+                <Sk w="25%" h={12} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--espaco-4)" }}>
+          <div style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", border: "1px solid var(--cor-borda-clara)", padding: "var(--espaco-5)" }}>
+            <Sk w={150} h={15} mb={12} />
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                  <Sk w={32} h={32} r="50%" />
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 6 }}>
+                    <Sk w="60%" h={13} />
+                    <Sk w="40%" h={11} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ProgressPage() {
   const { user } = useAuth();
   const [selectedProjectId, setSelectedProjectId] = useState("");
@@ -68,9 +114,7 @@ export default function ProgressPage() {
     }
   };
 
-  if (loading) {
-    return <StatusView title="Carregando progresso" description="Buscando progresso real dos projetos." />;
-  }
+  if (loading) return <ProgressSkeleton />;
 
   if (error) {
     return <StatusView title="Falha ao carregar progresso" description={error.message} />;

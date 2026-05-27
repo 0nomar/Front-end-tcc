@@ -194,7 +194,7 @@
 
 /* ---- Cartão de resumo ---- */
 .cartao-resumo {
-  background-color: var(--cor-branco);
+  background-color: var(--cor-superficie);
   border-radius: var(--raio-grande);
   padding: var(--espaco-5);
   border: 1px solid;
@@ -303,7 +303,7 @@
    Cartões internos (projeto, inscrições, notificações)
    ================================================================ */
 .painel__card {
-  background-color: var(--cor-branco);
+  background-color: var(--cor-superficie);
   border-radius: var(--raio-grande);
   border: 1px solid var(--cor-borda-clara);
   overflow: hidden;
@@ -550,7 +550,7 @@
    Gráfico de atividade
    ================================================================ */
 .painel__card-grafico {
-  background-color: var(--cor-branco);
+  background-color: var(--cor-superficie);
   border-radius: var(--raio-grande);
   border: 1px solid var(--cor-borda-clara);
   padding: var(--espaco-4);

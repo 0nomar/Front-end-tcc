@@ -16,6 +16,69 @@ import { mapFeedback, mapProject, mapProgressItem } from "../utils/adapters";
 import { formatProjectStatus } from "../utils/formatters";
 import "./ProjectDetailPage.css";
 
+function ProjectDetailSkeleton() {
+  const Sk = ({ w = "100%", h = 14, r = "0.5rem" }) => (
+    <div className="skeleton" style={{ width: w, height: h, borderRadius: r }} />
+  );
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--espaco-5)", padding: "var(--espaco-4)" }}>
+      <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+        <Sk w={32} h={32} r="var(--raio-medio)" />
+        <Sk w={200} h={16} />
+        <Sk w={70} h={22} r="var(--raio-completo)" />
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "var(--espaco-5)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--espaco-4)" }}>
+          <div style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", border: "1px solid var(--cor-borda-clara)", padding: "var(--espaco-5)" }}>
+            <Sk w="70%" h={22} mb={12} />
+            <Sk w="100%" h={13} mb={6} />
+            <Sk w="95%" h={13} mb={6} />
+            <Sk w="80%" h={13} mb={16} />
+            <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+              {[1, 2, 3].map((i) => <Sk key={i} w={70} h={24} r="var(--raio-completo)" />)}
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "var(--espaco-3)" }}>
+              {[1, 2, 3].map((i) => (
+                <div key={i} style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  <Sk w="60%" h={12} />
+                  <Sk w="80%" h={16} />
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", border: "1px solid var(--cor-borda-clara)", padding: "var(--espaco-5)" }}>
+            <Sk w={160} h={16} mb={16} />
+            {[1, 2].map((i) => (
+              <div key={i} style={{ display: "flex", gap: 12, alignItems: "center", padding: "10px 0", borderBottom: "1px solid var(--cor-borda-clara)" }}>
+                <Sk w={36} h={36} r="50%" />
+                <div style={{ flex: 1 }}>
+                  <Sk w="55%" h={13} mb={6} />
+                  <Sk w="40%" h={11} />
+                </div>
+                <Sk w={70} h={22} r="var(--raio-completo)" />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--espaco-4)" }}>
+          <div style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", border: "1px solid var(--cor-borda-clara)", padding: "var(--espaco-5)", display: "flex", flexDirection: "column", gap: 14 }}>
+            <Sk w={110} h={15} />
+            <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+              <Sk w={48} h={48} r="50%" />
+              <div style={{ flex: 1 }}>
+                <Sk w="65%" h={14} mb={6} />
+                <Sk w="50%" h={12} />
+              </div>
+            </div>
+            <Sk w="100%" h={40} r="var(--raio-medio)" />
+            <Sk w="100%" h={40} r="var(--raio-medio)" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ProjectDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -167,9 +230,7 @@ export default function ProjectDetailPage() {
   const getInscricaoName = (i) =>
     i?.alunoNome ?? i?.aluno?.usuario?.nome ?? i?.usuario?.nome ?? i?.nome ?? `Inscricao #${i?.id}`;
 
-  if (loading) {
-    return <StatusView title="Carregando projeto" description="Buscando detalhes do projeto na API." />;
-  }
+  if (loading) return <ProjectDetailSkeleton />;
   if (error || !project) {
     return <StatusView title="Projeto indisponivel" description={error?.message || "Nao foi possivel localizar este projeto."} />;
   }

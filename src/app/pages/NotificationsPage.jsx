@@ -25,6 +25,47 @@ const typeConfig = {
   INSCRICAO_REJEITADA: { icon: XCircle, iconeAreaClass: "notificacao-item__icone-area--erro", iconColor: "var(--cor-erro)" },
 };
 
+function NotificationsSkeleton() {
+  const Sk = ({ w = "100%", h = 14, r = "0.5rem" }) => (
+    <div className="skeleton" style={{ width: w, height: h, borderRadius: r }} />
+  );
+  return (
+    <div className="pagina-notificacoes">
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--espaco-4)" }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <Sk w={20} h={20} r="50%" />
+          <Sk w={160} h={15} />
+        </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <Sk w={160} h={34} r="var(--raio-medio)" />
+          <Sk w={140} h={34} r="var(--raio-medio)" />
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: 8, marginBottom: "var(--espaco-4)" }}>
+        {[1, 2, 3].map((i) => <Sk key={i} w={100} h={32} r="var(--raio-completo)" />)}
+      </div>
+      <div className="pagina-notificacoes__lista">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="notificacao-item" style={{ display: "flex", gap: 14, alignItems: "center", padding: "var(--espaco-4)" }}>
+            <Sk w={40} h={40} r="var(--raio-medio)" />
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 7 }}>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <Sk w="50%" h={14} />
+                <Sk w={60} h={12} />
+              </div>
+              <Sk w="80%" h={12} />
+            </div>
+            <div style={{ display: "flex", gap: 6 }}>
+              <Sk w={32} h={32} r="var(--raio-medio)" />
+              <Sk w={32} h={32} r="var(--raio-medio)" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function timeAgo(dateStr) {
   if (!dateStr) return "-";
   const date = new Date(dateStr);
@@ -84,9 +125,7 @@ export default function NotificationsPage() {
     setData([]);
   };
 
-  if (loading) {
-    return <StatusView title="Carregando notificacoes" description="Buscando notificacoes reais da API." />;
-  }
+  if (loading) return <NotificationsSkeleton />;
 
   if (error) {
     return <StatusView title="Falha ao carregar notificacoes" description={error.message} />;
