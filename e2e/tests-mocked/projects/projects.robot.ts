@@ -12,9 +12,13 @@ export async function runProjectsListAndApplyFlow(page: Page) {
   await page.getByRole("button", { name: "Filtros" }).click();
   await expect(page.getByText("Area de pesquisa")).toBeVisible();
   await page.locator("select.pagina-projetos__input-filtro-curso").selectOption("Sistemas de Informacao");
+  await expect(page.getByText("2 / 3")).toBeVisible();
+  await expect(page.getByText("Prof Ana Orientadora (orientador)")).toBeVisible();
   await page.getByText("Projeto E2E Candidatura").click();
   await expect(page).toHaveURL(/\/app\/projects\/2$/);
   await expect(page.getByRole("heading", { name: "Projeto E2E Candidatura" })).toBeVisible();
+  await expect(page.getByText("1/3")).toBeVisible();
+  await expect(page.getByText("orientador", { exact: true })).toBeVisible();
   await expect(page.getByText("Sobre o projeto")).toBeVisible();
   await page.getByRole("button", { name: "Inscrever-se" }).click();
   await expect(page.getByText("Inscricao no projeto")).toBeVisible();

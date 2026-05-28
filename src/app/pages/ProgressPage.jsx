@@ -6,7 +6,12 @@ import { useAuth } from "../hooks/useAuth";
 import { useAsyncData } from "../hooks/useAsyncDataHook";
 import { userService } from "../services/userService";
 import { projectService } from "../services/projectService";
-import { mapProject, mapProgressItem } from "../utils/adapters";
+import {
+  getProjectSeatHolders,
+  getProjectSlotsUsage,
+  mapProject,
+  mapProgressItem,
+} from "../utils/adapters";
 import { StatusView } from "../components/StatusView";
 import "./ProgressPage.css";
 
@@ -64,7 +69,21 @@ export default function ProgressPage() {
   const { data, loading, error, reload } = useAsyncData(async () => {
     if (!user?.id) return { projects: [], progressByProject: {} };
     const projectsResult = await userService.getProjects(user.id).catch(() => []);
-    const projects = Array.isArray(projectsResult) ? projectsResult.map(mapProject) : [];
+    const mappedProjects = Array.isArray(projectsResult) ? projectsResult.map(mapProject) : [];
+    const projects = await Promise.all(
+      mappedProjects.map(async (project) => {
+        const collaborators = await projectService.getCollaborators(project.id).catch(() => null);
+        if (!Array.isArray(collaborators)) return project;
+        const slots = getProjectSlotsUsage(project, collaborators);
+        return {
+          ...project,
+          collaborators,
+          acceptedCollaborators: getProjectSeatHolders(project, collaborators),
+          slotsUsed: slots.used,
+          slotsRemaining: slots.remaining,
+        };
+      }),
+    );
     const progressEntries = await Promise.all(
       projects.map(async (project) => ({
         projectId: project.id,
@@ -92,6 +111,7 @@ export default function ProgressPage() {
   const projects = data?.projects ?? [];
   const selectedProject = projects.find((project) => String(project.id) === String(selectedProjectId)) ?? projects[0];
   const selectedProgress = selectedProject ? data?.progressByProject?.[selectedProject.id] ?? [] : [];
+  const selectedProjectSlots = selectedProject ? getProjectSlotsUsage(selectedProject) : { total: 0, remaining: 0 };
 
   const completionPercent = useMemo(() => {
     if (!selectedProject) return 0;
@@ -174,7 +194,7 @@ export default function ProgressPage() {
             {[
               { label: "Criado em", value: selectedProject.createdAt ? new Date(selectedProject.createdAt).toLocaleDateString("pt-BR") : "-", icon: Calendar },
               { label: "Atualizacoes", value: selectedProgress.length, icon: TrendingUp },
-              { label: "Vagas", value: `${Math.max(selectedProject.slots - selectedProject.slotsUsed, 0)}/${selectedProject.slots}`, icon: Clock },
+              { label: "Vagas", value: `${selectedProjectSlots.remaining}/${selectedProjectSlots.total}`, icon: Clock },
             ].map((item) => (
               <div key={item.label} className="pagina-progresso__item-data">
                 <div className="pagina-progresso__linha-data">

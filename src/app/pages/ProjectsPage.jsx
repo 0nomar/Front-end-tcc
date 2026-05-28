@@ -7,7 +7,7 @@ import { projectService } from "../services/projectService";
 import { courseService } from "../services/courseService";
 import { StatusView } from "../components/StatusView";
 import ProjectCardSkeleton from "../components/ProjectCardSkeleton";
-import { mapProject } from "../utils/adapters";
+import { getProjectSeatHolders, getProjectSlotsUsage, mapProject } from "../utils/adapters";
 import { formatProjectStatus } from "../utils/formatters";
 import "./ProjectsPage.css";
 
@@ -55,7 +55,24 @@ export default function ProjectsPage() {
         status: selectedStatus === "Todos" ? "" : selectedStatus,
         busca: search,
       });
-      return Array.isArray(result) ? result.map(mapProject) : [];
+      const projects = Array.isArray(result) ? result.map(mapProject) : [];
+
+      return Promise.all(
+        projects.map(async (project) => {
+          const collaborators = await projectService.getCollaborators(project.id).catch(() => null);
+          if (!Array.isArray(collaborators)) return project;
+
+          const slots = getProjectSlotsUsage(project, collaborators);
+
+          return {
+            ...project,
+            collaborators,
+            acceptedCollaborators: getProjectSeatHolders(project, collaborators),
+            slotsUsed: slots.used,
+            slotsRemaining: slots.remaining,
+          };
+        }),
+      );
     },
     [selectedCourse, selectedArea, selectedStatus, search],
     { initialData: [] },
@@ -237,13 +254,8 @@ export default function ProjectsPage() {
       {!loading && filtered.length > 0 && (
         <div className="pagina-projetos__grade">
           {filtered.map((project, index) => {
-            const acceptedCollaborators = Array.isArray(project.collaborators)
-              ? project.collaborators.filter((collaborator) => collaborator?.status === "ACEITO")
-              : [];
-            const slotsUsed = acceptedCollaborators.length;
-            const slots = Math.max(project.slots ?? 0, 0);
-            const remainingSlots = slots - slotsUsed;
-            const isFull = remainingSlots <= 0;
+            const slots = getProjectSlotsUsage(project);
+            const isFull = slots.remaining <= 0;
 
             return (
               <motion.div
@@ -275,7 +287,7 @@ export default function ProjectsPage() {
                   <div className="projeto-card__informacoes">
                     <div className="projeto-card__info-item">
                       <div className="projeto-card__info-icone"><Users size={12} /></div>
-                      <p className="projeto-card__info-valor">{`${slotsUsed} / ${slots}`}</p>
+                      <p className="projeto-card__info-valor">{`${slots.used} / ${slots.total}`}</p>
                       <p className="projeto-card__info-rotulo">vagas ocupadas</p>
                     </div>
                     <div className="projeto-card__info-item">
@@ -298,7 +310,7 @@ export default function ProjectsPage() {
                         </span>
                       </div>
                       <span className="projeto-card__nome-orientador">
-                        {project.advisor?.name ?? "Sem orientador"}
+                        {project.advisor?.name ? `${project.advisor.name} (orientador)` : "Sem orientador"}
                       </span>
                     </div>
                     <ChevronRight size={14} className="projeto-card__seta-acesso" />
