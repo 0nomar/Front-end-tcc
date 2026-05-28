@@ -520,7 +520,7 @@ export default function ProjectDetailPage() {
                     <span className="card-colaboradores__nome">
                       {getCollaboratorName(c)}
                       {isProjectAdvisor(project, c) && (
-                        <span className="card-colaboradores__papel">orientador</span>
+                        <span className="card-colaboradores__papel"> (Orientador)</span>
                       )}
                     </span>
                     {canRemoveCollaborator(c) && (

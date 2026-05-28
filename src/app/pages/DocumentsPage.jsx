@@ -1,12 +1,7 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import {
-  Upload,
-  FileText,
-  CheckCircle,
-  Trash2,
-  Eye,
-  FolderOpen,
-  Plus,
+  Upload, FileText, CheckCircle, Trash2, Eye,
+  FolderOpen, Plus, X, AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../hooks/useAuth";
@@ -28,20 +23,7 @@ function normalizeDocument(doc) {
     type: doc?.tipo ?? doc?.type ?? "CURRICULO",
     uploadedAt: doc?.dataEnvio ?? doc?.uploadedAt ?? null,
     status: doc?.status ?? "ENVIADO",
-    previewUrl: doc?.previewUrl ?? `/api/documentos/${doc?.id}/preview`,
   };
-}
-
-function buildPreviewUrl(doc) {
-  if (!doc?.previewUrl) {
-    return `${api.baseUrl}/api/documentos/${doc.id}/preview`;
-  }
-
-  if (doc.previewUrl.startsWith("http")) {
-    return doc.previewUrl;
-  }
-
-  return `${api.baseUrl}${doc.previewUrl}`;
 }
 
 function DocumentsSkeleton() {
@@ -87,21 +69,118 @@ function DocumentsSkeleton() {
   );
 }
 
+function DocumentViewer({ doc, onClose }) {
+  const [blobUrl, setBlobUrl] = useState(null);
+  const [loadingPreview, setLoadingPreview] = useState(true);
+  const [previewError, setPreviewError] = useState(null);
+
+  const isPdf = doc?.name?.toLowerCase().endsWith(".pdf");
+
+  useEffect(() => {
+    if (!doc?.id) return;
+
+    setLoadingPreview(true);
+    setPreviewError(null);
+    setBlobUrl(null);
+
+    let objectUrl = null;
+
+    api.getBlob(`/api/documentos/${doc.id}/preview`)
+      .then((blob) => {
+        objectUrl = URL.createObjectURL(blob);
+        setBlobUrl(objectUrl);
+      })
+      .catch((err) => {
+        setPreviewError(
+          err?.status === 415
+            ? "Preview disponível apenas para arquivos PDF."
+            : "Não foi possível carregar o documento."
+        );
+      })
+      .finally(() => setLoadingPreview(false));
+
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [doc?.id]);
+
+  return (
+    <div className="doc-viewer__overlay" onClick={onClose}>
+      <div className="doc-viewer__modal" onClick={(e) => e.stopPropagation()}>
+
+        <div className="doc-viewer__cabecalho">
+          <div className="doc-viewer__info">
+            <FileText size={16} />
+            <span className="doc-viewer__nome">{doc.name}</span>
+          </div>
+          <button className="doc-viewer__fechar" onClick={onClose} title="Fechar">
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="doc-viewer__corpo">
+          {loadingPreview && (
+            <div className="doc-viewer__estado">
+              <div className="doc-viewer__spinner" />
+              <span>Carregando documento...</span>
+            </div>
+          )}
+
+          {!loadingPreview && previewError && (
+            <div className="doc-viewer__estado doc-viewer__estado--erro">
+              <AlertCircle size={32} />
+              <p>{previewError}</p>
+              {!isPdf && (
+                <p style={{ fontSize: "0.8rem", color: "var(--cor-texto-mudo)", marginTop: 4 }}>
+                  Arquivos .doc e .docx não podem ser visualizados no navegador.
+                  Use o botão de download para abrir no seu computador.
+                </p>
+              )}
+            </div>
+          )}
+
+          {!loadingPreview && blobUrl && (
+            <iframe
+              src={blobUrl}
+              className="doc-viewer__iframe"
+              title={doc.name}
+            />
+          )}
+        </div>
+
+        <div className="doc-viewer__rodape">
+          <button className="doc-viewer__botao-cancelar" onClick={onClose}>
+            Fechar
+          </button>
+          {blobUrl && (
+            <a
+              href={blobUrl}
+              download={doc.name}
+              className="doc-viewer__botao-download"
+            >
+              Baixar arquivo
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function DocumentsPage() {
   const { user } = useAuth();
   const fileInputRef = useRef(null);
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [tipoDocumento, setTipoDocumento] = useState("HISTORICO");
+  const [docVisualizando, setDocVisualizando] = useState(null);
+
   const { data, loading, error, reload } = useAsyncData(
     async () => {
       if (!user?.id) return [];
-
       const response = await documentService.getDocuments(user.id);
       const listaDocumentos = response?.data || response || [];
-
       if (!Array.isArray(listaDocumentos)) return [];
-
       return listaDocumentos.map(normalizeDocument);
     },
     [user?.id],
@@ -113,7 +192,6 @@ export default function DocumentsPage() {
   const handleUpload = async (files) => {
     const file = files?.[0];
     if (!file) return;
-
     setUploading(true);
     try {
       await documentService.upload(user.id, tipoDocumento, file);
@@ -151,10 +229,7 @@ export default function DocumentsPage() {
   );
 
   if (loading) return <DocumentsSkeleton />;
-
-  if (error) {
-    return <StatusView title="Falha ao carregar documentos" description={error.message} />;
-  }
+  if (error) return <StatusView title="Falha ao carregar documentos" description={error.message} />;
 
   return (
     <div className="pagina-documentos">
@@ -191,10 +266,7 @@ export default function DocumentsPage() {
       </div>
 
       <div
-        onDragOver={(event) => {
-          event.preventDefault();
-          setDragging(true);
-        }}
+        onDragOver={(event) => { event.preventDefault(); setDragging(true); }}
         onDragLeave={() => setDragging(false)}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
@@ -208,13 +280,14 @@ export default function DocumentsPage() {
           style={{ display: "none" }}
           onChange={(event) => handleUpload(event.target.files)}
         />
-
         {uploading ? (
           <div className="pagina-documentos__progresso-upload">
             <div className="pagina-documentos__upload-icone-animado">
               <Upload size={20} />
             </div>
-            <p className="pagina-documentos__upload-label">Enviando {tipoDocumento === "HISTORICO" ? "Histórico" : "Currículo"}...</p>
+            <p className="pagina-documentos__upload-label">
+              Enviando {tipoDocumento === "HISTORICO" ? "Histórico" : "Currículo"}...
+            </p>
           </div>
         ) : (
           <>
@@ -224,9 +297,7 @@ export default function DocumentsPage() {
             <p className="pagina-documentos__upload-titulo">
               {dragging ? "Solte o arquivo aqui" : "Clique ou arraste seu arquivo aqui"}
             </p>
-            <p className="pagina-documentos__upload-subtitulo">
-              Formatos aceitos: PDF, DOC, DOCX
-            </p>
+            <p className="pagina-documentos__upload-subtitulo">Formatos aceitos: PDF, DOC, DOCX</p>
           </>
         )}
       </div>
@@ -259,7 +330,6 @@ export default function DocumentsPage() {
 
                 <div className="documento-item__info">
                   <p className="documento-item__nome">{doc.name || "Documento sem nome"}</p>
-
                   <div className="documento-item__meta">
                     <span className="documento-item__data">
                       {doc.uploadedAt ? new Date(doc.uploadedAt).toLocaleDateString("pt-BR") : "-"}
@@ -276,16 +346,18 @@ export default function DocumentsPage() {
                 </div>
 
                 <div className="documento-item__acoes">
-                  <a
-                    href={buildPreviewUrl(doc)}
-                    target="_blank"
-                    rel="noreferrer"
+                  <button
+                    onClick={() => setDocVisualizando(doc)}
                     className="documento-item__botao-acao"
                     title="Visualizar"
                   >
                     <Eye size={15} />
-                  </a>
-                  <button onClick={() => handleDelete(doc.id)} className="documento-item__botao-acao documento-item__botao-excluir" title="Excluir">
+                  </button>
+                  <button
+                    onClick={() => handleDelete(doc.id)}
+                    className="documento-item__botao-acao documento-item__botao-excluir"
+                    title="Excluir"
+                  >
                     <Trash2 size={15} />
                   </button>
                 </div>
@@ -294,6 +366,13 @@ export default function DocumentsPage() {
           </div>
         )}
       </div>
+
+      {docVisualizando && (
+        <DocumentViewer
+          doc={docVisualizando}
+          onClose={() => setDocVisualizando(null)}
+        />
+      )}
     </div>
   );
 }
