@@ -1,3 +1,4 @@
+import { conversationService } from "../services/conversationService";
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router";
 import {
@@ -116,6 +117,7 @@ export default function ProjectDetailPage() {
   }, [id], { initialData: { project: null, progress: [], feedbacks: [] } });
 
   const project = data?.project;
+  console.log("advisor:", project?.advisor);
 
   const isOwner = useMemo(() => {
     if (!user?.id || !project) return false;
@@ -413,7 +415,18 @@ export default function ProjectDetailPage() {
               !isOwner && <div className="card-inscricao__status-encerrado">{formatProjectStatus(project.status)}</div>
             )}
 
-            <button onClick={() => navigate("/app/chat")} className="card-inscricao__botao-perguntar">
+            <button
+              onClick={async () => {
+                try {
+                  await conversationService.openPrivate(project.advisor.id);
+                  navigate("/app/chat");
+                } catch {
+                  toast.error("Erro ao abrir conversa com o orientador");
+                }
+              }}
+              className="card-inscricao__botao-perguntar"
+              disabled={!project.advisor?.id}
+            >
               <MessageSquare size={15} /> Perguntar ao orientador
             </button>
           </div>
@@ -446,7 +459,17 @@ export default function ProjectDetailPage() {
                 <span className="card-orientador__info-valor">{data.progress.length}</span>
               </div>
             </div>
-            <button onClick={() => navigate("/app/chat")} className="card-orientador__botao-mensagem">
+            <button
+              onClick={async () => {
+                try {
+                  await conversationService.openPrivate(project.advisor.id);
+                  navigate("/app/chat");
+                } catch {
+                  toast.error("Erro ao abrir conversa com o orientador");
+                }
+              }}
+              className="card-orientador__botao-mensagem"
+            >
               <Mail size={14} /> Enviar mensagem
             </button>
           </div>
@@ -484,7 +507,23 @@ export default function ProjectDetailPage() {
                 ))}
               </ul>
             )}
+
+            {/* Botão conversa do grupo */}
+            <button
+              onClick={async () => {
+                try {
+                  await conversationService.abrirOuCriarPorProjeto(project.id);
+                  navigate("/app/chat");
+                } catch {
+                  toast.error("Erro ao abrir conversa do grupo");
+                }
+              }}
+              className="card-colaboradores__botao-grupo"
+            >
+              <MessageSquare size={14} /> Mensagem do grupo
+            </button>
           </div>
+
         </div>
       </div>
 

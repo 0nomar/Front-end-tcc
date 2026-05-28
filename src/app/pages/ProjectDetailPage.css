@@ -327,7 +327,6 @@
   border-radius: var(--raio-grande);
   border: 1px solid var(--cor-borda-clara);
   padding: var(--espaco-6);
-  position: sticky;
   top: 6rem;
 }
 
@@ -929,4 +928,27 @@
 .modal-confirmacao__botao-confirmar:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.card-colaboradores__botao-grupo {
+  width: 100%;
+  margin-top: var(--espaco-4);
+  padding: var(--espaco-2) 0;
+  border: 1px solid var(--cor-primaria-borda);
+  background-color: var(--cor-branco);
+  border-radius: var(--raio-grande);
+  color: var(--cor-primaria);
+  cursor: pointer;
+  font-size: var(--tamanho-base);
+  font-weight: var(--peso-medio);
+  font-family: var(--fonte-principal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espaco-2);
+  transition: var(--transicao-normal);
+}
+
+.card-colaboradores__botao-grupo:hover {
+  background-color: var(--cor-primaria-clara);
 }
