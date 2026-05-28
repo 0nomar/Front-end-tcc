@@ -1,13 +1,21 @@
 export function getUserName(user) {
-  return user?.nome ?? user?.name ?? user?.usuario?.nome ?? "Usuario";
+  const nestedUser = user?.usuario ?? user?.user ?? user?.aluno?.usuario ?? user?.aluno;
+  return user?.nome ?? user?.name ?? nestedUser?.nome ?? nestedUser?.name ?? "Usuario";
 }
 
 export function getUserEmail(user) {
-  return user?.email ?? user?.usuario?.email ?? "";
+  const nestedUser = user?.usuario ?? user?.user ?? user?.aluno?.usuario ?? user?.aluno;
+  return user?.email ?? nestedUser?.email ?? "";
 }
 
 export function getUserType(user) {
-  return user?.tipo ?? user?.type ?? user?.usuario?.tipo ?? "";
+  const nestedUser = user?.usuario ?? user?.user ?? user?.aluno?.usuario ?? user?.aluno;
+  return user?.tipo ?? user?.type ?? nestedUser?.tipo ?? nestedUser?.type ?? "";
+}
+
+export function getUserId(user) {
+  const nestedUser = user?.usuario ?? user?.user ?? user?.aluno?.usuario ?? user?.aluno;
+  return user?.usuarioId ?? user?.userId ?? nestedUser?.id ?? user?.id ?? null;
 }
 
 function toNumber(value) {
@@ -39,6 +47,86 @@ function hasExplicitParticipants(project) {
   );
 }
 
+function getProjectSlotsTotal(project) {
+  return (
+    toNumber(project?.slots) ??
+    toNumber(project?.limite_vagas) ??
+    toNumber(project?.limiteVagas) ??
+    toNumber(project?.limite_participantes) ??
+    toNumber(project?.limiteParticipantes) ??
+    toNumber(project?.vagas) ??
+    toNumber(project?.quantidadeVagas) ??
+    toNumber(project?.qtdVagas) ??
+    0
+  );
+}
+
+function getExplicitSlotsUsed(project) {
+  return (
+    toNumber(project?.slotsUsed) ??
+    toNumber(project?.vagasOcupadas) ??
+    toNumber(project?.vagasPreenchidas) ??
+    toNumber(project?.quantidadeVagasOcupadas) ??
+    toNumber(project?.quantidadeVagasPreenchidas)
+  );
+}
+
+function hasAcceptedStatus(person) {
+  const status = String(person?.status ?? person?.statusInscricao ?? person?.situacao ?? "").toUpperCase();
+  return !status || status === "ACEITO" || status === "APROVADO" || status === "APPROVED";
+}
+
+export function isProjectAdvisor(project, person) {
+  const personId = getUserId(person);
+  const advisorId =
+    project?.advisorId ??
+    project?.orientadorId ??
+    project?.advisor?.id ??
+    project?.orientador?.usuario?.id ??
+    project?.orientador?.id ??
+    null;
+
+  return (
+    getUserType(person).toUpperCase() === "ORIENTADOR" ||
+    (advisorId != null && personId != null && Number(personId) === Number(advisorId))
+  );
+}
+
+export function getProjectSeatHolders(project, people = null) {
+  const source = Array.isArray(people)
+    ? people
+    : getProjectParticipants(project);
+  const seen = new Set();
+
+  return source.filter((person) => {
+    if (!person || isProjectAdvisor(project, person) || !hasAcceptedStatus(person)) {
+      return false;
+    }
+
+    const identifier = getUserId(person) ?? getUserEmail(person);
+    const key = identifier || getUserName(person);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+export function getProjectSlotsUsage(project, people = null) {
+  const total = Math.max(getProjectSlotsTotal(project), 0);
+  const hasPeopleSource = Array.isArray(people);
+  const used =
+    hasPeopleSource
+      ? getProjectSeatHolders(project, people).length
+      : getExplicitSlotsUsed(project) ??
+        (hasExplicitParticipants(project) ? getProjectSeatHolders(project).length : 0);
+
+  return {
+    total,
+    used: Math.max(used, 0),
+    remaining: Math.max(total - used, 0),
+  };
+}
+
 export function mapProject(project) {
   // ProjetoResponse retorna campos planos (orientadorId, alunoCriadorId)
   // mas também pode vir com objetos aninhados (legado) — suporta os dois
@@ -52,26 +140,9 @@ export function mapProject(project) {
   const alunoCriadorId = project?.alunoCriadorId ?? alunoCriadorUsuario?.id ?? null;
   const alunoCriadorNome = project?.alunoCriadorNome ?? getUserName(alunoCriadorUsuario) ?? null;
 
-  const participantes = getProjectParticipants(project);
   const colaboradores = getProjectCollaborators(project);
-  const colaboradoresAceitos = colaboradores.filter((colaborador) => colaborador?.status === "ACEITO");
-  const vagasTotal =
-    toNumber(project?.limite_vagas) ??
-    toNumber(project?.limiteVagas) ??
-    toNumber(project?.limite_participantes) ??
-    toNumber(project?.limiteParticipantes) ??
-    toNumber(project?.vagas) ??
-    toNumber(project?.quantidadeVagas) ??
-    toNumber(project?.qtdVagas) ??
-    toNumber(project?.slots) ??
-    0;
-  const vagasOcupadas =
-    hasExplicitParticipants(project)
-      ? participantes.length
-      : toNumber(project?.quantidadeVagasPreenchidas) ??
-        toNumber(project?.slotsUsed) ??
-        0;
-  const vagasRestantes = Math.max(vagasTotal - vagasOcupadas, 0);
+  const colaboradoresAceitos = getProjectSeatHolders({ ...project, advisorId: orientadorId }, colaboradores);
+  const vagas = getProjectSlotsUsage({ ...project, advisorId: orientadorId });
 
   return {
     id: project?.id,
@@ -93,11 +164,11 @@ export function mapProject(project) {
     dataInicio: project?.dataInicio ?? null,
     dataFim: project?.dataFim ?? null,
     dataLimiteInscricao: project?.dataLimiteInscricao ?? null,
-    slots: vagasTotal,
-    slotsUsed: vagasOcupadas,
-    slotsRemaining: vagasRestantes,
-    participants: participantes,
-    approvedParticipants: participantes,
+    slots: vagas.total,
+    slotsUsed: vagas.used,
+    slotsRemaining: vagas.remaining,
+    participants: getProjectSeatHolders({ ...project, advisorId: orientadorId }),
+    approvedParticipants: getProjectSeatHolders({ ...project, advisorId: orientadorId }),
     collaborators: colaboradores,
     acceptedCollaborators: colaboradoresAceitos,
     ownerId: alunoCriadorId,

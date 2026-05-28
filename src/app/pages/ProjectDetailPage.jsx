@@ -12,7 +12,15 @@ import { projectService } from "../services/projectService";
 import { applicationService } from "../services/applicationService";
 import { feedbackService } from "../services/feedbackService";
 import { StatusView } from "../components/StatusView";
-import { mapFeedback, mapProject, mapProgressItem } from "../utils/adapters";
+import {
+  getProjectSlotsUsage,
+  getUserId,
+  getUserName,
+  isProjectAdvisor,
+  mapFeedback,
+  mapProject,
+  mapProgressItem,
+} from "../utils/adapters";
 import { formatProjectStatus } from "../utils/formatters";
 import "./ProjectDetailPage.css";
 
@@ -116,6 +124,11 @@ export default function ProjectDetailPage() {
   }, [id], { initialData: { project: null, progress: [], feedbacks: [] } });
 
   const project = data?.project;
+
+  const slots = useMemo(
+    () => (project ? getProjectSlotsUsage(project, collaborators) : { total: 0, used: 0, remaining: 0 }),
+    [project, collaborators],
+  );
 
   const isOwner = useMemo(() => {
     if (!user?.id || !project) return false;
@@ -222,10 +235,20 @@ export default function ProjectDetailPage() {
   };
 
   const getCollaboratorName = (c) =>
-    c?.usuario?.nome ?? c?.nome ?? c?.name ?? `Usuario #${c?.id ?? "?"}`;
+    getUserName(c) || `Usuario #${getUserId(c) ?? "?"}`;
 
   const getCollaboratorId = (c) =>
-    c?.usuario?.id ?? c?.usuarioId ?? c?.id;
+    getUserId(c);
+
+  const canRemoveCollaborator = (c) => {
+    const collaboratorId = getCollaboratorId(c);
+    return (
+      isOwner &&
+      collaboratorId != null &&
+      !isProjectAdvisor(project, c) &&
+      (project.ownerId == null || Number(collaboratorId) !== Number(project.ownerId))
+    );
+  };
 
   const getInscricaoName = (i) =>
     i?.alunoNome ?? i?.aluno?.usuario?.nome ?? i?.usuario?.nome ?? i?.nome ?? `Inscricao #${i?.id}`;
@@ -391,7 +414,7 @@ export default function ProjectDetailPage() {
           <div className="card-inscricao">
             <div className="card-inscricao__grade-stats">
               {[
-                { icon: Users, label: "Vagas disponiveis", value: `${Math.max(project.slots - project.slotsUsed, 0)}/${project.slots}` },
+                { icon: Users, label: "Vagas disponiveis", value: `${slots.remaining}/${slots.total}` },
                 { icon: Clock, label: "Criado em", value: project.createdAt ? new Date(project.createdAt).toLocaleDateString("pt-BR") : "-" },
                 { icon: BookOpen, label: "Area", value: project.area },
               ].map((item) => (
@@ -405,12 +428,16 @@ export default function ProjectDetailPage() {
               ))}
             </div>
 
-            {project.status === "ABERTO" && !isOwner ? (
+            {project.status === "ABERTO" && !isOwner && slots.remaining > 0 ? (
               <button onClick={() => setShowModal(true)} className="card-inscricao__botao-inscrever">
                 <Send size={16} /> Inscrever-se
               </button>
             ) : (
-              !isOwner && <div className="card-inscricao__status-encerrado">{formatProjectStatus(project.status)}</div>
+              !isOwner && (
+                <div className="card-inscricao__status-encerrado">
+                  {slots.remaining <= 0 ? "Vagas preenchidas" : formatProjectStatus(project.status)}
+                </div>
+              )
             )}
 
             <button onClick={() => navigate("/app/chat")} className="card-inscricao__botao-perguntar">
@@ -467,8 +494,13 @@ export default function ProjectDetailPage() {
                     <div className="card-colaboradores__avatar">
                       {getCollaboratorName(c).charAt(0).toUpperCase()}
                     </div>
-                    <span className="card-colaboradores__nome">{getCollaboratorName(c)}</span>
-                    {isOwner && (
+                    <span className="card-colaboradores__nome">
+                      {getCollaboratorName(c)}
+                      {isProjectAdvisor(project, c) && (
+                        <span className="card-colaboradores__papel">orientador</span>
+                      )}
+                    </span>
+                    {canRemoveCollaborator(c) && (
                       <button
                         onClick={() => handleRemoveCollaborator(getCollaboratorId(c))}
                         disabled={removingId === getCollaboratorId(c)}

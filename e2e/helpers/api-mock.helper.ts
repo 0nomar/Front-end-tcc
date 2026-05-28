@@ -40,6 +40,15 @@ export const mockUsers = {
     departamento: "Computacao",
     titulacao: "Doutora",
   } satisfies MockUser,
+  collaborator: {
+    id: 3,
+    nome: "Aluno Colaborador",
+    email: "colaborador.e2e@universidade.br",
+    tipo: "ALUNO",
+    curso: "Sistemas de Informacao",
+    instituicao: "Universidade E2E",
+    semestre: "6o Semestre",
+  } satisfies MockUser,
 };
 
 const areas = [
@@ -437,7 +446,11 @@ export async function setupApiMock(page: Page, options: MockOptions = {}) {
 
     const collaboratorsMatch = path.match(/^\/api\/projetos\/(\d+)\/colaboradores$/);
     if (collaboratorsMatch && method === "GET") {
-      await fulfill(route, 200, [{ id: 1, usuario: mockUsers.student, status: "ACEITO" }]);
+      const projectId = Number(collaboratorsMatch[1]);
+      const collaborators = projectId === 2
+        ? [mockUsers.advisor, mockUsers.student, mockUsers.collaborator]
+        : [mockUsers.advisor, mockUsers.student];
+      await fulfill(route, 200, collaborators);
       return;
     }
 

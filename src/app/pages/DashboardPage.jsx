@@ -17,6 +17,8 @@ import { applicationService } from "../services/applicationService";
 import { notificationService } from "../services/notificationService";
 import { StatusView } from "../components/StatusView";
 import {
+  getProjectSeatHolders,
+  getProjectSlotsUsage,
   mapApplication,
   mapNotification,
   mapProject,
@@ -124,8 +126,24 @@ export default function DashboardPage() {
       notificationService.listMine().catch(() => []),
     ]);
 
+    const mappedProjects = Array.isArray(projects) ? projects.map(mapProject) : [];
+    const projectsWithSlots = await Promise.all(
+      mappedProjects.map(async (project) => {
+        const collaborators = await projectService.getCollaborators(project.id).catch(() => null);
+        if (!Array.isArray(collaborators)) return project;
+        const slots = getProjectSlotsUsage(project, collaborators);
+        return {
+          ...project,
+          collaborators,
+          acceptedCollaborators: getProjectSeatHolders(project, collaborators),
+          slotsUsed: slots.used,
+          slotsRemaining: slots.remaining,
+        };
+      }),
+    );
+
     return {
-      projects: Array.isArray(projects) ? projects.map(mapProject) : [],
+      projects: projectsWithSlots,
       applications: Array.isArray(applications) ? applications.map(mapApplication) : [],
       notifications: Array.isArray(notifications) ? notifications.map(mapNotification) : [],
     };
@@ -362,33 +380,37 @@ export default function DashboardPage() {
               </button>
             </div>
             <div className="painel__card-lista">
-              {derived.recentProjects.map((project, index) => (
-                <motion.button
-                  key={project.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.25, delay: index * 0.05 }}
-                  whileHover={{ scale: 1.03, boxShadow: "0 10px 24px rgba(37,99,235,0.12)" }}
-                  whileTap={{ scale: 0.97 }}
-                  onClick={() => navigate(`/app/projects/${project.id}`)}
-                  className="projeto-sugerido"
-                >
-                  <div className="projeto-sugerido__linha">
-                    <div className="projeto-sugerido__icone-area">
-                      <FolderOpen size={14} style={{ color: "var(--cor-primaria)" }} />
-                    </div>
-                    <div className="projeto-sugerido__info">
-                      <p className="projeto-sugerido__titulo">{project.title}</p>
-                      <div className="projeto-sugerido__metadados">
-                        <span className="projeto-sugerido__indicador-vaga" />
-                        <span className="projeto-sugerido__vagas">
-                          {Math.max(project.slots - project.slotsUsed, 0)} vagas
-                        </span>
+              {derived.recentProjects.map((project, index) => {
+                const slots = getProjectSlotsUsage(project);
+
+                return (
+                  <motion.button
+                    key={project.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25, delay: index * 0.05 }}
+                    whileHover={{ scale: 1.03, boxShadow: "0 10px 24px rgba(37,99,235,0.12)" }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => navigate(`/app/projects/${project.id}`)}
+                    className="projeto-sugerido"
+                  >
+                    <div className="projeto-sugerido__linha">
+                      <div className="projeto-sugerido__icone-area">
+                        <FolderOpen size={14} style={{ color: "var(--cor-primaria)" }} />
+                      </div>
+                      <div className="projeto-sugerido__info">
+                        <p className="projeto-sugerido__titulo">{project.title}</p>
+                        <div className="projeto-sugerido__metadados">
+                          <span className="projeto-sugerido__indicador-vaga" />
+                          <span className="projeto-sugerido__vagas">
+                            {slots.remaining} vagas
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </motion.button>
-              ))}
+                  </motion.button>
+                );
+              })}
             </div>
           </div>
 

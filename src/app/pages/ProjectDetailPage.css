@@ -319,6 +319,14 @@
   display: flex;
   flex-direction: column;
   gap: var(--espaco-4);
+  align-self: start;
+}
+
+@media (min-width: 1024px) {
+  .pagina-detalhe-projeto__sidebar {
+    position: sticky;
+    top: 5.5rem;
+  }
 }
 
 /* Card de inscrição */
@@ -327,8 +335,6 @@
   border-radius: var(--raio-grande);
   border: 1px solid var(--cor-borda-clara);
   padding: var(--espaco-6);
-  position: sticky;
-  top: 6rem;
 }
 
 /* Estado de inscrição enviada */
@@ -794,11 +800,22 @@
 
 .card-colaboradores__nome {
   flex: 1;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--espaco-1);
   font-size: var(--tamanho-base);
   color: var(--cor-texto-medio);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.card-colaboradores__papel {
+  flex-shrink: 0;
+  color: var(--cor-primaria);
+  font-size: var(--tamanho-xs);
+  font-weight: var(--peso-semi);
 }
 
 .card-colaboradores__botao-remover {
