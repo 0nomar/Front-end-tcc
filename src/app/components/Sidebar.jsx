@@ -1,4 +1,5 @@
 import { NavLink } from "react-router";
+import { useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   LayoutDashboard,
@@ -44,7 +45,22 @@ function getInitials(name) {
 
 export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
   const { user, logout } = useAuth();
-  const { data } = useAsyncData(() => notificationService.listMine(), [], { initialData: [] });
+  const { data, reload } = useAsyncData(
+    () => notificationService.listMine(),
+    [],
+    { initialData: [] }
+  );
+  useEffect(() => {
+    const atualizar = () => {
+      reload();
+    };
+
+    window.addEventListener("notificationsUpdated", atualizar);
+
+    return () => {
+      window.removeEventListener("notificationsUpdated", atualizar);
+    };
+  }, [reload]);
   const notifications = Array.isArray(data) ? data : [];
   const unreadCount = notifications.filter((item) => !item.lida).length;
 

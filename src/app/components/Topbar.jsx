@@ -7,6 +7,7 @@ import { useAsyncData } from "../hooks/useAsyncDataHook";
 import { notificationService } from "../services/notificationService";
 import { formatUserType } from "../utils/formatters";
 import "./Topbar.css";
+import { mapNotification } from "../utils/adapters";
 
 function getInitials(name) {
   if (!name) return "IC";
@@ -22,9 +23,19 @@ export function Topbar({ onMenuClick, title, subtitle }) {
   const profileMenuRef = useRef(null);
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { data } = useAsyncData(() => notificationService.listMine(), [], { initialData: [] });
+  const { data, reload } = useAsyncData(
+    async () => {
+      const result = await notificationService.listMine();
+      return Array.isArray(result)
+        ? result.map(mapNotification)
+        : [];
+    },
+    [],
+    { initialData: [] }
+  );
+
   const notifications = Array.isArray(data) ? data : [];
-  const unreadCount = notifications.filter((item) => !item.lida).length;
+  const unreadCount = notifications.filter((item) => !item.read).length;
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -47,6 +58,18 @@ export function Topbar({ onMenuClick, title, subtitle }) {
       document.removeEventListener("keydown", handleEscape);
     };
   }, []);
+
+  useEffect(() => {
+    const handleNotificationsUpdated = () => {
+      reload();
+    };
+
+    window.addEventListener("notifications-updated", handleNotificationsUpdated);
+
+    return () => {
+      window.removeEventListener("notifications-updated", handleNotificationsUpdated);
+    };
+  }, [reload]);
 
   const handleLogout = async () => {
     setDropdownOpen(false);

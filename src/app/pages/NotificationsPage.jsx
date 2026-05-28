@@ -94,6 +94,11 @@ export default function NotificationsPage() {
     () => initialNotifications.filter((item) => !item.read).length,
     [initialNotifications],
   );
+
+  const notificarAtualizacaoGlobal = () => {
+    window.dispatchEvent(new Event("notificationsUpdated"));
+  };
+
   const filtered = useMemo(
     () => (filter === "all" ? initialNotifications : initialNotifications.filter((item) => item.type === filter)),
     [filter, initialNotifications],
@@ -103,6 +108,8 @@ export default function NotificationsPage() {
     try {
       await notificationService.markAsRead(id);
       await reload();
+      window.dispatchEvent(new Event("notifications-updated"));
+      notificarAtualizacaoGlobal();
     } catch (err) {
       toast.error(err.message || "Nao foi possivel marcar como lida.");
     }
@@ -112,6 +119,7 @@ export default function NotificationsPage() {
     try {
       await notificationService.markAllAsRead();
       await reload();
+      window.dispatchEvent(new Event("notifications-updated"));
     } catch (err) {
       toast.error(err.message || "Nao foi possivel marcar todas como lidas.");
     }

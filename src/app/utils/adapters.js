@@ -1,3 +1,5 @@
+import { formatNotificationType } from "./formatters";
+
 export function getUserName(user) {
   return user?.nome ?? user?.name ?? user?.usuario?.nome ?? "Usuario";
 }
@@ -136,7 +138,10 @@ export function mapApplication(application) {
 export function mapNotification(notification) {
   return {
     id: notification?.id,
-    title: notification?.titulo ?? notification?.tipo ?? "Notificacao",
+    title:
+      notification?.titulo ??
+      formatNotificationType(notification?.tipo) ??
+      "Notificacao",
     message: notification?.mensagem ?? notification?.message ?? "",
     type: notification?.tipo ?? "INFO",
     read: notification?.lida ?? notification?.read ?? false,
