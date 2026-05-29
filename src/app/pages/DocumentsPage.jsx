@@ -9,6 +9,7 @@ import { useAsyncData } from "../hooks/useAsyncDataHook";
 import { api } from "../services/api";
 import { documentService } from "../services/documentService";
 import { StatusView } from "../components/StatusView";
+import { useUploadDocumento } from "../../hooks/useUploadDocumento";
 import "./DocumentsPage.css";
 
 const statItems = [
@@ -23,6 +24,7 @@ function normalizeDocument(doc) {
     type: doc?.tipo ?? doc?.type ?? "CURRICULO",
     uploadedAt: doc?.dataEnvio ?? doc?.uploadedAt ?? null,
     status: doc?.status ?? "ENVIADO",
+    url: doc?.url ?? null,
   };
 }
 
@@ -170,8 +172,9 @@ function DocumentViewer({ doc, onClose }) {
 export default function DocumentsPage() {
   const { user } = useAuth();
   const fileInputRef = useRef(null);
+  const { upload: uploadDocumentoStorage, uploading: uploadingStorage, erro: storageError, progresso } = useUploadDocumento();
   const [dragging, setDragging] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [savingMetadata, setSavingMetadata] = useState(false);
   const [tipoDocumento, setTipoDocumento] = useState("HISTORICO");
   const [docVisualizando, setDocVisualizando] = useState(null);
 
@@ -188,19 +191,33 @@ export default function DocumentsPage() {
   );
 
   const docs = Array.isArray(data) ? data : [];
+  const uploading = uploadingStorage || savingMetadata;
 
   const handleUpload = async (files) => {
     const file = files?.[0];
     if (!file) return;
-    setUploading(true);
+    if (!user?.id) {
+      toast.error("Usuario nao autenticado.");
+      return;
+    }
+    setSavingMetadata(false);
     try {
-      await documentService.upload(user.id, tipoDocumento, file);
+      const uploaded = await uploadDocumentoStorage(file, `usuarios/${user.id}/${tipoDocumento.toLowerCase()}`);
+      if (!uploaded?.publicUrl) {
+        throw new Error(storageError || "Nao foi possivel enviar o documento para a nuvem.");
+      }
+
+      setSavingMetadata(true);
+      await documentService.upload(user.id, tipoDocumento, file.name, uploaded.publicUrl);
       toast.success(`${tipoDocumento === "HISTORICO" ? "Histórico" : "Currículo"} enviado com sucesso.`);
       await reload();
     } catch (uploadError) {
       toast.error(uploadError.message || "Não foi possível enviar o documento.");
     } finally {
-      setUploading(false);
+      setSavingMetadata(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -276,7 +293,7 @@ export default function DocumentsPage() {
           ref={fileInputRef}
           type="file"
           multiple={false}
-          accept=".pdf,.doc,.docx"
+          accept=".pdf,.jpg,.jpeg,.png"
           style={{ display: "none" }}
           onChange={(event) => handleUpload(event.target.files)}
         />
@@ -286,7 +303,9 @@ export default function DocumentsPage() {
               <Upload size={20} />
             </div>
             <p className="pagina-documentos__upload-label">
-              Enviando {tipoDocumento === "HISTORICO" ? "Histórico" : "Currículo"}...
+              {savingMetadata
+                ? "Salvando dados do documento..."
+                : `Enviando ${tipoDocumento === "HISTORICO" ? "Histórico" : "Currículo"}... ${progresso}%`}
             </p>
           </div>
         ) : (
@@ -297,7 +316,7 @@ export default function DocumentsPage() {
             <p className="pagina-documentos__upload-titulo">
               {dragging ? "Solte o arquivo aqui" : "Clique ou arraste seu arquivo aqui"}
             </p>
-            <p className="pagina-documentos__upload-subtitulo">Formatos aceitos: PDF, DOC, DOCX</p>
+            <p className="pagina-documentos__upload-subtitulo">Formatos aceitos: PDF, JPG, PNG</p>
           </>
         )}
       </div>

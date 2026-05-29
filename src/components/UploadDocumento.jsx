@@ -3,17 +3,21 @@ import { getStoredToken } from "../app/utils/storage";
 import { useUploadDocumento } from "../hooks/useUploadDocumento";
 
 function buildBackendUrl(path) {
-  const baseUrl = import.meta.env.VITE_BACKEND_URL?.replace(/\/$/, "");
+  const baseUrl = (import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || "").replace(/\/$/, "");
 
   if (!baseUrl) {
-    throw new Error("Backend nao configurado. Defina VITE_BACKEND_URL.");
+    throw new Error("Backend nao configurado. Defina VITE_API_URL ou VITE_BACKEND_URL.");
   }
 
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  if (baseUrl.endsWith("/api") && normalizedPath.startsWith("/api/")) {
+    return `${baseUrl}${normalizedPath.slice(4)}`;
+  }
+
   return `${baseUrl}${normalizedPath}`;
 }
 
-async function saveDocumentoMetadata({ candidatoId, tipo, publicUrl, fileName }) {
+async function saveDocumentoMetadata({ usuarioId, tipo, publicUrl, fileName }) {
   const token = getStoredToken();
   const headers = new Headers({
     "Content-Type": "application/json",
@@ -24,14 +28,14 @@ async function saveDocumentoMetadata({ candidatoId, tipo, publicUrl, fileName })
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const response = await fetch(buildBackendUrl("/documentos"), {
+  const response = await fetch(buildBackendUrl("/api/documentos/upload"), {
     method: "POST",
     headers,
     body: JSON.stringify({
-      candidato_id: candidatoId,
-      tipo,
+      usuarioId,
+      tipo: tipo?.toUpperCase(),
+      nomeArquivo: fileName,
       url: publicUrl,
-      nome_arquivo: fileName,
     }),
   });
 
@@ -42,7 +46,7 @@ async function saveDocumentoMetadata({ candidatoId, tipo, publicUrl, fileName })
   return response;
 }
 
-function UploadDocumento({ candidatoId, tipo }) {
+function UploadDocumento({ candidatoId, usuarioId, tipo }) {
   const { upload, uploading, erro, progresso } = useUploadDocumento();
   const [success, setSuccess] = useState(false);
   const [serverError, setServerError] = useState(null);
@@ -55,16 +59,17 @@ function UploadDocumento({ candidatoId, tipo }) {
     setServerError(null);
 
     try {
-      if (!candidatoId) {
-        throw new Error("Candidato nao informado para vincular o documento.");
+      const ownerId = usuarioId ?? candidatoId;
+      if (!ownerId) {
+        throw new Error("Usuario nao informado para vincular o documento.");
       }
 
-      const result = await upload(file, `candidatos/${candidatoId}`);
+      const result = await upload(file, `usuarios/${ownerId}/${tipo?.toLowerCase() || "documento"}`);
 
       if (!result?.publicUrl) return;
 
       await saveDocumentoMetadata({
-        candidatoId,
+        usuarioId: ownerId,
         tipo,
         publicUrl: result.publicUrl,
         fileName: file.name,

@@ -1,13 +1,13 @@
 import { api } from "./api";
 
 export const documentService = {
-  upload(usuarioId, tipo, arquivo) {
-    const formData = new FormData();
-    formData.append("usuarioId", usuarioId);
-    formData.append("tipo", tipo);
-    formData.append("arquivo", arquivo);
-
-    return api.post("/api/documentos/upload", formData);
+  upload(usuarioId, tipo, nomeArquivo, url) {
+    return api.post("/api/documentos/upload", {
+      usuarioId,
+      tipo,
+      nomeArquivo,
+      url,
+    });
   },
 
   remove(id) {
