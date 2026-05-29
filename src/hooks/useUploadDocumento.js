@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { supabase } from "../supabase";
+import { isSupabaseConfigured, supabase } from "../supabase";
 
 const BUCKET_NAME = "documents";
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
@@ -47,6 +47,10 @@ export function useUploadDocumento() {
     let progressInterval = null;
 
     try {
+      if (!isSupabaseConfigured || !supabase) {
+        throw new Error("Supabase nao configurado. Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.");
+      }
+
       validateFile(file);
 
       const safeFolder = folder
