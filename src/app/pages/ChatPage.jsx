@@ -6,7 +6,7 @@ import { useAuth } from "../hooks/useAuth";
 import { conversationService } from "../services/conversationService";
 import { StatusView } from "../components/StatusView";
 import "./ChatPage.css";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 function getInitials(name) {
   if (!name) return "PR";
@@ -16,15 +16,20 @@ function getInitials(name) {
 function formatarHora(data) {
   if (!data) return "";
 
-  return new Date(data).toLocaleTimeString("pt-BR", {
+  const parsed = new Date(data);
+  if (Number.isNaN(parsed.getTime())) return "";
+
+  return parsed.toLocaleTimeString("pt-BR", {
     hour: "2-digit",
     minute: "2-digit",
   });
 }
 
 function formatarDia(data) {
-  const hoje = new Date();
   const d = new Date(data);
+  if (Number.isNaN(d.getTime())) return "";
+
+  const hoje = new Date();
 
   const isHoje = d.toDateString() === hoje.toDateString();
 
@@ -46,6 +51,7 @@ function formatarDia(data) {
 export default function ChatPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const messagesEndRef = useRef(null);
   const enviandoRef = useRef(false);
@@ -88,9 +94,16 @@ export default function ChatPage() {
   useEffect(() => { if (user?.id) loadConversations(); }, [user?.id]);
 
   useEffect(() => {
-    if (!selectedConversation && conversations.length > 0)
-      setSelectedConversation(conversations[0]);
-  }, [conversations]);
+    if (selectedConversation || conversations.length === 0) return;
+    const targetId = location.state?.conversationId;
+    const target = targetId
+      ? conversations.find((conversation) => Number(conversation.id) === Number(targetId))
+      : null;
+    setSelectedConversation(target ?? conversations[0]);
+    if (targetId) {
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [conversations, selectedConversation, location.state?.conversationId, location.pathname, navigate]);
 
   useEffect(() => {
     if (!selectedConversation?.id) return;

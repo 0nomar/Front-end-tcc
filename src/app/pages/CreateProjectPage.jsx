@@ -11,6 +11,7 @@ const INITIAL_FORM = {
   titulo: "",
   descricao: "",
   requisitos: "",
+  tecnologias: "",
   areaId: "",
   vagas: "",
   dataInicio: "",
@@ -78,6 +79,7 @@ export default function CreateProjectPage() {
         titulo: form.titulo.trim(),
         descricao: form.descricao.trim() || undefined,
         requisitos: form.requisitos.trim() || undefined,
+        tecnologias: form.tecnologias.trim() || undefined,
         areaId: Number(form.areaId),
         vagas: Number(form.vagas),
         dataInicio: form.dataInicio || undefined,
@@ -183,6 +185,17 @@ export default function CreateProjectPage() {
               id="requisitos" name="requisitos" type="text"
               value={form.requisitos} onChange={handleChange}
               placeholder="Ex: Conhecimento em Python, estatistica basica"
+              className="formulario-projeto__input"
+              disabled={isDisabled}
+            />
+          </div>
+
+          <div className="formulario-projeto__campo">
+            <label htmlFor="tecnologias" className="formulario-projeto__rotulo">Tecnologias e competencias</label>
+            <input
+              id="tecnologias" name="tecnologias" type="text"
+              value={form.tecnologias} onChange={handleChange}
+              placeholder="Ex: React, Spring Boot, PostgreSQL"
               className="formulario-projeto__input"
               disabled={isDisabled}
             />

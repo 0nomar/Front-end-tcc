@@ -462,9 +462,9 @@
 }
 
 .projeto-card__status--encerrado {
-  background-color: var(--cor-fundo);
-  color: var(--cor-texto-fraco);
-  border-color: var(--cor-borda);
+  background-color: var(--cor-erro-clara);
+  color: var(--cor-erro-escura);
+  border-color: var(--cor-erro-borda);
 }
 
 .projeto-card__botao-salvar {

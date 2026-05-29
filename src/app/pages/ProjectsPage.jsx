@@ -256,6 +256,13 @@ export default function ProjectsPage() {
           {filtered.map((project, index) => {
             const slots = getProjectSlotsUsage(project);
             const isFull = slots.remaining <= 0;
+            const statusClass = project.status === "FINALIZADO"
+              ? "projeto-card__status--encerrado"
+              : project.status === "EM_ANDAMENTO"
+                ? "projeto-card__status--andamento"
+                : isFull
+                  ? "projeto-card__status--encerrado"
+                  : "projeto-card__status--aberto";
 
             return (
               <motion.div
@@ -270,8 +277,8 @@ export default function ProjectsPage() {
                 <div className="projeto-card__barra-topo" />
                 <div className="projeto-card__corpo">
                   <div className="projeto-card__cabecalho">
-                    <span className={`projeto-card__status ${isFull ? "projeto-card__status--encerrado" : "projeto-card__status--aberto"}`}>
-                      {isFull ? "Cheio" : formatProjectStatus(project.status)}
+                    <span className={`projeto-card__status ${statusClass}`}>
+                      {isFull && project.status === "ABERTO" ? "Cheio" : formatProjectStatus(project.status)}
                     </span>
                   </div>
 
