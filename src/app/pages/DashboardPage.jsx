@@ -349,7 +349,6 @@ export default function DashboardPage() {
           <div className="painel__card-grafico">
             <div className="painel__grafico-cabecalho">
               <h3 className="painel__card-titulo">Atividade recente</h3>
-              <span className="painel__grafico-periodo">Dados da API</span>
             </div>
             <ResponsiveContainer width="100%" height={120}>
               <AreaChart data={derived.activityData}>
