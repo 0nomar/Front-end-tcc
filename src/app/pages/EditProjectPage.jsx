@@ -28,6 +28,7 @@ export default function EditProjectPage() {
           titulo: raw.titulo ?? "",
           descricao: raw.descricao ?? "",
           requisitos: raw.requisitos ?? "",
+          tecnologias: raw.tecnologias ?? "",
           areaId: String(raw.areaId ?? ""),
           vagas: String(raw.vagas ?? ""),
           dataInicio: raw.dataInicio ?? "",
@@ -69,6 +70,7 @@ export default function EditProjectPage() {
         titulo: form.titulo.trim(),
         descricao: form.descricao.trim() || undefined,
         requisitos: form.requisitos.trim() || undefined,
+        tecnologias: form.tecnologias.trim() || undefined,
         areaId: Number(form.areaId),
         vagas: Number(form.vagas),
         dataInicio: form.dataInicio || undefined,
@@ -146,6 +148,13 @@ export default function EditProjectPage() {
             <label htmlFor="requisitos" className="formulario-projeto__rotulo">Requisitos</label>
             <input id="requisitos" name="requisitos" type="text" value={form.requisitos} onChange={handleChange}
               placeholder="Ex: Python, estatistica basica"
+              className="formulario-projeto__input" disabled={isDisabled} />
+          </div>
+
+          <div className="formulario-projeto__campo">
+            <label htmlFor="tecnologias" className="formulario-projeto__rotulo">Tecnologias e competencias</label>
+            <input id="tecnologias" name="tecnologias" type="text" value={form.tecnologias} onChange={handleChange}
+              placeholder="Ex: React, Spring Boot, PostgreSQL"
               className="formulario-projeto__input" disabled={isDisabled} />
           </div>
 

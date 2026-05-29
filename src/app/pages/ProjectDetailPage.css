@@ -185,8 +185,9 @@
 }
 
 .detalhe-card__badge-status--encerrado {
-  background-color: var(--cor-fundo-leve);
-  color: var(--cor-texto-medio);
+  background-color: var(--cor-erro-clara);
+  color: var(--cor-erro-escura);
+  border-color: var(--cor-erro-borda);
 }
 
 .detalhe-card__badge-area {
@@ -574,6 +575,21 @@
   background-color: var(--cor-primaria-clara);
 }
 
+.card-orientador__botao-mensagem:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.card-orientador__botao-avaliar {
+  margin-top: var(--espaco-3);
+  border-color: var(--cor-amarelo-borda, #fde68a);
+  color: var(--cor-atencao-escura, #92400e);
+}
+
+.card-orientador__botao-avaliar:hover {
+  background-color: var(--cor-atencao-clara, #fffbeb);
+}
+
 /* ================================================================
    Modal de inscrição
    ================================================================ */
@@ -658,6 +674,74 @@
   font-size: 0.75rem;
   color: var(--cor-texto-mudo);
   margin-top: var(--espaco-1);
+}
+
+.modal-inscricao__arquivo {
+  min-height: 2.75rem;
+  border: 1px dashed var(--cor-borda);
+  border-radius: var(--raio-grande);
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto-medio);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-2);
+  padding: 0 var(--espaco-4);
+  font-size: var(--tamanho-medio);
+}
+
+.modal-inscricao__arquivo:hover {
+  border-color: var(--cor-primaria);
+  color: var(--cor-primaria);
+}
+
+.modal-inscricao__arquivo input {
+  display: none;
+}
+
+.modal-inscricao__progresso {
+  height: 0.375rem;
+  border-radius: var(--raio-completo);
+  background-color: var(--cor-fundo-leve);
+  overflow: hidden;
+  margin-top: var(--espaco-2);
+}
+
+.modal-inscricao__progresso span {
+  display: block;
+  height: 100%;
+  background-color: var(--cor-primaria);
+  transition: width 0.2s ease;
+}
+
+.modal-inscricao__erro-upload {
+  margin-top: var(--espaco-2);
+  color: var(--cor-erro);
+  font-size: var(--tamanho-base);
+}
+
+.modal-avaliacao__estrelas {
+  display: flex;
+  gap: var(--espaco-2);
+}
+
+.modal-avaliacao__estrela {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-medio);
+  background-color: var(--cor-branco);
+  color: var(--cor-texto-mudo);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.modal-avaliacao__estrela--ativa {
+  color: var(--cor-amarelo-estrela, #f59e0b);
+  border-color: var(--cor-amarelo-borda, #fde68a);
+  background-color: var(--cor-atencao-clara, #fffbeb);
 }
 
 .modal-inscricao__dica {

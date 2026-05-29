@@ -145,6 +145,7 @@ export function mapProject(project) {
   const colaboradores = getProjectCollaborators(project);
   const colaboradoresAceitos = getProjectSeatHolders({ ...project, advisorId: orientadorId }, colaboradores);
   const vagas = getProjectSlotsUsage({ ...project, advisorId: orientadorId });
+  const tecnologias = project?.tecnologias ?? project?.technologies ?? project?.competencias ?? project?.tags;
 
   return {
     id: project?.id,
@@ -157,7 +158,12 @@ export function mapProject(project) {
       if (Array.isArray(r)) return r;
       return r.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean);
     })(),
-    tags: project?.tags ?? [],
+    technologies: tecnologias ?? "",
+    tags: (() => {
+      if (!tecnologias) return [];
+      if (Array.isArray(tecnologias)) return tecnologias;
+      return String(tecnologias).split(/[,;\n]+/).map(s => s.trim()).filter(Boolean);
+    })(),
     courses: project?.cursosAceitos ?? (project?.cursoNome ? [project.cursoNome] : []),
     area: project?.areaNome ?? project?.area ?? project?.orientador?.areaAtuacao ?? "Pesquisa",
     areaId: project?.areaId ?? null,

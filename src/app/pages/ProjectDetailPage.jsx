@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router";
 import {
   ArrowLeft, Users, Clock, BookOpen, Send, Mail, MessageSquare,
   Share2, Bookmark, BarChart2, Eye, CheckCircle, Pencil, Trash2,
-  UserPlus, UserMinus, Loader2, AlertTriangle,
+  UserPlus, UserMinus, Loader2, AlertTriangle, Star, Upload,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAsyncData } from "../hooks/useAsyncDataHook";
@@ -12,6 +12,8 @@ import { useAuth } from "../hooks/useAuth";
 import { projectService } from "../services/projectService";
 import { applicationService } from "../services/applicationService";
 import { feedbackService } from "../services/feedbackService";
+import { documentService } from "../services/documentService";
+import { useUploadDocumento } from "../../hooks/useUploadDocumento";
 import { StatusView } from "../components/StatusView";
 import {
   getProjectSlotsUsage,
@@ -96,7 +98,14 @@ export default function ProjectDetailPage() {
   const [saved, setSaved] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [motivation, setMotivation] = useState("");
+  const [documentFile, setDocumentFile] = useState(null);
   const [loadingApply, setLoadingApply] = useState(false);
+  const { upload: uploadDocumento, uploading: uploadingDocumento, erro: uploadErro, progresso: uploadProgresso } = useUploadDocumento();
+
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackRating, setFeedbackRating] = useState(0);
+  const [feedbackComment, setFeedbackComment] = useState("");
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
 
   // Delete
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -125,7 +134,6 @@ export default function ProjectDetailPage() {
   }, [id], { initialData: { project: null, progress: [], feedbacks: [] } });
 
   const project = data?.project;
-  console.log("advisor:", project?.advisor);
 
   const slots = useMemo(
     () => (project ? getProjectSlotsUsage(project, collaborators) : { total: 0, used: 0, remaining: 0 }),
@@ -174,13 +182,47 @@ export default function ProjectDetailPage() {
     return (ratings.reduce((acc, item) => acc + item.rating, 0) / ratings.length).toFixed(1);
   }, [data]);
 
+  const statusClass = project?.status === "FINALIZADO"
+    ? "detalhe-card__badge-status--encerrado"
+    : project?.status === "EM_ANDAMENTO"
+      ? "detalhe-card__badge-status--andamento"
+      : "detalhe-card__badge-status--aberto";
+
+  const openConversation = async (kind) => {
+    try {
+      const conversa = kind === "group"
+        ? await conversationService.abrirOuCriarPorProjeto(project.id)
+        : await conversationService.openPrivate(project.advisor?.id);
+      navigate("/app/chat", { state: { conversationId: conversa?.id } });
+    } catch {
+      toast.error(kind === "group" ? "Erro ao abrir conversa do grupo" : "Erro ao abrir conversa com o orientador");
+    }
+  };
+
   const handleApply = async () => {
     setLoadingApply(true);
     try {
       await applicationService.create(id, motivation.trim());
-      toast.success("Inscricao enviada com sucesso.");
+      let documentWarning = null;
+      if (documentFile) {
+        try {
+          const result = await uploadDocumento(documentFile, `usuarios/${user?.id}/inscricoes/${id}`);
+          if (!result?.publicUrl) {
+            throw new Error("Nao foi possivel enviar o documento da inscricao.");
+          }
+          await documentService.upload(user.id, "CURRICULO", documentFile.name, result.publicUrl);
+        } catch (err) {
+          documentWarning = err.message || "Nao foi possivel anexar o documento da inscricao.";
+        }
+      }
+      if (documentWarning) {
+        toast.warning(`Inscricao enviada, mas o documento nao foi anexado. ${documentWarning}`);
+      } else {
+        toast.success("Inscricao enviada com sucesso.");
+      }
       setShowModal(false);
       setMotivation("");
+      setDocumentFile(null);
       await reload();
     } catch (err) {
       toast.error(err.message || "Nao foi possivel enviar a inscricao.");
@@ -192,6 +234,31 @@ export default function ProjectDetailPage() {
   const closeApplyModal = () => {
     setShowModal(false);
     setMotivation("");
+    setDocumentFile(null);
+  };
+
+  const handleProjectFeedback = async () => {
+    if (!feedbackRating) {
+      toast.error("Selecione uma nota para avaliar o projeto.");
+      return;
+    }
+    setFeedbackLoading(true);
+    try {
+      await feedbackService.create({
+        projetoId: Number(id),
+        nota: feedbackRating,
+        comentario: feedbackComment.trim() || undefined,
+      });
+      toast.success("Avaliacao enviada com sucesso.");
+      setShowFeedbackModal(false);
+      setFeedbackRating(0);
+      setFeedbackComment("");
+      await reload();
+    } catch (err) {
+      toast.error(err.message || "Nao foi possivel enviar a avaliacao.");
+    } finally {
+      setFeedbackLoading(false);
+    }
   };
 
   const handleDelete = async () => {
@@ -292,7 +359,7 @@ export default function ProjectDetailPage() {
           <div className="detalhe-card">
             <div className="detalhe-card__topo">
               <div className="detalhe-card__badges">
-                <span className="detalhe-card__badge-status detalhe-card__badge-status--aberto">
+                <span className={`detalhe-card__badge-status ${statusClass}`}>
                   {formatProjectStatus(project.status)}
                 </span>
                 <span className="detalhe-card__badge-area">{project.area}</span>
@@ -443,14 +510,7 @@ export default function ProjectDetailPage() {
             )}
 
             <button
-              onClick={async () => {
-                try {
-                  await conversationService.openPrivate(project.advisor.id);
-                  navigate("/app/chat");
-                } catch {
-                  toast.error("Erro ao abrir conversa com o orientador");
-                }
-              }}
+              onClick={() => openConversation("private")}
               className="card-inscricao__botao-perguntar"
               disabled={!project.advisor?.id}
             >
@@ -487,18 +547,21 @@ export default function ProjectDetailPage() {
               </div>
             </div>
             <button
-              onClick={async () => {
-                try {
-                  await conversationService.openPrivate(project.advisor.id);
-                  navigate("/app/chat");
-                } catch {
-                  toast.error("Erro ao abrir conversa com o orientador");
-                }
-              }}
+              onClick={() => openConversation("private")}
               className="card-orientador__botao-mensagem"
+              disabled={!project.advisor?.id}
             >
               <Mail size={14} /> Enviar mensagem
             </button>
+            {!isOwner && project.status === "FINALIZADO" && (
+              <button
+                type="button"
+                onClick={() => setShowFeedbackModal(true)}
+                className="card-orientador__botao-mensagem card-orientador__botao-avaliar"
+              >
+                <Star size={14} /> Avaliar projeto
+              </button>
+            )}
           </div>
 
           {/* Card colaboradores */}
@@ -542,14 +605,7 @@ export default function ProjectDetailPage() {
 
             {/* Botão conversa do grupo */}
             <button
-              onClick={async () => {
-                try {
-                  await conversationService.abrirOuCriarPorProjeto(project.id);
-                  navigate("/app/chat");
-                } catch {
-                  toast.error("Erro ao abrir conversa do grupo");
-                }
-              }}
+              onClick={() => openConversation("group")}
               className="card-colaboradores__botao-grupo"
             >
               <MessageSquare size={14} /> Mensagem do grupo
@@ -584,13 +640,78 @@ export default function ProjectDetailPage() {
                 />
                 <p className="modal-inscricao__contador">{motivation.length}/1500 caracteres</p>
               </div>
+              <div>
+                <label className="modal-inscricao__label">Documento da inscricao</label>
+                <label className="modal-inscricao__arquivo">
+                  <Upload size={16} />
+                  <span>{documentFile ? documentFile.name : "Anexar PDF, JPG ou PNG"}</span>
+                  <input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+                    onChange={(e) => setDocumentFile(e.target.files?.[0] ?? null)}
+                    disabled={loadingApply || uploadingDocumento}
+                  />
+                </label>
+                {(uploadingDocumento || uploadProgresso > 0) && (
+                  <div className="modal-inscricao__progresso">
+                    <span style={{ width: `${uploadProgresso}%` }} />
+                  </div>
+                )}
+                {uploadErro && <p className="modal-inscricao__erro-upload">{uploadErro}</p>}
+              </div>
             </div>
             <div className="modal-inscricao__rodape">
               <button type="button" onClick={closeApplyModal} className="modal-inscricao__botao-cancelar" disabled={loadingApply}>
                 Cancelar
               </button>
-              <button type="button" onClick={handleApply} disabled={loadingApply} className="modal-inscricao__botao-enviar">
-                {loadingApply ? <div className="modal-inscricao__spinner" /> : <><Send size={15} /> Enviar inscricao</>}
+              <button type="button" onClick={handleApply} disabled={loadingApply || uploadingDocumento} className="modal-inscricao__botao-enviar">
+                {loadingApply || uploadingDocumento ? <div className="modal-inscricao__spinner" /> : <><Send size={15} /> Enviar inscricao</>}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showFeedbackModal && (
+        <div className="modal-inscricao__sobreposicao" role="presentation" onClick={(e) => e.target === e.currentTarget && !feedbackLoading && setShowFeedbackModal(false)}>
+          <div className="modal-inscricao__painel">
+            <div className="modal-inscricao__cabecalho">
+              <h3 className="modal-inscricao__titulo">Avaliar projeto</h3>
+              <p className="modal-inscricao__subtitulo">{project.title}</p>
+            </div>
+            <div className="modal-inscricao__corpo">
+              <div className="modal-avaliacao__estrelas">
+                {[1, 2, 3, 4, 5].map((score) => (
+                  <button
+                    key={score}
+                    type="button"
+                    onClick={() => setFeedbackRating(score)}
+                    className={`modal-avaliacao__estrela ${score <= feedbackRating ? "modal-avaliacao__estrela--ativa" : ""}`}
+                    aria-label={`Nota ${score}`}
+                  >
+                    <Star size={22} fill={score <= feedbackRating ? "currentColor" : "none"} />
+                  </button>
+                ))}
+              </div>
+              <div>
+                <label className="modal-inscricao__label">Comentario</label>
+                <textarea
+                  value={feedbackComment}
+                  onChange={(e) => setFeedbackComment(e.target.value)}
+                  rows={4}
+                  maxLength={1000}
+                  className="modal-inscricao__textarea"
+                  placeholder="Conte como foi sua experiencia no projeto..."
+                />
+                <p className="modal-inscricao__contador">{feedbackComment.length}/1000 caracteres</p>
+              </div>
+            </div>
+            <div className="modal-inscricao__rodape">
+              <button type="button" onClick={() => setShowFeedbackModal(false)} className="modal-inscricao__botao-cancelar" disabled={feedbackLoading}>
+                Cancelar
+              </button>
+              <button type="button" onClick={handleProjectFeedback} disabled={feedbackLoading || feedbackRating === 0} className="modal-inscricao__botao-enviar">
+                {feedbackLoading ? <div className="modal-inscricao__spinner" /> : <><Send size={15} /> Enviar avaliacao</>}
               </button>
             </div>
           </div>
