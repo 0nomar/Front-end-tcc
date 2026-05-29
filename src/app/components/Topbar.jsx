@@ -8,6 +8,7 @@ import { notificationService } from "../services/notificationService";
 import { formatUserType } from "../utils/formatters";
 import "./Topbar.css";
 import { mapNotification } from "../utils/adapters";
+import { SearchModal } from "./SearchModal";
 
 function getInitials(name) {
   if (!name) return "IC";
@@ -36,6 +37,7 @@ export function Topbar({ onMenuClick, title, subtitle }) {
 
   const notifications = Array.isArray(data) ? data : [];
   const unreadCount = notifications.filter((item) => !item.read).length;
+  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
     const handleOutsideClick = (event) => {
@@ -71,6 +73,17 @@ export function Topbar({ onMenuClick, title, subtitle }) {
     };
   }, [reload]);
 
+  useEffect(() => {
+    const handler = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, []);
+
   const handleLogout = async () => {
     setDropdownOpen(false);
     await logout();
@@ -94,11 +107,18 @@ export function Topbar({ onMenuClick, title, subtitle }) {
       </div>
 
       <div className="barra-topo__secao-direita">
-        <button className="barra-topo__busca" type="button">
-          <Search size={15} />
-          <span>Buscar...</span>
-          <span className="barra-topo__atalho-busca">CTRL+K</span>
-        </button>
+
+      <button
+        className="barra-topo__busca"
+        type="button"
+        onClick={() => setSearchOpen(true)}
+      >
+        <Search size={15} />
+        <span>Buscar...</span>
+        <span className="barra-topo__atalho-busca">CTRL+K</span>
+      </button>
+
+      {searchOpen && <SearchModal onClose={() => setSearchOpen(false)} />}
 
         <motion.button
           whileHover={{ scale: 1.05 }}
