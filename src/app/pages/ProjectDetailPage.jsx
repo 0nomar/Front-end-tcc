@@ -518,7 +518,7 @@ export default function ProjectDetailPage() {
                       {getCollaboratorName(c).charAt(0).toUpperCase()}
                     </div>
                     <span className="card-colaboradores__nome">
-                      {getCollaboratorName(c)}
+                      {getCollaboratorName(c)}  
                       {isProjectAdvisor(project, c) && (
                         <span className="card-colaboradores__papel"> (Orientador)</span>
                       )}

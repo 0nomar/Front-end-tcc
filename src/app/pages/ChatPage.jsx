@@ -6,6 +6,7 @@ import { useAuth } from "../hooks/useAuth";
 import { conversationService } from "../services/conversationService";
 import { StatusView } from "../components/StatusView";
 import "./ChatPage.css";
+import { useNavigate } from "react-router";
 
 function getInitials(name) {
   if (!name) return "PR";
@@ -44,6 +45,8 @@ function formatarDia(data) {
 
 export default function ChatPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
   const messagesEndRef = useRef(null);
   const enviandoRef = useRef(false);
 
@@ -57,6 +60,11 @@ export default function ChatPage() {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [error, setError] = useState(null);
   const [abrindoPrivada, setAbrindoPrivada] = useState(null);
+
+  const abrirPerfil = (usuarioId) => {
+    if (!usuarioId) return;
+    navigate(`/app/users/${usuarioId}`);
+  };
 
   // Modal de edição
   const [modalEdicao, setModalEdicao] = useState(null); // { id, conteudo }
@@ -324,9 +332,7 @@ export default function ChatPage() {
                                 className={`mensagem-nome mensagem-nome--clicavel ${
                                   carregando ? "mensagem-nome--carregando" : ""
                                 }`}
-                                onClick={() =>
-                                  abrirConversaPrivada(m?.remetenteId, m?.remetenteNome)
-                                }
+                                onClick={() => abrirPerfil(m?.remetenteId)}
                                 title={`Enviar mensagem para ${m?.remetenteNome}`}
                                 disabled={carregando}
                               >

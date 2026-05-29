@@ -18,6 +18,7 @@ import NotificationsPage from "./pages/NotificationsPage";
 import SettingsPage from "./pages/SettingsPage";
 import CreateProjectPage from "./pages/CreateProjectPage";
 import EditProjectPage from "./pages/EditProjectPage";
+import UserProfilePage from "./pages/UserProfilePage";
 
 export const router = createBrowserRouter([
   {
@@ -54,6 +55,7 @@ export const router = createBrowserRouter([
       { path: "documents", Component: DocumentsPage },
       { path: "notifications", Component: NotificationsPage },
       { path: "configuracoes", Component: SettingsPage },
+      { path: "users/:id", Component: UserProfilePage },
     ],
   },
 ]);
