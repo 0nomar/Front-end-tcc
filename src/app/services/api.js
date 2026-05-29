@@ -81,5 +81,18 @@ export const api = {
     request(path, {
       method: "DELETE",
     }),
+  getBlob: (path) =>
+    fetch(buildRequestUrl(path), {
+      headers: {
+        Authorization: `Bearer ${getStoredToken()}`,
+      },
+    }).then(async (res) => {
+      if (!res.ok) {
+        const error = new Error("Erro ao carregar arquivo");
+        error.status = res.status;
+        throw error;
+      }
+      return res.blob();
+    }),
   baseUrl: API_BASE_URL,
 };

@@ -1,3 +1,5 @@
+import { formatNotificationType } from "./formatters";
+
 export function getUserName(user) {
   const nestedUser = user?.usuario ?? user?.user ?? user?.aluno?.usuario ?? user?.aluno;
   return user?.nome ?? user?.name ?? nestedUser?.nome ?? nestedUser?.name ?? "Usuario";
@@ -207,7 +209,10 @@ export function mapApplication(application) {
 export function mapNotification(notification) {
   return {
     id: notification?.id,
-    title: notification?.titulo ?? notification?.tipo ?? "Notificacao",
+    title:
+      notification?.titulo ??
+      formatNotificationType(notification?.tipo) ??
+      "Notificacao",
     message: notification?.mensagem ?? notification?.message ?? "",
     type: notification?.tipo ?? "INFO",
     read: notification?.lida ?? notification?.read ?? false,
