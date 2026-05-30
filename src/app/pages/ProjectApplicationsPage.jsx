@@ -208,7 +208,7 @@ export default function ProjectApplicationsPage() {
     return (
       <StatusView
         title="Acesso negado"
-        description="Apenas o orientador responsavel por este projeto pode gerenciar as inscricoes."
+        description="Apenas o orientador responsável por este projeto pode gerenciar as inscrições."
         action={
           <Link to={`/app/projects/${id}`} className="pagina-inscricoes-projeto__botao-voltar pagina-inscricoes-projeto__botao-voltar--link">
             Voltar ao projeto

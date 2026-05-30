@@ -242,7 +242,7 @@ export function mapFeedback(feedback) {
 export function mapProgressItem(progress) {
   return {
     id: progress?.id,
-    title: progress?.descricao ?? progress?.titulo ?? "Atualizacao",
+    title: progress?.descricao ?? progress?.titulo ?? "Atualização",
     content: progress?.descricao ?? progress?.content ?? "",
     date: progress?.dataRegistro ?? progress?.date ?? null,
     author: getUserName(progress?.usuario ?? progress?.autor ?? {}),

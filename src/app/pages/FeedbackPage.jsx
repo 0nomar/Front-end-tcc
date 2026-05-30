@@ -104,7 +104,7 @@ export default function FeedbackPage() {
     return (feedbacks.reduce((acc, item) => acc + item.rating, 0) / feedbacks.length).toFixed(1);
   }, [data]);
 
-  const statsValues = [data?.feedbacks?.length ?? 0, averageRating, Number(averageRating) >= 4 ? "Excelente" : "Em evolucao"];
+  const statsValues = [data?.feedbacks?.length ?? 0, averageRating, Number(averageRating) >= 4 ? "Excelente" : "Em evolução"];
 
   const handleSubmit = async (e) => {
     e.preventDefault();

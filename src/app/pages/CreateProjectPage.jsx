@@ -251,7 +251,7 @@ export default function CreateProjectPage() {
             </div>
           )}
 
-          {/* Titulo */}
+          {/* Título */}
           <div className="formulario-projeto__campo">
             <label htmlFor="titulo" className="formulario-projeto__rotulo">
               Título <span className="formulario-projeto__obrigatorio">*</span>
@@ -265,7 +265,7 @@ export default function CreateProjectPage() {
             />
           </div>
 
-          {/* Descricao */}
+          {/* Descrição */}
           <div className="formulario-projeto__campo">
             <label htmlFor="descricao" className="formulario-projeto__rotulo">Descrição</label>
             <textarea
@@ -283,14 +283,14 @@ export default function CreateProjectPage() {
             <input
               id="requisitos" name="requisitos" type="text"
               value={form.requisitos} onChange={handleChange}
-              placeholder="Ex: Conhecimento em Python, estatistica basica"
+              placeholder="Ex: Conhecimento em Python, estatística básica"
               className="formulario-projeto__input"
               disabled={isDisabled}
             />
           </div>
 
           <div className="formulario-projeto__campo">
-            <label htmlFor="tecnologias" className="formulario-projeto__rotulo">Tecnologias e competencias</label>
+            <label htmlFor="tecnologias" className="formulario-projeto__rotulo">Tecnologias e competências</label>
             <div className="formulario-projeto__lista-input">
               <input
                 id="tecnologias" name="tecnologias" type="text"
@@ -336,7 +336,7 @@ export default function CreateProjectPage() {
           <div className="formulario-projeto__grade-2">
             <div className="formulario-projeto__campo">
               <label htmlFor="areaId" className="formulario-projeto__rotulo">
-                Area de pesquisa <span className="formulario-projeto__obrigatorio">*</span>
+                Área de pesquisa <span className="formulario-projeto__obrigatorio">*</span>
               </label>
               <select
                 id="areaId" name="areaId"
@@ -391,7 +391,7 @@ export default function CreateProjectPage() {
           {/* Datas */}
           <div className="formulario-projeto__grade-3">
             <div className="formulario-projeto__campo">
-              <label htmlFor="dataInicio" className="formulario-projeto__rotulo">Data de inicio</label>
+              <label htmlFor="dataInicio" className="formulario-projeto__rotulo">Data de início</label>
               <input
                 id="dataInicio" name="dataInicio" type="date"
                 value={form.dataInicio} onChange={handleChange}
@@ -399,7 +399,7 @@ export default function CreateProjectPage() {
               />
             </div>
             <div className="formulario-projeto__campo">
-              <label htmlFor="dataFim" className="formulario-projeto__rotulo">Data de termino</label>
+              <label htmlFor="dataFim" className="formulario-projeto__rotulo">Data de término</label>
               <input
                 id="dataFim" name="dataFim" type="date"
                 value={form.dataFim} onChange={handleChange}

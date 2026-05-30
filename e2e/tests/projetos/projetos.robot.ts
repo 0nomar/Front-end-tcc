@@ -32,7 +32,7 @@ export async function runCreateProjectFlow(page: Page) {
   await page.goto("/app/projects/new");
   await page.getByPlaceholder("Ex: Sistema de deteccao de anomalias com IA").fill(draft.title);
   await page.getByPlaceholder("Descreva os objetivos, metodologia e resultados esperados...").fill(draft.description);
-  await page.getByPlaceholder("Ex: Conhecimento em Python, estatistica basica").fill(draft.requirements);
+  await page.getByPlaceholder("Ex: Conhecimento em Python, estatística básica").fill(draft.requirements);
   await page.getByPlaceholder("Ex: React, Spring Boot, PostgreSQL").fill(draft.technologies);
   await page.locator("#areaId").selectOption({ index: 1 });
   const advisorSelect = page.locator("#orientadorId");

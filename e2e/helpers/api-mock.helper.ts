@@ -216,7 +216,7 @@ export async function setupApiMock(page: Page, options: MockOptions = {}) {
     progress: options.empty?.progress ? [] : [
       {
         id: 40,
-        descricao: "Levantamento bibliografico concluido.",
+        descricao: "Levantamento bibliográfico concluído.",
         dataRegistro: "2026-05-08T12:00:00.000Z",
         usuario: mockUsers.student,
       },

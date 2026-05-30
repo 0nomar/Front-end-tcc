@@ -18,7 +18,7 @@ export async function loginAndOpenProfile(page: Page, user: { email: string; sen
   const loginPage = new LoginPage(page);
   await loginPage.login(user.email, user.senha);
   await page.goto("/app/profile");
-  await expect(page.getByText(/informacoes do perfil/i)).toBeVisible();
+  await expect(page.getByText(/informações do perfil/i)).toBeVisible();
 }
 
 export async function updateProfileFields(page: Page) {

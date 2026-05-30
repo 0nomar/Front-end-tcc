@@ -55,9 +55,9 @@ export default function EditProjectPage() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!form.titulo.trim()) { setError("O titulo e obrigatorio."); return; }
-    if (!form.areaId) { setError("Selecione uma area."); return; }
-    if (!areas.some((area) => String(area.id) === form.areaId)) { setError("Selecione uma area cadastrada."); return; }
+    if (!form.titulo.trim()) { setError("O título é obrigatório."); return; }
+    if (!form.areaId) { setError("Selecione uma área."); return; }
+    if (!areas.some((area) => String(area.id) === form.areaId)) { setError("Selecione uma área cadastrada."); return; }
     if (!form.vagas || Number(form.vagas) < 1) { setError("Informe o numero de vagas."); return; }
     const dateError = validateProjectDates(form);
     if (dateError) { setError(dateError); return; }
@@ -106,7 +106,7 @@ export default function EditProjectPage() {
         </button>
         <div>
           <h2 className="pagina-criar-projeto__titulo">Editar projeto</h2>
-          <p className="pagina-criar-projeto__subtitulo">Atualize as informacoes do projeto</p>
+          <p className="pagina-criar-projeto__subtitulo">Atualize as informações do projeto</p>
         </div>
       </div>
 
@@ -126,20 +126,20 @@ export default function EditProjectPage() {
           )}
           {areasUnavailable && (
             <div className="formulario-projeto__alerta formulario-projeto__alerta--erro" role="alert">
-              Nenhuma area de pesquisa cadastrada. Solicite ao administrador o cadastro de uma area antes de editar projetos.
+              Nenhuma área de pesquisa cadastrada. Solicite ao administrador o cadastro de uma área antes de editar projetos.
             </div>
           )}
 
           <div className="formulario-projeto__campo">
             <label htmlFor="titulo" className="formulario-projeto__rotulo">
-              Titulo <span className="formulario-projeto__obrigatorio">*</span>
+              Título <span className="formulario-projeto__obrigatorio">*</span>
             </label>
             <input id="titulo" name="titulo" type="text" value={form.titulo} onChange={handleChange}
               className="formulario-projeto__input" maxLength={200} disabled={isDisabled} autoFocus />
           </div>
 
           <div className="formulario-projeto__campo">
-            <label htmlFor="descricao" className="formulario-projeto__rotulo">Descricao</label>
+            <label htmlFor="descricao" className="formulario-projeto__rotulo">Descrição</label>
             <textarea id="descricao" name="descricao" value={form.descricao} onChange={handleChange}
               className="formulario-projeto__textarea" rows={4} disabled={isDisabled} />
           </div>
@@ -147,12 +147,12 @@ export default function EditProjectPage() {
           <div className="formulario-projeto__campo">
             <label htmlFor="requisitos" className="formulario-projeto__rotulo">Requisitos</label>
             <input id="requisitos" name="requisitos" type="text" value={form.requisitos} onChange={handleChange}
-              placeholder="Ex: Python, estatistica basica"
+              placeholder="Ex: Python, estatística básica"
               className="formulario-projeto__input" disabled={isDisabled} />
           </div>
 
           <div className="formulario-projeto__campo">
-            <label htmlFor="tecnologias" className="formulario-projeto__rotulo">Tecnologias e competencias</label>
+            <label htmlFor="tecnologias" className="formulario-projeto__rotulo">Tecnologias e competências</label>
             <input id="tecnologias" name="tecnologias" type="text" value={form.tecnologias} onChange={handleChange}
               placeholder="Ex: React, Spring Boot, PostgreSQL"
               className="formulario-projeto__input" disabled={isDisabled} />
@@ -161,11 +161,11 @@ export default function EditProjectPage() {
           <div className="formulario-projeto__grade-2">
             <div className="formulario-projeto__campo">
               <label htmlFor="areaId" className="formulario-projeto__rotulo">
-                Area <span className="formulario-projeto__obrigatorio">*</span>
+                Área <span className="formulario-projeto__obrigatorio">*</span>
               </label>
               <select id="areaId" name="areaId" value={form.areaId} onChange={handleChange}
                 className="formulario-projeto__select" disabled={isDisabled}>
-                <option value="">{areasUnavailable ? "Nenhuma area cadastrada" : "Selecione uma area"}</option>
+                <option value="">{areasUnavailable ? "Nenhuma área cadastrada" : "Selecione uma área"}</option>
                 {areas.map((a) => (
                   <option key={a.id} value={a.id}>{a.nome}</option>
                 ))}
@@ -184,12 +184,12 @@ export default function EditProjectPage() {
 
           <div className="formulario-projeto__grade-3">
             <div className="formulario-projeto__campo">
-              <label htmlFor="dataInicio" className="formulario-projeto__rotulo">Data de inicio</label>
+              <label htmlFor="dataInicio" className="formulario-projeto__rotulo">Data de início</label>
               <input id="dataInicio" name="dataInicio" type="date" value={form.dataInicio}
                 onChange={handleChange} className="formulario-projeto__input" disabled={isDisabled} />
             </div>
             <div className="formulario-projeto__campo">
-              <label htmlFor="dataFim" className="formulario-projeto__rotulo">Data de termino</label>
+              <label htmlFor="dataFim" className="formulario-projeto__rotulo">Data de término</label>
               <input id="dataFim" name="dataFim" type="date" value={form.dataFim}
                 onChange={handleChange} className="formulario-projeto__input" disabled={isDisabled} />
             </div>

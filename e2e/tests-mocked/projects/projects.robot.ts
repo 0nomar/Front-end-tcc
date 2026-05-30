@@ -35,7 +35,7 @@ export async function runProjectsCrudFlow(page: Page) {
   await expect(page.getByText("O titulo e obrigatorio.")).toBeVisible();
   await page.getByPlaceholder("Ex: Sistema de deteccao de anomalias com IA").fill(project.title);
   await page.getByPlaceholder("Descreva os objetivos, metodologia e resultados esperados...").fill(project.description);
-  await page.getByPlaceholder("Ex: Conhecimento em Python, estatistica basica").fill(project.requirements);
+  await page.getByPlaceholder("Ex: Conhecimento em Python, estatística básica").fill(project.requirements);
   await page.getByPlaceholder("Ex: React, Spring Boot, PostgreSQL").fill(project.technologies);
   await page.locator("#areaId").selectOption({ index: 1 });
   await page.getByPlaceholder("Ex: 3").fill(String(project.slots));

@@ -18,7 +18,7 @@ export class CreateProjectPage {
     await this.page
       .getByPlaceholder("Descreva os objetivos, metodologia e resultados esperados...")
       .fill(project.description);
-    await this.page.getByPlaceholder("Ex: Conhecimento em Python, estatistica basica").fill(project.requirements);
+    await this.page.getByPlaceholder("Ex: Conhecimento em Python, estatística básica").fill(project.requirements);
     await this.page.getByPlaceholder("Ex: React, Spring Boot, PostgreSQL").fill(project.technologies);
     await this.page.locator("#areaId").selectOption({ index: 1 });
     const advisorSelect = this.page.locator("#orientadorId");

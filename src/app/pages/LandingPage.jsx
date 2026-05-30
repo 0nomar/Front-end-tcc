@@ -16,17 +16,17 @@ const navItems = [
 ];
 
 const features = [
-  { icon: Search,       title: "Busca Inteligente de Projetos",  description: "Encontre projetos alinhados ao seu perfil com filtros por area, curso e bolsa disponivel.", colorClass: "landing__card-feature__icone-area--azul" },
+  { icon: Search,       title: "Busca Inteligente de Projetos",  description: "Encontre projetos alinhados ao seu perfil com filtros por área, curso e bolsa disponível.", colorClass: "landing__card-feature__icone-area--azul" },
   { icon: FileText,     title: "Inscrição 100% Online",          description: "Candidate-se a projetos, envie documentos e acompanhe tudo em um único lugar.", colorClass: "landing__card-feature__icone-area--violeta" },
-  { icon: TrendingUp,   title: "Acompanhamento de Progresso",    description: "Visualize marcos, entregas e evolucao do projeto com timelines interativas.", colorClass: "landing__card-feature__icone-area--esmeralda" },
-  { icon: MessageSquare,title: "Chat com Orientadores",          description: "Comunicacao direta e agil com seu orientador sem precisar de e-mails.", colorClass: "landing__card-feature__icone-area--laranja" },
-  { icon: Star,         title: "Sistema de Feedback",            description: "Receba avaliacoes detalhadas e construtivas ao longo da pesquisa.", colorClass: "landing__card-feature__icone-area--amarelo" },
+  { icon: TrendingUp,   title: "Acompanhamento de Progresso",    description: "Visualize marcos, entregas e evolução do projeto com timelines interativas.", colorClass: "landing__card-feature__icone-area--esmeralda" },
+  { icon: MessageSquare,title: "Chat com Orientadores",          description: "Comunicação direta e ágil com seu orientador sem precisar de e-mails.", colorClass: "landing__card-feature__icone-area--laranja" },
+  { icon: Star,         title: "Sistema de Feedback",            description: "Receba avaliações detalhadas e construtivas ao longo da pesquisa.", colorClass: "landing__card-feature__icone-area--amarelo" },
   { icon: Shield,       title: "Gestão de Documentos",           description: "Faça upload e gerencie todos os seus documentos acadêmicos com segurança.", colorClass: "landing__card-feature__icone-area--rosa" },
 ];
 
 const steps = [
-  { number: "01", title: "Crie sua conta",            description: "Cadastre-se como aluno ou orientador e complete seu perfil academico." },
-  { number: "02", title: "Explore e candidate-se",    description: "Busque projetos por area de interesse e envie sua candidatura online." },
+  { number: "01", title: "Crie sua conta",            description: "Cadastre-se como aluno ou orientador e complete seu perfil acadêmico." },
+  { number: "02", title: "Explore e candidate-se",    description: "Busque projetos por área de interesse e envie sua candidatura online." },
   { number: "03", title: "Desenvolva sua pesquisa",   description: "Acompanhe o progresso, comunique-se com seu orientador e entregue resultados." },
 ];
 
@@ -39,7 +39,7 @@ const stats = [
   { value: "500+",   label: "Projetos publicados" },
   { value: "2.400+", label: "Alunos inscritos" },
   { value: "180+",   label: "Orientadores ativos" },
-  { value: "94%",    label: "Taxa de satisfacao" },
+  { value: "94%",    label: "Taxa de satisfação" },
 ];
 
 const mockupNavItems = [
@@ -167,7 +167,7 @@ export default function LandingPage() {
             >
 
               <h1 className="landing__hero-titulo">
-                Sua pesquisa comeca{" "}
+                Sua pesquisa começa{" "}
                 <span className="landing__hero-titulo-destaque">aqui.</span>
               </h1>
 
@@ -244,7 +244,7 @@ export default function LandingPage() {
                         <div className="landing__mockup-trilha">
                           <div className="landing__mockup-barra-prog" />
                         </div>
-                        <p className="landing__mockup-prog-texto">35% concluido</p>
+                        <p className="landing__mockup-prog-texto">35% concluído</p>
                       </div>
                     </div>
                   </div>
@@ -333,7 +333,7 @@ export default function LandingPage() {
             {[
               { icon: Users, label: "Para alunos e orientadores" },
               { icon: Globe, label: "100% online e acessível" },
-              { icon: Zap,   label: "Rapido e facil de usar" },
+              { icon: Zap,   label: "Rápido e fácil de usar" },
             ].map((item) => (
               <motion.div key={item.label} variants={itemFadeUp} whileHover={{ scale: 1.03 }} className="landing__card-solucao">
                 <item.icon size={20} style={{ flexShrink: 0 }} />
@@ -349,7 +349,7 @@ export default function LandingPage() {
         <div className="landing__secao-interno">
           <div className="landing__secao-cabecalho">
             <span className="landing__secao-badge landing__secao-badge--azul">Funcionalidades</span>
-            <h2 className="landing__secao-titulo">Tudo que voce precisa, em um so lugar</h2>
+            <h2 className="landing__secao-titulo">Tudo que você precisa, em um só lugar</h2>
           </div>
           <motion.div variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.15 }} className="landing__grade-3">
             {features.map((feature) => (
@@ -390,7 +390,7 @@ export default function LandingPage() {
       <motion.section variants={sectionFadeUp} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="landing__secao">
         <div className="landing__secao-interno">
           <div className="landing__secao-cabecalho">
-            <span className="landing__secao-badge landing__secao-badge--esmeralda">Beneficios</span>
+            <span className="landing__secao-badge landing__secao-badge--esmeralda">Benefícios</span>
             <h2 className="landing__secao-titulo">Para toda a comunidade acadêmica</h2>
           </div>
           <motion.div variants={staggerContainer} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="landing__grade-2">
