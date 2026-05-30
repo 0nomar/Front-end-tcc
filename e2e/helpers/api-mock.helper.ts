@@ -326,6 +326,11 @@ export async function setupApiMock(page: Page, options: MockOptions = {}) {
       return;
     }
 
+    if (method === "GET" && path === "/api/usuarios/orientadores") {
+      await fulfill(route, 200, [mockUsers.advisor]);
+      return;
+    }
+
     const userProjectMatch = path.match(/^\/api\/usuarios\/(\d+)\/projetos$/);
     if (method === "GET" && userProjectMatch) {
       await fulfill(route, 200, options.empty?.projects ? [] : state.projects);
@@ -377,6 +382,7 @@ export async function setupApiMock(page: Page, options: MockOptions = {}) {
         titulo: String(body.titulo),
         descricao: String(body.descricao ?? ""),
         requisitos: String(body.requisitos ?? ""),
+        tecnologias: String(body.tecnologias ?? body.competencias ?? ""),
         areaId: Number(body.areaId),
         areaNome: areas.find((item) => item.id === Number(body.areaId))?.nome ?? "Ciencia da Computacao",
         cursoNome: String(body.curso ?? "Ciencia da Computacao"),
@@ -385,7 +391,7 @@ export async function setupApiMock(page: Page, options: MockOptions = {}) {
         dataCriacao: new Date().toISOString(),
         alunoCriadorId: state.currentUser.id,
         alunoCriadorNome: state.currentUser.nome,
-        orientadorId: mockUsers.advisor.id,
+        orientadorId: Number(body.orientadorId ?? mockUsers.advisor.id),
         orientadorNome: mockUsers.advisor.nome,
         orientadorEmail: mockUsers.advisor.email,
       };
@@ -413,6 +419,7 @@ export async function setupApiMock(page: Page, options: MockOptions = {}) {
         titulo: String(body.titulo ?? state.projects[index].titulo),
         descricao: String(body.descricao ?? state.projects[index].descricao),
         requisitos: String(body.requisitos ?? state.projects[index].requisitos),
+        tecnologias: String(body.tecnologias ?? state.projects[index].tecnologias ?? ""),
         areaId: Number(body.areaId ?? state.projects[index].areaId),
         vagas: Number(body.vagas ?? state.projects[index].vagas),
       };

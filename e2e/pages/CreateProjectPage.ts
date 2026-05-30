@@ -19,8 +19,12 @@ export class CreateProjectPage {
       .getByPlaceholder("Descreva os objetivos, metodologia e resultados esperados...")
       .fill(project.description);
     await this.page.getByPlaceholder("Ex: Conhecimento em Python, estatistica basica").fill(project.requirements);
+    await this.page.getByPlaceholder("Ex: React, Spring Boot, PostgreSQL").fill(project.technologies);
     await this.page.locator("#areaId").selectOption({ index: 1 });
-    await this.page.locator("#curso").selectOption({ index: 1 });
+    const advisorSelect = this.page.locator("#orientadorId");
+    if (await advisorSelect.isVisible()) {
+      await advisorSelect.selectOption({ index: 1 });
+    }
     await this.page.getByPlaceholder("Ex: 3").fill(String(project.slots));
   }
 
