@@ -27,11 +27,11 @@ function validateFile(file) {
   const extension = file.name.split(".").pop()?.toLowerCase() ?? "";
 
   if (!ALLOWED_TYPES.includes(file.type) || !ALLOWED_EXTENSIONS.includes(extension)) {
-    throw new Error("Tipo de arquivo nao suportado. Use PDF, JPG ou PNG.");
+    throw new Error("Tipo de arquivo não suportado. Use PDF, JPG ou PNG.");
   }
 
   if (file.size > MAX_FILE_SIZE_BYTES) {
-    throw new Error("Arquivo muito grande. O limite e 5MB.");
+    throw new Error("Arquivo muito grande. O limite é 5 MB.");
   }
 }
 
@@ -48,7 +48,7 @@ export function useUploadDocumento() {
 
     try {
       if (!isSupabaseConfigured || !supabase) {
-        throw new Error("Supabase nao configurado. Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.");
+        throw new Error("Supabase não configurado. Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.");
       }
 
       validateFile(file);
@@ -80,7 +80,7 @@ export function useUploadDocumento() {
         .getPublicUrl(filePath);
 
       if (!publicUrlData?.publicUrl) {
-        throw new Error("Nao foi possivel gerar a URL publica do documento.");
+        throw new Error("Não foi possível gerar a URL pública do documento.");
       }
 
       setProgresso(100);
@@ -89,7 +89,7 @@ export function useUploadDocumento() {
         publicUrl: publicUrlData.publicUrl,
       };
     } catch (err) {
-      setErro(err.message || "Nao foi possivel enviar o documento.");
+      setErro(err.message || "Não foi possível enviar o documento.");
       setProgresso(0);
       return null;
     } finally {

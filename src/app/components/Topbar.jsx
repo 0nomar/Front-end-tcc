@@ -146,7 +146,7 @@ export function Topbar({ onMenuClick, title, subtitle }) {
               <span className="barra-topo__iniciais-avatar">{getInitials(user?.nome)}</span>
             </div>
             <div className="barra-topo__info-perfil">
-              <p className="barra-topo__nome-perfil">{user?.nome?.split(" ")[0] ?? "Usuario"}</p>
+              <p className="barra-topo__nome-perfil">{user?.nome?.split(" ")[0] ?? "Usuário"}</p>
               <p className="barra-topo__tipo-perfil">{formatUserType(user?.tipo)}</p>
             </div>
             <ChevronDown size={14} className="barra-topo__icone-dropdown" />
@@ -171,7 +171,7 @@ export function Topbar({ onMenuClick, title, subtitle }) {
                   onClick={() => { navigate("/app/configuracoes"); setDropdownOpen(false); }}
                   className="barra-topo__item-menu"
                 >
-                  Configuracoes
+                  Configurações
                 </button>
                 <hr className="barra-topo__divisor-menu" />
                 <button

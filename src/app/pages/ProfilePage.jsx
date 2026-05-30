@@ -131,7 +131,7 @@ export default function ProfilePage() {
       toast.success("Perfil atualizado com sucesso.");
       setEditing(false);
     } catch (err) {
-      toast.error(err.message || "Nao foi possivel salvar o perfil.");
+      toast.error(err.message || "Não foi possível salvar o perfil.");
     } finally {
       setLoadingSave(false);
     }
@@ -140,7 +140,7 @@ export default function ProfilePage() {
   if (loading) return <ProfileSkeleton />;
 
   if (error || !data?.profile) {
-    return <StatusView title="Falha ao carregar perfil" description={error?.message || "Perfil indisponivel."} />;
+    return <StatusView title="Falha ao carregar perfil" description={error?.message || "Perfil indisponível."} />;
   }
 
   const profile = data.profile;
@@ -161,12 +161,12 @@ export default function ProfilePage() {
 
             <h2 className="cartao-perfil__nome">{profile.nome}</h2>
             <p className="cartao-perfil__tipo">{formatUserType(profile.tipo)}</p>
-            <p className="cartao-perfil__instituicao">{profile.instituicao ?? "Instituicao nao informada"}</p>
+            <p className="cartao-perfil__instituicao">{profile.instituicao ?? "Instituição não informada"}</p>
 
             <div className="cartao-perfil__estatisticas">
               {[
                 { label: "Projetos", value: approvedApps },
-                { label: "Inscricoes", value: data.applications.length },
+                { label: "Inscrições", value: data.applications.length },
                 { label: "Tipo", value: formatUserType(profile.tipo) },
               ].map((item) => (
                 <div key={item.label} className="cartao-perfil__stat">
@@ -179,9 +179,9 @@ export default function ProfilePage() {
             <div className="cartao-perfil__info-lista">
               {[
                 { icon: Mail, label: profile.email },
-                { icon: BookOpen, label: profile.curso ?? "Curso nao informado" },
-                { icon: Building2, label: profile.instituicao ?? "Instituicao nao informada" },
-                { icon: GraduationCap, label: profile.semestre ?? "Semestre nao informado" },
+                { icon: BookOpen, label: profile.curso ?? "Curso não informado" },
+                { icon: Building2, label: profile.instituicao ?? "Instituição não informada" },
+                { icon: GraduationCap, label: profile.semestre ?? "Semestre não informado" },
                 { icon: Calendar, label: "Conta autenticada via API" },
               ].map((item) => (
                 <div key={item.label} className="cartao-perfil__info-item">
@@ -196,7 +196,7 @@ export default function ProfilePage() {
         <div className="pagina-perfil__conteudo-principal">
           <div className="secao-perfil">
             <div className="secao-perfil__cabecalho">
-              <h3 className="secao-perfil__titulo">Informacoes do perfil</h3>
+              <h3 className="secao-perfil__titulo">Informações do perfil</h3>
               {!editing ? (
                 <button onClick={() => setEditing(true)} className="secao-perfil__botao-editar">
                   <Edit3 size={14} />
@@ -220,7 +220,7 @@ export default function ProfilePage() {
                 { label: "Nome completo", value: form.nome, icon: User, field: "nome" },
                 { label: "E-mail", value: form.email, icon: Mail, field: "email" },
                 { label: "Curso", value: form.curso, icon: BookOpen, field: "curso" },
-                { label: "Instituicao", value: form.instituicao, icon: Building2, field: "instituicao" },
+                { label: "Instituição", value: form.instituicao, icon: Building2, field: "instituicao" },
                 { label: "Semestre", value: form.semestre, icon: GraduationCap, field: "semestre" },
                 { label: "Tipo", value: formatUserType(profile.tipo), icon: Award, field: null },
               ].map((field) => (
@@ -253,10 +253,10 @@ export default function ProfilePage() {
           </div>
 
           <div className="secao-perfil">
-            <h3 className="secao-perfil__titulo">Historico academico</h3>
+            <h3 className="secao-perfil__titulo">Histórico acadêmico</h3>
             <div className="historico-academico__lista">
               {data.applications.length === 0 ? (
-                <StatusView title="Sem historico" description="Suas inscricoes e aprovacoes aparecerao aqui." />
+                <StatusView title="Sem histórico" description="Suas inscrições e aprovações aparecerão aqui." />
               ) : (
                 data.applications.map((application) => (
                   <div key={application.id} className="historico-item">
@@ -266,7 +266,7 @@ export default function ProfilePage() {
                     <div className="historico-item__info">
                       <p className="historico-item__titulo">{application.project?.title ?? "Projeto"}</p>
                       <p className="historico-item__meta">
-                        {application.appliedAt ? new Date(application.appliedAt).toLocaleDateString("pt-BR") : "-"} · {application.project?.area ?? "Area nao informada"}
+                        {application.appliedAt ? new Date(application.appliedAt).toLocaleDateString("pt-BR") : "-"} · {application.project?.area ?? "Área não informada"}
                       </p>
                     </div>
                     <span className="historico-item__etiqueta historico-item__etiqueta--aprovado">

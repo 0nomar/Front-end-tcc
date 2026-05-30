@@ -87,8 +87,8 @@ export default function ProjectsPage() {
     () =>
       projects.filter((project) => {
         const term = search.toLowerCase();
-        // Mantemos a busca no cliente tambem para cobrir descricao e tags,
-        // ja que a API foca apenas no titulo por padrao.
+        // Mantemos a busca no cliente também para cobrir descrição e tags,
+        // já que a API foca apenas no título por padrão.
         return (
           project.title.toLowerCase().includes(term) ||
           project.description.toLowerCase().includes(term) ||
@@ -112,7 +112,7 @@ export default function ProjectsPage() {
       <div className="pagina-projetos__cabecalho">
         <div>
           <h2 className="pagina-projetos__titulo">{filtered.length} projetos encontrados</h2>
-          <p className="pagina-projetos__subtitulo">Encontre a oportunidade certa para sua carreira academica</p>
+          <p className="pagina-projetos__subtitulo">Encontre a oportunidade certa para sua carreira acadêmica</p>
         </div>
         <div className="pagina-projetos__acoes-cabecalho">
           <motion.button
@@ -148,7 +148,7 @@ export default function ProjectsPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="pagina-projetos__input-busca"
-          placeholder="Buscar projetos por titulo, area ou tecnologia..."
+          placeholder="Buscar projetos por título, área ou tecnologia..."
         />
         {search && (
           <button onClick={() => setSearch("")} className="pagina-projetos__botao-limpar-busca">
@@ -161,7 +161,7 @@ export default function ProjectsPage() {
         <div className="pagina-projetos__painel-filtros">
           <div className="pagina-projetos__grade-filtros">
             <div>
-              <label className="pagina-projetos__rotulo-filtro">Area de pesquisa</label>
+              <label className="pagina-projetos__rotulo-filtro">Área de pesquisa</label>
               <div className="pagina-projetos__chips-filtro">
                 {areas.map((area) => (
                   <button
@@ -305,7 +305,7 @@ export default function ProjectsPage() {
                     <div className="projeto-card__info-item">
                       <div className="projeto-card__info-icone"><FolderOpen size={12} /></div>
                       <p className="projeto-card__info-valor">{project.area}</p>
-                      <p className="projeto-card__info-rotulo">area</p>
+                      <p className="projeto-card__info-rotulo">área</p>
                     </div>
                   </div>
 

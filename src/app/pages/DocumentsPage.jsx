@@ -95,7 +95,7 @@ function DocumentViewer({ doc, onClose }) {
       .catch((err) => {
         setPreviewError(
           err?.status === 415
-            ? "Preview disponível apenas para arquivos PDF."
+            ? "Pré-visualização disponível apenas para arquivos PDF."
             : "Não foi possível carregar o documento."
         );
       })
@@ -197,14 +197,14 @@ export default function DocumentsPage() {
     const file = files?.[0];
     if (!file) return;
     if (!user?.id) {
-      toast.error("Usuario nao autenticado.");
+      toast.error("Usuário não autenticado.");
       return;
     }
     setSavingMetadata(false);
     try {
       const uploaded = await uploadDocumentoStorage(file, `usuarios/${user.id}/${tipoDocumento.toLowerCase()}`);
       if (!uploaded?.publicUrl) {
-        throw new Error(storageError || "Nao foi possivel enviar o documento para a nuvem.");
+        throw new Error(storageError || "Não foi possível enviar o documento para a nuvem.");
       }
 
       setSavingMetadata(true);

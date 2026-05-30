@@ -23,27 +23,27 @@ export async function loginAndOpenApplications(page: Page, learner: User) {
   const loginPage = new LoginPage(page);
   await loginPage.login(learner.email, learner.senha);
   await page.goto("/app/applications");
-  await expect(page.getByRole("heading", { name: "Minhas Inscricoes", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Minhas Inscrições", exact: true })).toBeVisible();
 }
 
 export async function applyToProjectViaApi(request: APIRequestContext, learner: User, projectId: number) {
   const learnerToken = await loginByApi(request, learner);
   const response = await request.post(`${API_URL}/api/inscricoes`, {
     headers: { Authorization: `Bearer ${learnerToken}` },
-    data: { projetoId: projectId, motivacao: "Inscricao real E2E" },
+    data: { projetoId: projectId, motivacao: "Inscrição real E2E" },
   });
   expect(response.ok(), await response.text()).toBeTruthy();
 }
 
 export async function validateApplicationVisibleInUi(page: Page, projectTitle: string) {
   await page.reload();
-  await expect(page.getByText("Total de inscricoes")).toBeVisible();
+  await expect(page.getByText("Total de inscrições")).toBeVisible();
   await expect(page.getByText(projectTitle)).toBeVisible();
 }
 
 export async function cancelApplicationViaUi(page: Page, projectTitle: string) {
   await page.getByText(projectTitle).click();
-  const cancelButton = page.getByRole("button", { name: /cancelar inscricao/i });
+  const cancelButton = page.getByRole("button", { name: /cancelar inscrição/i });
   await expect(cancelButton).toBeVisible();
   await cancelButton.click();
   await page.getByRole("button", { name: /confirmar cancelamento/i }).click();

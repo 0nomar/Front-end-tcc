@@ -72,7 +72,7 @@ function StarRating({ value, onChange, readOnly = false }) {
 
 const statConfig = [
   { label: "Feedbacks recebidos", icon: MessageSquare, areaClass: "resumo-feedback__icone-area--azul", iconClass: "resumo-feedback__icone--azul" },
-  { label: "Nota media", icon: Star, areaClass: "resumo-feedback__icone-area--amarelo", iconClass: "resumo-feedback__icone--amarelo" },
+  { label: "Nota média", icon: Star, areaClass: "resumo-feedback__icone-area--amarelo", iconClass: "resumo-feedback__icone--amarelo" },
   { label: "Desempenho geral", icon: Award, areaClass: "resumo-feedback__icone-area--violeta", iconClass: "resumo-feedback__icone--violeta" },
 ];
 
@@ -122,7 +122,7 @@ export default function FeedbackPage() {
       setRating(0);
       setComment("");
     } catch (err) {
-      toast.error(err.message || "Nao foi possivel enviar o feedback.");
+      toast.error(err.message || "Não foi possível enviar o feedback.");
     } finally {
       setLoadingSubmit(false);
     }
@@ -183,7 +183,7 @@ export default function FeedbackPage() {
                   <Star size={22} className="resumo-feedback__icone--amarelo" />
                 </div>
                 <p className="feedback-card__titulo-vazio">Nenhum feedback ainda</p>
-                <p className="feedback-card__subtitulo-vazio">Os feedbacks reais enviados e recebidos aparecerao aqui.</p>
+                <p className="feedback-card__subtitulo-vazio">Os feedbacks reais enviados e recebidos aparecerão aqui.</p>
               </div>
             )}
           </div>
@@ -198,7 +198,7 @@ export default function FeedbackPage() {
                 <CheckCircle size={28} style={{ color: "var(--cor-sucesso)" }} />
               </div>
               <h3 className="avaliacao-orientador__titulo-sucesso">Feedback enviado!</h3>
-              <p className="avaliacao-orientador__texto-sucesso">Sua avaliacao foi registrada via API.</p>
+              <p className="avaliacao-orientador__texto-sucesso">Sua avaliação foi registrada via API.</p>
               <button onClick={() => setSubmitted(false)} className="avaliacao-orientador__botao-outro">
                 Dar outro feedback
               </button>
@@ -210,8 +210,8 @@ export default function FeedbackPage() {
                   <div className="avaliacao-orientador__estrelas-prompt">
                     {[1, 2, 3, 4, 5].map((score) => <Star key={score} size={28} className="avaliacao-orientador__estrela-vazia" />)}
                   </div>
-                  <h4 className="avaliacao-orientador__titulo-prompt">Como foi sua experiencia?</h4>
-                  <p className="avaliacao-orientador__texto-prompt">Avalie projetos e orientacoes com base nos dados reais do sistema.</p>
+                  <h4 className="avaliacao-orientador__titulo-prompt">Como foi sua experiência?</h4>
+                  <p className="avaliacao-orientador__texto-prompt">Avalie projetos e orientações com base nos dados reais do sistema.</p>
                   <button onClick={() => setShowForm(true)} className="avaliacao-orientador__botao-iniciar">
                     Avaliar
                   </button>
@@ -229,15 +229,15 @@ export default function FeedbackPage() {
                   </div>
 
                   <div className="formulario-avaliacao__grupo">
-                    <label className="formulario-avaliacao__label">Avaliacao geral</label>
+                    <label className="formulario-avaliacao__label">Avaliação geral</label>
                     <div className="formulario-avaliacao__linha-estrelas">
                       <StarRating value={rating} onChange={setRating} />
                     </div>
                   </div>
 
                   <div className="formulario-avaliacao__grupo">
-                    <label className="formulario-avaliacao__label">Comentario</label>
-                    <textarea value={comment} onChange={(e) => setComment(e.target.value)} rows={4} className="formulario-avaliacao__textarea" placeholder="Compartilhe sua experiencia..." required />
+                    <label className="formulario-avaliacao__label">Comentário</label>
+                    <textarea value={comment} onChange={(e) => setComment(e.target.value)} rows={4} className="formulario-avaliacao__textarea" placeholder="Compartilhe sua experiência..." required />
                   </div>
 
                   <div className="formulario-avaliacao__acoes">
@@ -245,7 +245,7 @@ export default function FeedbackPage() {
                       Cancelar
                     </button>
                     <button type="submit" disabled={loadingSubmit || rating === 0 || !comment || !selectedProject} className="formulario-avaliacao__botao-enviar">
-                      {loadingSubmit ? <div className="formulario-avaliacao__spinner" /> : <><Send size={15} /> Enviar avaliacao</>}
+                      {loadingSubmit ? <div className="formulario-avaliacao__spinner" /> : <><Send size={15} /> Enviar avaliação</>}
                     </button>
                   </div>
                 </form>

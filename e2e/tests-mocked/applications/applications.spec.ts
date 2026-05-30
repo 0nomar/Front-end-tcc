@@ -11,7 +11,7 @@ test.describe("inscricoes do aluno", () => {
     await authenticateAs(page, mockUsers.student);
   });
 
-  test("filtra, expande, navega para projeto e cancela inscricao pendente", async ({ page }) => {
+  test("filtra, expande, navega para projeto e cancela inscrição pendente", async ({ page }) => {
     await runApplicationsFilterAndCancelFlow(page);
   });
 

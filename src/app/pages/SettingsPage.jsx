@@ -110,9 +110,9 @@ export default function SettingsPage() {
         semestre: form.semestre,
       });
       await refreshUser();
-      toast.success("Configuracoes salvas com sucesso.");
+      toast.success("Configurações salvas com sucesso.");
     } catch (err) {
-      toast.error(err.message || "Nao foi possivel salvar as configuracoes.");
+      toast.error(err.message || "Não foi possível salvar as configurações.");
     } finally {
       setSaving(false);
     }
@@ -124,10 +124,10 @@ export default function SettingsPage() {
       return;
     }
     if (form.senhaNova !== form.confirmarSenha) {
-      toast.error("A confirmacao de senha nao confere.");
+      toast.error("A confirmação de senha não confere.");
       return;
     }
-    toast.info("O backend atual nao expoe rota de troca de senha. Mantive a interface preparada.");
+    toast.info("O backend atual não expõe rota de troca de senha. Mantive a interface preparada.");
     setOpenPasswordModal(false);
   };
 
@@ -160,7 +160,7 @@ export default function SettingsPage() {
       <motion.section {...cardEnter} transition={{ duration: 0.3, delay: 0.05 }} className="secao-config">
         <div className="secao-config__titulo-linha">
           <GraduationCap size={18} className="secao-config__icone" />
-          <h3 className="secao-config__titulo">Dados Academicos</h3>
+          <h3 className="secao-config__titulo">Dados Acadêmicos</h3>
         </div>
         <div className="secao-config__grade">
           <div>
@@ -177,7 +177,7 @@ export default function SettingsPage() {
       <motion.section {...cardEnter} transition={{ duration: 0.3, delay: 0.08 }} className="secao-config">
         <div className="secao-config__titulo-linha">
           <Briefcase size={18} className="secao-config__icone" />
-          <h3 className="secao-config__titulo">Informacoes profissionais</h3>
+          <h3 className="secao-config__titulo">Informações profissionais</h3>
         </div>
         <div className="secao-config__grade">
           <div>
@@ -185,7 +185,7 @@ export default function SettingsPage() {
             <input value={form.departamento} onChange={(e) => handleInput("departamento", e.target.value)} className="campo-config__input" />
           </div>
           <div>
-            <label className="campo-config__label">Titulacao</label>
+            <label className="campo-config__label">Titulação</label>
             <input value={form.titulacao} onChange={(e) => handleInput("titulacao", e.target.value)} className="campo-config__input" />
           </div>
         </div>
@@ -194,10 +194,10 @@ export default function SettingsPage() {
       <motion.section {...cardEnter} transition={{ duration: 0.3, delay: 0.12 }} className="secao-config">
         <div className="secao-config__titulo-linha">
           <Bell size={18} className="secao-config__icone" />
-          <h3 className="secao-config__titulo">Notificacoes</h3>
+          <h3 className="secao-config__titulo">Notificações</h3>
         </div>
         <div className="secao-config__toggle-linha">
-          <p className="secao-config__toggle-label">Ativar/desativar notificacoes</p>
+          <p className="secao-config__toggle-label">Ativar/desativar notificações</p>
           <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} onClick={() => setNotificationsEnabled((prev) => !prev)} className={`toggle ${notificationsEnabled ? "toggle--ativo" : "toggle--inativo"}`}>
             <span className={`toggle__bolinha ${notificationsEnabled ? "toggle__bolinha--ativa" : "toggle__bolinha--inativa"}`} />
           </motion.button>
@@ -207,12 +207,12 @@ export default function SettingsPage() {
       <motion.section {...cardEnter} transition={{ duration: 0.3, delay: 0.16 }} className="secao-config">
         <div className="secao-config__titulo-linha">
           <Palette size={18} className="secao-config__icone" />
-          <h3 className="secao-config__titulo">Aparencia</h3>
+          <h3 className="secao-config__titulo">Aparência</h3>
         </div>
         <div className="secao-config__toggle-linha">
           <div>
             <p className="secao-config__toggle-label">Modo escuro</p>
-            <p className="secao-config__toggle-ajuda">A preferencia fica salva no navegador e continua apos login e logout.</p>
+            <p className="secao-config__toggle-ajuda">A preferência fica salva no navegador e continua após login e logout.</p>
           </div>
           <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} onClick={toggleTheme} className={`toggle ${isDark ? "toggle--ativo" : "toggle--inativo"}`} aria-pressed={isDark} aria-label="Alternar modo escuro">
             <span className={`toggle__bolinha ${isDark ? "toggle__bolinha--ativa" : "toggle__bolinha--inativa"}`} />
@@ -223,7 +223,7 @@ export default function SettingsPage() {
       <motion.section {...cardEnter} transition={{ duration: 0.3, delay: 0.2 }} className="secao-config">
         <div className="secao-config__titulo-linha">
           <Shield size={18} className="secao-config__icone" />
-          <h3 className="secao-config__titulo">Seguranca</h3>
+          <h3 className="secao-config__titulo">Segurança</h3>
         </div>
         <div className="secao-config__acoes">
           <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} onClick={() => setOpenPasswordModal(true)} className="secao-config__botao secao-config__botao--neutro">
@@ -236,7 +236,7 @@ export default function SettingsPage() {
             </span>
           </motion.button>
           <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }} onClick={saveProfile} disabled={saving} className="secao-config__botao secao-config__botao--primario">
-            {saving ? "Salvando..." : "Salvar alteracoes"}
+            {saving ? "Salvando..." : "Salvar alterações"}
           </motion.button>
         </div>
       </motion.section>

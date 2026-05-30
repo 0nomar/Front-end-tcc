@@ -22,8 +22,8 @@ export async function runProjectsListAndApplyFlow(page: Page) {
   await expect(page.getByText("Sobre o projeto")).toBeVisible();
   await page.getByRole("button", { name: "Inscrever-se" }).click();
   await expect(page.getByText("Inscricao no projeto")).toBeVisible();
-  await page.getByPlaceholder("Escreva sua motivacao para o projeto...").fill("Quero contribuir com a pesquisa.");
-  await page.getByRole("button", { name: "Enviar inscricao" }).click();
+  await page.getByPlaceholder("Escreva sua motivação para o projeto...").fill("Quero contribuir com a pesquisa.");
+  await page.getByRole("button", { name: "Enviar inscrição" }).click();
   await expectToast(page, "Inscricao enviada com sucesso.");
 }
 
@@ -47,7 +47,7 @@ export async function runProjectsCrudFlow(page: Page) {
   await expect(page.getByRole("heading", { name: "Editar projeto" })).toBeVisible();
   await page.locator("#titulo").fill(`${project.title} atualizado`);
   await page.locator("#vagas").fill("4");
-  await page.getByRole("button", { name: "Salvar alteracoes" }).click();
+  await page.getByRole("button", { name: "Salvar alterações" }).click();
   await expect(page.getByText("Projeto atualizado! Redirecionando...")).toBeVisible();
   await expect(page).toHaveURL(/\/app\/projects\/\d+$/);
   await page.getByRole("button", { name: "Excluir" }).click();
@@ -58,7 +58,7 @@ export async function runProjectsCrudFlow(page: Page) {
 
 export async function runProjectsEmptyAndErrorFlow(page: Page) {
   await page.goto("/app/projects");
-  await page.getByPlaceholder("Buscar projetos por titulo, area ou tecnologia...").fill("nao existe");
+  await page.getByPlaceholder("Buscar projetos por título, área ou tecnologia...").fill("não existe");
   await expect(page.getByText("Nenhum projeto encontrado")).toBeVisible();
   const errorPage = await page.context().newPage();
   await setupApiMock(errorPage, { fail: [/^\/api\/projetos(?:\?|$)/] });
@@ -80,11 +80,11 @@ export async function runProjectApplicationsAccessFlow(browser: Browser) {
   await setupApiMock(advisorPage, { user: mockUsers.advisor });
   await authenticateAs(advisorPage, mockUsers.advisor);
   await advisorPage.goto("/app/projects/2/applications");
-  await expect(advisorPage.getByRole("heading", { name: "Inscricoes no projeto" })).toBeVisible();
-  await advisorPage.getByRole("button", { name: "Carta de motivacao" }).first().click();
+  await expect(advisorPage.getByRole("heading", { name: "Inscrições no projeto" })).toBeVisible();
+  await advisorPage.getByRole("button", { name: "Carta de motivação" }).first().click();
   await expect(advisorPage.getByText("Quero participar deste projeto.")).toBeVisible();
   await advisorPage.getByRole("button", { name: "Aprovar" }).first().click();
-  await expect(advisorPage.getByText("Aprovar inscricao")).toBeVisible();
+  await expect(advisorPage.getByText("Aprovar inscrição")).toBeVisible();
   await advisorPage.getByPlaceholder("Escreva um parecer opcional...").fill("Aprovado no E2E.");
   await advisorPage.getByRole("button", { name: "Confirmar" }).click();
   await expectToast(advisorPage, "Inscricao aprovada.");

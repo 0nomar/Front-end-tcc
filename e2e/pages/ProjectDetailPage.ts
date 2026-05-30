@@ -23,11 +23,11 @@ export class ProjectDetailPage {
   }
 
   async fillApplication(motivation: string): Promise<void> {
-    await this.page.getByPlaceholder("Escreva sua motivacao para o projeto...").fill(motivation);
+    await this.page.getByPlaceholder("Escreva sua motivação para o projeto...").fill(motivation);
   }
 
   async submitApplication(): Promise<void> {
-    await this.page.getByRole("button", { name: "Enviar inscricao" }).click();
+    await this.page.getByRole("button", { name: "Enviar inscrição" }).click();
   }
 
   async expectApplicationSuccess(): Promise<void> {

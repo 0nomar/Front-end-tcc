@@ -174,15 +174,15 @@ export default function ProjectApplicationsPage() {
       if (type === "approve") {
         await applicationService.approve(applicationId, parecer);
         removeApplication(applicationId);
-        toast.success("Inscricao aprovada.");
+        toast.success("Inscrição aprovada.");
       } else {
         await applicationService.reject(applicationId, parecer);
         removeApplication(applicationId);
-        toast.success("Inscricao rejeitada.");
+        toast.success("Inscrição rejeitada.");
       }
       closeActionModal();
     } catch (err) {
-      toast.error(err.message || "Nao foi possivel concluir a acao.");
+      toast.error(err.message || "Não foi possível concluir a ação.");
     } finally {
       setCardActionLoadingId(null);
     }
@@ -193,8 +193,8 @@ export default function ProjectApplicationsPage() {
   if (error || !project) {
     return (
       <StatusView
-        title="Nao foi possivel carregar"
-        description={error?.message ?? "Projeto nao encontrado."}
+        title="Não foi possível carregar"
+        description={error?.message ?? "Projeto não encontrado."}
         action={
           <button type="button" className="pagina-inscricoes-projeto__botao-voltar" onClick={() => navigate("/app/projects")}>
             Voltar aos projetos
@@ -222,7 +222,7 @@ export default function ProjectApplicationsPage() {
     <div className="pagina-inscricoes-projeto">
       <div className="pagina-inscricoes-projeto__cabecalho">
         <div>
-          <h1 className="pagina-inscricoes-projeto__titulo">Inscricoes no projeto</h1>
+          <h1 className="pagina-inscricoes-projeto__titulo">Inscrições no projeto</h1>
           <p className="pagina-inscricoes-projeto__subtitulo">{project.title}</p>
         </div>
         <Link to={`/app/projects/${id}`} className="pagina-inscricoes-projeto__botao-voltar pagina-inscricoes-projeto__botao-voltar--link">
@@ -250,8 +250,8 @@ export default function ProjectApplicationsPage() {
           <div className="pagina-inscricoes-projeto__vazio-icone">
             <Users size={28} style={{ color: "var(--cor-texto-mudo)" }} />
           </div>
-          <h3 className="pagina-inscricoes-projeto__vazio-titulo">Nenhuma inscricao ainda</h3>
-          <p className="pagina-inscricoes-projeto__vazio-texto">Quando alunos se inscreverem, eles aparecerao nesta lista.</p>
+          <h3 className="pagina-inscricoes-projeto__vazio-titulo">Nenhuma inscrição ainda</h3>
+          <p className="pagina-inscricoes-projeto__vazio-texto">Quando alunos se inscreverem, eles aparecerão nesta lista.</p>
           <button type="button" className="pagina-inscricoes-projeto__botao-voltar" onClick={() => navigate(`/app/projects/${id}`)}>
             Voltar ao projeto
           </button>
@@ -297,7 +297,7 @@ export default function ProjectApplicationsPage() {
                         onClick={() => toggleMotivation(application.id)}
                       >
                         {motivationOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                        Carta de motivacao
+                        Carta de motivação
                       </button>
                       {motivationOpen && (
                         <p className="pagina-inscricoes-projeto__motivacao-texto">{application.motivation}</p>
@@ -355,9 +355,9 @@ export default function ProjectApplicationsPage() {
         <div className="modal-inscricao__sobreposicao" role="presentation" onClick={(e) => e.target === e.currentTarget && closeActionModal()}>
           <div className="modal-inscricao__painel pagina-inscricoes-projeto__modal">
             <h3 className="modal-inscricao__titulo">
-              {actionModal.type === "approve" ? "Aprovar inscricao" : "Rejeitar inscricao"}
+              {actionModal.type === "approve" ? "Aprovar inscrição" : "Rejeitar inscrição"}
             </h3>
-            <p className="modal-inscricao__subtitulo">Parecer para o aluno (opcional, ate 500 caracteres)</p>
+            <p className="modal-inscricao__subtitulo">Parecer para o aluno (opcional, até 500 caracteres)</p>
             <textarea
               className="modal-inscricao__textarea"
               rows={4}

@@ -17,11 +17,11 @@ const navItems = [
 
 const features = [
   { icon: Search,       title: "Busca Inteligente de Projetos",  description: "Encontre projetos alinhados ao seu perfil com filtros por area, curso e bolsa disponivel.", colorClass: "landing__card-feature__icone-area--azul" },
-  { icon: FileText,     title: "Inscrição 100% Online",          description: "Candidate-se a projetos, envie documentos e acompanhe tudo em um unico lugar.", colorClass: "landing__card-feature__icone-area--violeta" },
+  { icon: FileText,     title: "Inscrição 100% Online",          description: "Candidate-se a projetos, envie documentos e acompanhe tudo em um único lugar.", colorClass: "landing__card-feature__icone-area--violeta" },
   { icon: TrendingUp,   title: "Acompanhamento de Progresso",    description: "Visualize marcos, entregas e evolucao do projeto com timelines interativas.", colorClass: "landing__card-feature__icone-area--esmeralda" },
   { icon: MessageSquare,title: "Chat com Orientadores",          description: "Comunicacao direta e agil com seu orientador sem precisar de e-mails.", colorClass: "landing__card-feature__icone-area--laranja" },
   { icon: Star,         title: "Sistema de Feedback",            description: "Receba avaliacoes detalhadas e construtivas ao longo da pesquisa.", colorClass: "landing__card-feature__icone-area--amarelo" },
-  { icon: Shield,       title: "Gestão de Documentos",           description: "Faca upload e gerencie todos os seus documentos academicos com seguranca.", colorClass: "landing__card-feature__icone-area--rosa" },
+  { icon: Shield,       title: "Gestão de Documentos",           description: "Faça upload e gerencie todos os seus documentos acadêmicos com segurança.", colorClass: "landing__card-feature__icone-area--rosa" },
 ];
 
 const steps = [
@@ -60,7 +60,7 @@ const problemCards = [
     id: "falta-visibilidade",
     icon: "BUSCA",
     title: "Falta de visibilidade",
-    desc: "Alunos nao sabem quais projetos estão disponíveis ou como candidatar-se.",
+    desc: "Alunos não sabem quais projetos estão disponíveis ou como candidatar-se.",
   },
   {
     id: "acompanhamento-manual",
@@ -226,9 +226,9 @@ export default function LandingPage() {
                       <div className="landing__mockup-grade">
                         {[
                           { label: "Projetos ativos", value: "1", colorClass: "landing__mockup-card-azul" },
-                          { label: "Inscricoes",       value: "3", colorClass: "landing__mockup-card-violeta" },
+                          { label: "Inscrições",       value: "3", colorClass: "landing__mockup-card-violeta" },
                           { label: "Mensagens",        value: "2", colorClass: "landing__mockup-card-verde" },
-                          { label: "Notificacoes",     value: "3", colorClass: "landing__mockup-card-laranja" },
+                          { label: "Notificações",     value: "3", colorClass: "landing__mockup-card-laranja" },
                         ].map((s) => (
                           <div key={s.label} className="landing__mockup-card-mini">
                             <span className="landing__mockup-card-label">{s.label}</span>
@@ -299,7 +299,7 @@ export default function LandingPage() {
           <div className="landing__secao-cabecalho">
             <span className="landing__secao-badge landing__secao-badge--vermelho">O Problema</span>
             <h2 className="landing__secao-titulo">
-              A iniciação científica ainda e <span className="landing__secao-titulo-destaque--vermelho">caótica</span>
+              A iniciação científica ainda é <span className="landing__secao-titulo-destaque--vermelho">caótica</span>
             </h2>
             <p className="landing__secao-subtitulo">
               Hoje, o processo envolve e-mails dispersos, planilhas desatualizadas e comunicações confusas.

@@ -8,6 +8,6 @@ export class NotificationsPage {
   }
 
   async expectVisible(): Promise<void> {
-    await expect(this.page.getByRole("heading", { name: "Notificacoes", exact: true })).toBeVisible();
+    await expect(this.page.getByRole("heading", { name: "Notificações", exact: true })).toBeVisible();
   }
 }

@@ -8,6 +8,6 @@ export class SettingsPage {
   }
 
   async expectVisible(): Promise<void> {
-    await expect(this.page.getByRole("heading", { name: "Configuracoes", exact: true })).toBeVisible();
+    await expect(this.page.getByRole("heading", { name: "Configurações", exact: true })).toBeVisible();
   }
 }

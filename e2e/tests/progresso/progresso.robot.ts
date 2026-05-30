@@ -41,12 +41,12 @@ export async function loginAndOpenProgress(page: Page, user: { email: string; se
   const loginPage = new LoginPage(page);
   await loginPage.login(user.email, user.senha);
   await page.goto("/app/progress");
-  await expect(page.getByText(/progresso|atualizacoes/i).first()).toBeVisible();
+  await expect(page.getByText(/progresso|atualizações/i).first()).toBeVisible();
 }
 
 export async function postProgressUpdate(page: Page, text: string) {
-  await page.getByRole("button", { name: /nova atualizacao/i }).click();
-  await page.getByPlaceholder("Descreva a atualizacao...").fill(text);
+  await page.getByRole("button", { name: /nova atualização/i }).click();
+  await page.getByPlaceholder("Descreva a atualização...").fill(text);
   await page.getByRole("button", { name: "Publicar" }).click();
   await expect(page.getByText(text).first()).toBeVisible();
 }

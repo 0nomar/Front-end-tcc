@@ -53,7 +53,7 @@ async function request(path, options = {}) {
     const message =
       typeof payload === "string"
         ? payload
-        : payload?.message || payload?.error || "Nao foi possivel concluir a requisicao.";
+        : payload?.message || payload?.error || "Não foi possível concluir a requisição.";
     const error = new Error(message);
     error.status = response.status;
     error.payload = payload;
@@ -88,7 +88,7 @@ export const api = {
       },
     }).then(async (res) => {
       if (!res.ok) {
-        const error = new Error("Erro ao carregar arquivo");
+        const error = new Error("Erro ao carregar arquivo.");
         error.status = res.status;
         throw error;
       }

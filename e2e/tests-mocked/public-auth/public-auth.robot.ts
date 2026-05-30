@@ -35,11 +35,11 @@ export async function runRegisterFlow(page: Page) {
   await page.getByRole("button", { name: "Continuar" }).click();
   await page.getByPlaceholder("Seu nome completo").fill(user.nome);
   await page.getByPlaceholder("seu@universidade.br").fill(user.email);
-  await page.getByPlaceholder("Seu registro academico").fill(user.ra);
+  await page.getByPlaceholder("Seu registro acadêmico").fill(user.ra);
   await page.getByPlaceholder("Minimo 8 caracteres").fill(user.senha);
   await page.getByPlaceholder("Repita a senha").fill("SenhaDiferente123!");
   await page.getByRole("button", { name: "Continuar" }).click();
-  await expect(page.getByText("As senhas nao coincidem.")).toBeVisible();
+  await expect(page.getByText("As senhas não coincidem.")).toBeVisible();
   await page.getByPlaceholder("Repita a senha").fill(user.senha);
   await page.getByRole("button", { name: "Continuar" }).click();
   await page.locator("select").first().selectOption({ index: 1 });

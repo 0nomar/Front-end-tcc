@@ -26,7 +26,7 @@ test.describe("projetos real", () => {
     await assertProjectPersistedViaApi(request, token!, projectId, project);
   });
 
-  test("filtra, entra no projeto, aprova/rejeita inscricao e exclui projeto", async ({ page, request }) => {
+  test("filtra, entra no projeto, aprova/rejeita inscrição e exclui projeto", async ({ page, request }) => {
     const owner = await prepareAuthenticatedUser(request);
     await runLoginForProjects(page, owner);
     const project = await runCreateProjectFlow(page);
@@ -43,7 +43,7 @@ test.describe("projetos real", () => {
     await deleteProjectViaApi(request, token!, projectId);
   });
 
-  test("usuario comum nao acessa gestao de inscricoes e detalhe persiste apos refresh", async ({ page, request }) => {
+  test("usuário comum não acessa gestão de inscrições e detalhe persiste após refresh", async ({ page, request }) => {
     const owner = await prepareAuthenticatedUser(request);
     await runLoginForProjects(page, owner);
     const project = await runCreateProjectFlow(page);

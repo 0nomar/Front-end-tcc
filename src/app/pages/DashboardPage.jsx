@@ -188,7 +188,7 @@ export default function DashboardPage() {
       href: "/app/projects",
     },
     {
-      label: "Inscricoes",
+      label: "Inscrições",
       value: derived.recentApplications.length,
       icon: FileText,
       areaClass: "cartao-resumo__icone-area--violeta",
@@ -197,7 +197,7 @@ export default function DashboardPage() {
       href: "/app/applications",
     },
     {
-      label: "Notificacoes",
+      label: "Notificações",
       value: derived.unreadNotifications,
       icon: Bell,
       areaClass: "cartao-resumo__icone-area--laranja",
@@ -206,7 +206,7 @@ export default function DashboardPage() {
       href: "/app/notifications",
     },
     {
-      label: "Atualizacoes",
+      label: "Atualizações",
       value: derived.activityData.reduce((acc, item) => acc + item.atividade, 0),
       icon: TrendingUp,
       areaClass: "cartao-resumo__icone-area--verde",
@@ -233,7 +233,7 @@ export default function DashboardPage() {
             {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}
           </p>
           <h2 className="painel__titulo-banner">
-            <span className="painel__titulo-destaque">Ola, {user?.nome?.split(" ")[0] ?? "pesquisador"}!</span>
+            <span className="painel__titulo-destaque">Olá, {user?.nome?.split(" ")[0] ?? "pesquisador"}!</span>
           </h2>
           <p className="painel__descricao-banner">
             Você tem <strong className="painel__destaque-banner">{derived.unreadNotifications} notificações</strong> pendentes
@@ -291,7 +291,7 @@ export default function DashboardPage() {
             </div>
             <div className="projeto-andamento__corpo">
               {derived.recentProjects.length === 0 ? (
-                <StatusView title="Nenhum projeto encontrado" description="A API ainda nao retornou projetos para exibir aqui." />
+                <StatusView title="Nenhum projeto encontrado" description="A API ainda não retornou projetos para exibir aqui." />
               ) : (
                 derived.recentProjects.map((project) => (
                   <div key={project.id} className="inscricao-item">
@@ -313,14 +313,14 @@ export default function DashboardPage() {
 
           <div className="painel__card">
             <div className="painel__card-cabecalho">
-              <h3 className="painel__card-titulo">Minhas inscricoes</h3>
+              <h3 className="painel__card-titulo">Minhas inscrições</h3>
               <button onClick={() => navigate("/app/applications")} className="painel__link-ver-mais">
                 Ver todas <ArrowRight size={13} />
               </button>
             </div>
             <div>
               {derived.recentApplications.length === 0 ? (
-                <StatusView title="Sem inscricoes" description="Quando você se candidatar a projetos, elas aparecerão aqui." />
+                <StatusView title="Sem inscrições" description="Quando você se candidatar a projetos, elas aparecerão aqui." />
               ) : (
                 derived.recentApplications.map((application, index) => (
                   <motion.div
@@ -415,14 +415,14 @@ export default function DashboardPage() {
 
           <div className="painel__card">
             <div className="painel__card-cabecalho">
-              <h3 className="painel__card-titulo">Notificacoes</h3>
+              <h3 className="painel__card-titulo">Notificações</h3>
               <button onClick={() => navigate("/app/notifications")} className="painel__link-ver-mais">
                 Ver todas <ArrowRight size={12} />
               </button>
             </div>
             <div>
               {derived.recentNotifications.length === 0 ? (
-                <StatusView title="Sem notificacoes" description="As notificações do sistema aparecerão aqui." />
+                <StatusView title="Sem notificações" description="As notificações do sistema aparecerão aqui." />
               ) : (
                 derived.recentNotifications.map((notif, index) => (
                   <motion.div

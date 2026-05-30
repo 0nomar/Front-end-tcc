@@ -125,12 +125,12 @@ export default function ProgressPage() {
 
     try {
       await projectService.addProgress(selectedProject.id, { descricao: newUpdate.trim() });
-      toast.success("Atualizacao publicada com sucesso.");
+      toast.success("Atualização publicada com sucesso.");
       setNewUpdate("");
       setShowAddUpdate(false);
       await reload();
     } catch (err) {
-      toast.error(err.message || "Nao foi possivel registrar a atualizacao.");
+      toast.error(err.message || "Não foi possível registrar a atualização.");
     }
   };
 
@@ -141,7 +141,7 @@ export default function ProgressPage() {
   }
 
   if (!selectedProject) {
-    return <StatusView title="Sem projetos vinculados" description="Nao encontramos projetos associados ao usuario autenticado." />;
+    return <StatusView title="Sem projetos vinculados" description="Não encontramos projetos associados ao usuário autenticado." />;
   }
 
   return (
@@ -173,12 +173,12 @@ export default function ProgressPage() {
             <div className="progresso-donut__centro">
               <div className="progresso-donut__centro-conteudo">
                 <p className="progresso-donut__percentual">{completionPercent}%</p>
-                <p className="progresso-donut__label-percentual">concluido</p>
+                <p className="progresso-donut__label-percentual">concluído</p>
               </div>
             </div>
           </div>
           <p className="progresso-donut__titulo">Progresso geral</p>
-          <p className="progresso-donut__subtitulo">{selectedProgress.length} atualizacoes registradas</p>
+          <p className="progresso-donut__subtitulo">{selectedProgress.length} atualizações registradas</p>
         </div>
 
         <div className="pagina-progresso__info-projeto">
@@ -193,7 +193,7 @@ export default function ProgressPage() {
           <div className="pagina-progresso__grade-datas">
             {[
               { label: "Criado em", value: selectedProject.createdAt ? new Date(selectedProject.createdAt).toLocaleDateString("pt-BR") : "-", icon: Calendar },
-              { label: "Atualizacoes", value: selectedProgress.length, icon: TrendingUp },
+              { label: "Atualizações", value: selectedProgress.length, icon: TrendingUp },
               { label: "Vagas", value: `${selectedProjectSlots.remaining}/${selectedProjectSlots.total}`, icon: Clock },
             ].map((item) => (
               <div key={item.label} className="pagina-progresso__item-data">
@@ -238,7 +238,7 @@ export default function ProgressPage() {
             <h3 className="pagina-progresso__titulo-card">Linha do tempo</h3>
             <div className="linha-do-tempo">
               {selectedProgress.length === 0 ? (
-                <StatusView title="Sem atualizacoes" description="Ainda nao existem registros de progresso para este projeto." />
+                <StatusView title="Sem atualizações" description="Ainda não existem registros de progresso para este projeto." />
               ) : (
                 selectedProgress.map((progress, index) => {
                   const Icon = index === 0 ? CheckCircle : index % 2 === 0 ? Clock : Circle;
@@ -269,10 +269,10 @@ export default function ProgressPage() {
 
         <div className="pagina-progresso__card">
           <div className="pagina-progresso__cabecalho-atualizacoes">
-            <h3 className="pagina-progresso__titulo-card" style={{ marginBottom: 0 }}>Atualizacoes</h3>
+            <h3 className="pagina-progresso__titulo-card" style={{ marginBottom: 0 }}>Atualizações</h3>
             <button onClick={() => setShowAddUpdate(!showAddUpdate)} className="pagina-progresso__botao-nova-atualizacao">
               <Plus size={14} />
-              Nova atualizacao
+              Nova atualização
             </button>
           </div>
 
@@ -282,7 +282,7 @@ export default function ProgressPage() {
                 <textarea
                   value={newUpdate}
                   onChange={(e) => setNewUpdate(e.target.value)}
-                  placeholder="Descreva a atualizacao..."
+                  placeholder="Descreva a atualização..."
                   rows={3}
                   className="formulario-atualizacao__textarea"
                 />
@@ -308,7 +308,7 @@ export default function ProgressPage() {
                   <div className="atualizacao-item__conteudo">
                     <div className="atualizacao-item__linha-titulo">
                       <h4 className="atualizacao-item__titulo">{progress.title}</h4>
-                      <span className="atualizacao-item__etiqueta atualizacao-item__etiqueta--atualizacao">Atualizacao</span>
+                      <span className="atualizacao-item__etiqueta atualizacao-item__etiqueta--atualizacao">Atualização</span>
                     </div>
                     <p className="atualizacao-item__texto">{progress.content}</p>
                     <div className="atualizacao-item__meta">

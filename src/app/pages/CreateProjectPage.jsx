@@ -93,7 +93,7 @@ export default function CreateProjectPage() {
       .catch(() => {
         if (!alive) return;
         setAreas([]);
-        setAreasError("Nao foi possivel carregar as areas cadastradas.");
+        setAreasError("Não foi possível carregar as áreas cadastradas.");
       })
       .finally(() => {
         if (!alive) return;
@@ -125,7 +125,7 @@ export default function CreateProjectPage() {
       .catch(() => {
         if (!alive) return;
         setAdvisors([]);
-        setAdvisorsError("Nao foi possivel carregar os orientadores cadastrados.");
+        setAdvisorsError("Não foi possível carregar os orientadores cadastrados.");
       })
       .finally(() => {
         if (!alive) return;
@@ -146,12 +146,12 @@ export default function CreateProjectPage() {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    if (!form.titulo.trim()) { setError("O titulo e obrigatorio."); return; }
-    if (!form.areaId) { setError("Selecione uma area de pesquisa."); return; }
-    if (!areas.some((area) => String(area.id) === form.areaId)) { setError("Selecione uma area cadastrada."); return; }
+    if (!form.titulo.trim()) { setError("O título é obrigatório."); return; }
+    if (!form.areaId) { setError("Selecione uma área de pesquisa."); return; }
+    if (!areas.some((area) => String(area.id) === form.areaId)) { setError("Selecione uma área cadastrada."); return; }
     if (isStudent && !form.orientadorId) { setError("Selecione o orientador que deve avaliar o projeto."); return; }
     if (isStudent && !advisors.some((advisor) => String(advisor.id) === form.orientadorId)) { setError("Selecione um orientador cadastrado."); return; }
-    if (!form.vagas || Number(form.vagas) < 1) { setError("Informe o numero de vagas (minimo 1)."); return; }
+    if (!form.vagas || Number(form.vagas) < 1) { setError("Informe o número de vagas (mínimo 1)."); return; }
     const dateError = validateProjectDates(form);
     if (dateError) { setError(dateError); return; }
 
@@ -187,7 +187,7 @@ export default function CreateProjectPage() {
         navigate(id ? `/app/projects/${id}` : "/app/projects");
       }, 1200);
     } catch (err) {
-      setError(err.message ?? "Nao foi possivel criar o projeto. Tente novamente.");
+      setError(err.message ?? "Não foi possível criar o projeto. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -212,7 +212,7 @@ export default function CreateProjectPage() {
         <div>
           <h2 className="pagina-criar-projeto__titulo">Novo projeto</h2>
           <p className="pagina-criar-projeto__subtitulo">
-            Preencha as informacoes para publicar seu projeto de pesquisa
+            Preencha as informações para publicar seu projeto de pesquisa
           </p>
         </div>
       </div>
@@ -241,7 +241,7 @@ export default function CreateProjectPage() {
 
           {areasUnavailable && (
             <div className="formulario-projeto__alerta formulario-projeto__alerta--erro" role="alert">
-              {areasError ?? "Nenhuma area de pesquisa cadastrada. Solicite ao administrador o cadastro de uma area antes de criar projetos."}
+              {areasError ?? "Nenhuma área de pesquisa cadastrada. Solicite ao administrador o cadastro de uma área antes de criar projetos."}
             </div>
           )}
 
@@ -254,12 +254,12 @@ export default function CreateProjectPage() {
           {/* Titulo */}
           <div className="formulario-projeto__campo">
             <label htmlFor="titulo" className="formulario-projeto__rotulo">
-              Titulo <span className="formulario-projeto__obrigatorio">*</span>
+              Título <span className="formulario-projeto__obrigatorio">*</span>
             </label>
             <input
               id="titulo" name="titulo" type="text"
               value={form.titulo} onChange={handleChange}
-              placeholder="Ex: Sistema de deteccao de anomalias com IA"
+              placeholder="Ex: Sistema de detecção de anomalias com IA"
               className="formulario-projeto__input"
               maxLength={200} disabled={isDisabled} autoFocus
             />
@@ -267,7 +267,7 @@ export default function CreateProjectPage() {
 
           {/* Descricao */}
           <div className="formulario-projeto__campo">
-            <label htmlFor="descricao" className="formulario-projeto__rotulo">Descricao</label>
+            <label htmlFor="descricao" className="formulario-projeto__rotulo">Descrição</label>
             <textarea
               id="descricao" name="descricao"
               value={form.descricao} onChange={handleChange}
@@ -345,7 +345,7 @@ export default function CreateProjectPage() {
                 disabled={isDisabled || areasLoading}
               >
                 <option value="">
-                  {areasLoading ? "Carregando..." : areasUnavailable ? "Nenhuma area cadastrada" : "Selecione uma area"}
+                  {areasLoading ? "Carregando..." : areasUnavailable ? "Nenhuma área cadastrada" : "Selecione uma área"}
                 </option>
                 {areas.map((a) => (
                   <option key={a.id} value={a.id}>{a.nome}</option>
@@ -407,7 +407,7 @@ export default function CreateProjectPage() {
               />
             </div>
             <div className="formulario-projeto__campo">
-              <label htmlFor="dataLimiteInscricao" className="formulario-projeto__rotulo">Limite de inscricao</label>
+              <label htmlFor="dataLimiteInscricao" className="formulario-projeto__rotulo">Limite de inscrição</label>
               <input
                 id="dataLimiteInscricao" name="dataLimiteInscricao" type="date"
                 value={form.dataLimiteInscricao} onChange={handleChange}

@@ -77,7 +77,7 @@ export const projectService = {
           return areas;
         }
       } catch {
-        // Usa fallback padrao quando o backend nao expor um endpoint dedicado.
+        // Usa fallback padrão quando o backend não expor um endpoint dedicado.
       }
     }
 

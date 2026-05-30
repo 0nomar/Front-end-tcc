@@ -136,7 +136,7 @@ export async function setupApiMock(page: Page, options: MockOptions = {}) {
       {
         id: 2,
         titulo: "Projeto E2E Candidatura",
-        descricao: "Projeto aberto para fluxo de inscricao.",
+        descricao: "Projeto aberto para fluxo de inscrição.",
         requisitos: "Python, estatistica",
         areaId: 2,
         areaNome: "Engenharia de Software",
@@ -198,8 +198,8 @@ export async function setupApiMock(page: Page, options: MockOptions = {}) {
     notifications: options.empty?.notifications ? [] : [
       {
         id: 30,
-        titulo: "Inscricao aprovada",
-        mensagem: "Sua inscricao foi aprovada.",
+        titulo: "Inscrição aprovada",
+        mensagem: "Sua inscrição foi aprovada.",
         tipo: "INSCRICAO_APROVADA",
         lida: false,
         dataCriacao: new Date().toISOString(),
@@ -207,7 +207,7 @@ export async function setupApiMock(page: Page, options: MockOptions = {}) {
       {
         id: 31,
         titulo: "Nova mensagem",
-        mensagem: "Voce recebeu uma nova mensagem.",
+        mensagem: "Você recebeu uma nova mensagem.",
         tipo: "MENSAGEM_RECEBIDA",
         lida: true,
         dataCriacao: "2026-05-07T12:00:00.000Z",
@@ -236,14 +236,14 @@ export async function setupApiMock(page: Page, options: MockOptions = {}) {
         id: 60,
         titulo: "Projeto E2E Candidatura",
         tipo: "GRUPO",
-        ultimaMensagem: "Vamos revisar os proximos passos.",
+        ultimaMensagem: "Vamos revisar os próximos passos.",
         ultimaMensagemHorario: "2026-05-10T12:00:00.000Z",
       },
     ],
     messages: [
       {
         id: 70,
-        conteudo: "Vamos revisar os proximos passos.",
+        conteudo: "Vamos revisar os próximos passos.",
         remetenteId: 2,
         remetenteNome: "Prof Ana Orientadora",
         dataEnvio: "2026-05-10T12:00:00.000Z",
@@ -410,7 +410,7 @@ export async function setupApiMock(page: Page, options: MockOptions = {}) {
     const projectMatch = path.match(/^\/api\/projetos\/(\d+)$/);
     if (projectMatch && method === "GET") {
       const project = state.projects.find((item) => item.id === Number(projectMatch[1]));
-      await fulfill(route, project ? 200 : 404, project ?? { message: "Projeto nao encontrado." });
+      await fulfill(route, project ? 200 : 404, project ?? { message: "Projeto não encontrado." });
       return;
     }
 
@@ -418,7 +418,7 @@ export async function setupApiMock(page: Page, options: MockOptions = {}) {
       const body = await readJson(route);
       const index = state.projects.findIndex((item) => item.id === Number(projectMatch[1]));
       if (index < 0) {
-        await fulfill(route, 404, { message: "Projeto nao encontrado." });
+        await fulfill(route, 404, { message: "Projeto não encontrado." });
         return;
       }
       state.projects[index] = {
@@ -649,7 +649,7 @@ export async function setupApiMock(page: Page, options: MockOptions = {}) {
       return;
     }
 
-    await fulfill(route, 404, { message: `Rota mock nao mapeada: ${method} ${path}` });
+    await fulfill(route, 404, { message: `Rota mock não mapeada: ${method} ${path}` });
   });
 
   return state;

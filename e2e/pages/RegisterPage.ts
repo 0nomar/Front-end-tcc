@@ -15,7 +15,7 @@ export class RegisterPage {
   async fillPersonalData(user: TestUser): Promise<void> {
     await this.page.getByPlaceholder("Seu nome completo").fill(user.nome);
     await this.page.getByPlaceholder("seu@universidade.br").fill(user.email);
-    await this.page.getByPlaceholder("Seu registro academico").fill(user.ra);
+    await this.page.getByPlaceholder("Seu registro acadêmico").fill(user.ra);
     await this.page.getByPlaceholder("Minimo 8 caracteres").fill(user.senha);
     await this.page.getByPlaceholder("Repita a senha").fill(user.senha);
   }

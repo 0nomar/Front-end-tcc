@@ -25,11 +25,11 @@ import "./Sidebar.css";
 const navItems = [
   { path: "/app", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { path: "/app/projects", label: "Projetos", icon: FolderOpen },
-  { path: "/app/applications", label: "Inscricoes", icon: FileText },
+  { path: "/app/applications", label: "Inscrições", icon: FileText },
   { path: "/app/chat", label: "Mensagens", icon: MessageSquare },
   { path: "/app/progress", label: "Progresso", icon: TrendingUp },
   { path: "/app/feedback", label: "Feedback", icon: Star },
-  { path: "/app/notifications", label: "Notificacoes", icon: Bell },
+  { path: "/app/notifications", label: "Notificações", icon: Bell },
   { path: "/app/documents", label: "Documentos", icon: Upload },
   // { path: "/app/profile", label: "Meu Perfil", icon: User },
 ];
@@ -77,7 +77,7 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
         {!collapsed && (
           <div>
             <p className="barra-lateral__nome-app">CollabResearch</p>
-            <p className="barra-lateral__subtitulo-app">Iniciacao Cientifica</p>
+            <p className="barra-lateral__subtitulo-app">Iniciação Científica</p>
           </div>
         )}
       </div>
@@ -121,7 +121,7 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
                     {item.label}
                   </span>
                 )}
-                {!collapsed && item.label === "Notificacoes" && unreadCount > 0 && (
+                {!collapsed && item.label === "Notificações" && unreadCount > 0 && (
                   <span className="barra-lateral__contador">{unreadCount}</span>
                 )}
               </>
@@ -137,7 +137,7 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
           onClick={() => setMobileOpen(false)}
         >
           <Settings size={18} className="barra-lateral__icone-nav" />
-          {!collapsed && <span className="barra-lateral__rotulo-nav">Configuracoes</span>}
+          {!collapsed && <span className="barra-lateral__rotulo-nav">Configurações</span>}
         </NavLink>
 
         {/* <motion.button

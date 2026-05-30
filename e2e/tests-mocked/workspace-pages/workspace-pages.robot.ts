@@ -5,8 +5,8 @@ export async function runDashboardFlow(page: Page) {
   await page.goto("/app");
   await expect(page.getByRole("heading", { name: "Dashboard", exact: true })).toBeVisible();
   await expect(page.getByText("Projetos recentes")).toBeVisible();
-  await expect(page.getByText("Minhas inscricoes")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Notificacoes" })).toBeVisible();
+  await expect(page.getByText("Minhas inscrições")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Notificações" })).toBeVisible();
   await page.getByRole("button", { name: /Buscar projetos/ }).click();
   await expect(page).toHaveURL(/\/app\/projects$/);
 }
@@ -45,11 +45,11 @@ export async function runProgressFlow(page: Page, browser: Browser) {
   await page.goto("/app/progress");
   await expect(page.getByRole("heading", { name: "Progresso do Projeto", exact: true })).toBeVisible();
   await expect(page.getByText("Linha do tempo")).toBeVisible();
-  await page.getByRole("button", { name: "Nova atualizacao" }).click();
-  await page.getByPlaceholder("Descreva a atualizacao...").fill("Atualizacao publicada pelo E2E.");
+  await page.getByRole("button", { name: "Nova atualização" }).click();
+  await page.getByPlaceholder("Descreva a atualização...").fill("Atualização publicada pelo E2E.");
   await page.getByRole("button", { name: "Publicar" }).click();
-  await expectToast(page, "Atualizacao publicada com sucesso.");
-  await expect(page.getByText("Atualizacao publicada pelo E2E.").first()).toBeVisible();
+  await expectToast(page, "Atualização publicada com sucesso.");
+  await expect(page.getByText("Atualização publicada pelo E2E.").first()).toBeVisible();
   const emptyContext = await browser.newContext();
   const emptyPage = await emptyContext.newPage();
   await setupApiMock(emptyPage, { empty: { projects: true } });
@@ -83,13 +83,13 @@ export async function runFeedbackFlow(page: Page, browser: Browser) {
 export async function runProfileFlow(page: Page) {
   await page.goto("/app/profile");
   await expect(page.getByRole("heading", { name: "Meu Perfil", exact: true })).toBeVisible();
-  await expect(page.getByText("Informacoes do perfil")).toBeVisible();
+  await expect(page.getByText("Informações do perfil")).toBeVisible();
   await page.getByRole("button", { name: "Editar perfil" }).click();
   await page.locator(".campo-perfil__input--editando").first().fill("Aluno E2E Atualizado");
   await page.getByRole("button", { name: "Salvar" }).click();
   await expectToast(page, "Perfil atualizado com sucesso.");
   await expect(page.locator(".campo-perfil__input").first()).toHaveValue("Aluno E2E Atualizado");
-  await expect(page.getByText("Historico academico")).toBeVisible();
+  await expect(page.getByText("Histórico acadêmico")).toBeVisible();
 }
 
 export async function runDocumentsFlow(page: Page, browser: Browser) {
@@ -116,7 +116,7 @@ export async function runDocumentsFlow(page: Page, browser: Browser) {
 
 export async function runNotificationsFlow(page: Page) {
   await page.goto("/app/notifications");
-  await expect(page.getByRole("heading", { name: "Notificacoes", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Notificações", exact: true })).toBeVisible();
   await expect(page.getByText("Inscricao aprovada", { exact: true })).toBeVisible();
   await page.getByTitle("Marcar como lida").click();
   await expect(page.getByText("Nenhuma nova notificacao")).toBeVisible();
@@ -128,7 +128,7 @@ export async function runNotificationsFlow(page: Page) {
 
 export async function runSettingsFlow(page: Page) {
   await page.goto("/app/configuracoes");
-  await expect(page.getByRole("heading", { name: "Configuracoes", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Configurações", exact: true })).toBeVisible();
   await expect(page.getByText("Perfil")).toBeVisible();
   await page.getByLabel("Alternar modo escuro").click();
   await page.getByRole("button", { name: "Alterar senha" }).first().click();
@@ -139,10 +139,10 @@ export async function runSettingsFlow(page: Page) {
   await page.getByPlaceholder("Nova senha", { exact: true }).fill("NovaSenha123!");
   await page.getByPlaceholder("Confirmar nova senha").fill("OutraSenha123!");
   await page.getByRole("button", { name: "Confirmar" }).click();
-  await expectToast(page, "A confirmacao de senha nao confere.");
+  await expectToast(page, "A confirmação de senha não confere.");
   await page.getByRole("button", { name: "Cancelar" }).click();
-  await page.getByRole("button", { name: "Salvar alteracoes" }).click();
-  await expectToast(page, "Configuracoes salvas com sucesso.");
+  await page.getByRole("button", { name: "Salvar alterações" }).click();
+  await expectToast(page, "Configurações salvas com sucesso.");
   await page.getByRole("button", { name: "Logout" }).click();
   await expect.poll(() => page.evaluate(() => localStorage.getItem("tcc_auth_token"))).toBeNull();
 }

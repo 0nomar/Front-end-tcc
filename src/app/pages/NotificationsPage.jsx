@@ -72,9 +72,9 @@ function timeAgo(dateStr) {
   const now = new Date();
   const diff = Math.floor((now.getTime() - date.getTime()) / 1000);
   if (diff < 60) return "Agora mesmo";
-  if (diff < 3600) return `${Math.floor(diff / 60)} min atras`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h atras`;
-  if (diff < 604800) return `${Math.floor(diff / 86400)} dias atras`;
+  if (diff < 3600) return `${Math.floor(diff / 60)} min atrás`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h atrás`;
+  if (diff < 604800) return `${Math.floor(diff / 86400)} dias atrás`;
   return date.toLocaleDateString("pt-BR");
 }
 
@@ -111,7 +111,7 @@ export default function NotificationsPage() {
       window.dispatchEvent(new Event("notifications-updated"));
       notificarAtualizacaoGlobal();
     } catch (err) {
-      toast.error(err.message || "Nao foi possivel marcar como lida.");
+      toast.error(err.message || "Não foi possível marcar como lida.");
     }
   };
 
@@ -121,7 +121,7 @@ export default function NotificationsPage() {
       await reload();
       window.dispatchEvent(new Event("notifications-updated"));
     } catch (err) {
-      toast.error(err.message || "Nao foi possivel marcar todas como lidas.");
+      toast.error(err.message || "Não foi possível marcar todas como lidas.");
     }
   };
 
@@ -136,7 +136,7 @@ export default function NotificationsPage() {
   if (loading) return <NotificationsSkeleton />;
 
   if (error) {
-    return <StatusView title="Falha ao carregar notificacoes" description={error.message} />;
+    return <StatusView title="Falha ao carregar notificações" description={error.message} />;
   }
 
   const filters = ["all", ...new Set(initialNotifications.map((item) => item.type))];
@@ -147,7 +147,7 @@ export default function NotificationsPage() {
         <div className="pagina-notificacoes__contagem">
           <Bell size={18} className="pagina-notificacoes__icone-contagem" />
           <span className="pagina-notificacoes__texto-contagem">
-            {unreadCount > 0 ? `${unreadCount} nao lidas` : "Nenhuma nova notificacao"}
+            {unreadCount > 0 ? `${unreadCount} não lidas` : "Nenhuma nova notificação"}
           </span>
         </div>
         <div className="pagina-notificacoes__botoes-acao">
@@ -182,8 +182,8 @@ export default function NotificationsPage() {
           <div className="pagina-notificacoes__icone-vazio">
             <Bell size={24} style={{ color: "var(--cor-texto-mudo)" }} />
           </div>
-          <h3 className="pagina-notificacoes__titulo-vazio">Nenhuma notificacao</h3>
-          <p className="pagina-notificacoes__descricao-vazio">Voce esta em dia. Nao ha notificacoes para exibir.</p>
+          <h3 className="pagina-notificacoes__titulo-vazio">Nenhuma notificação</h3>
+          <p className="pagina-notificacoes__descricao-vazio">Você está em dia. Não há notificações para exibir.</p>
         </div>
       ) : (
         <div className="pagina-notificacoes__lista">

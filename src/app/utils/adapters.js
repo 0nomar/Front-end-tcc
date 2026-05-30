@@ -2,7 +2,7 @@ import { formatNotificationType } from "./formatters";
 
 export function getUserName(user) {
   const nestedUser = user?.usuario ?? user?.user ?? user?.aluno?.usuario ?? user?.aluno;
-  return user?.nome ?? user?.name ?? nestedUser?.nome ?? nestedUser?.name ?? "Usuario";
+  return user?.nome ?? user?.name ?? nestedUser?.nome ?? nestedUser?.name ?? "Usuário";
 }
 
 export function getUserEmail(user) {
@@ -131,7 +131,7 @@ export function getProjectSlotsUsage(project, people = null) {
 
 export function mapProject(project) {
   // ProjetoResponse retorna campos planos (orientadorId, alunoCriadorId)
-  // mas também pode vir com objetos aninhados (legado) — suporta os dois
+  // mas também pode vir com objetos aninhados (legado) - suporta os dois formatos
   const orientadorUsuario = project?.orientador?.usuario ?? null;
   const alunoCriadorUsuario = project?.alunoCriador?.usuario ?? null;
 
@@ -149,7 +149,7 @@ export function mapProject(project) {
 
   return {
     id: project?.id,
-    title: project?.titulo ?? project?.title ?? "Projeto sem titulo",
+    title: project?.titulo ?? project?.title ?? "Projeto sem título",
     description: project?.descricao ?? project?.description ?? "",
     requisitos: project?.requisitos ?? "",
     requirements: (() => {
@@ -218,7 +218,7 @@ export function mapNotification(notification) {
     title:
       notification?.titulo ??
       formatNotificationType(notification?.tipo) ??
-      "Notificacao",
+      "Notificação",
     message: notification?.mensagem ?? notification?.message ?? "",
     type: notification?.tipo ?? "INFO",
     read: notification?.lida ?? notification?.read ?? false,

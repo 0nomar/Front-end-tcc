@@ -43,7 +43,7 @@ export default function EditProjectPage() {
           });
         }
       })
-      .catch((err) => setFetchError(err.message ?? "Nao foi possivel carregar o projeto."))
+      .catch((err) => setFetchError(err.message ?? "Não foi possível carregar o projeto."))
       .finally(() => setFetchLoading(false));
   }, [id]);
 
@@ -80,7 +80,7 @@ export default function EditProjectPage() {
       setSuccess(true);
       setTimeout(() => navigate(`/app/projects/${id}`), 1200);
     } catch (err) {
-      setError(err.message ?? "Nao foi possivel salvar as alteracoes.");
+      setError(err.message ?? "Não foi possível salvar as alterações.");
     } finally {
       setLoading(false);
     }
@@ -194,7 +194,7 @@ export default function EditProjectPage() {
                 onChange={handleChange} className="formulario-projeto__input" disabled={isDisabled} />
             </div>
             <div className="formulario-projeto__campo">
-              <label htmlFor="dataLimiteInscricao" className="formulario-projeto__rotulo">Limite de inscricao</label>
+              <label htmlFor="dataLimiteInscricao" className="formulario-projeto__rotulo">Limite de inscrição</label>
               <input id="dataLimiteInscricao" name="dataLimiteInscricao" type="date"
                 value={form.dataLimiteInscricao} onChange={handleChange}
                 className="formulario-projeto__input" disabled={isDisabled} />
@@ -213,7 +213,7 @@ export default function EditProjectPage() {
               disabled={isDisabled}>
               {loading
                 ? <><Loader2 size={16} className="formulario-projeto__spinner" /> Salvando...</>
-                : <><Save size={16} /> Salvar alteracoes</>}
+                : <><Save size={16} /> Salvar alterações</>}
             </motion.button>
           </div>
         </form>

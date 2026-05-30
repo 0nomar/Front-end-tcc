@@ -133,11 +133,11 @@ export default function ApplicationsPage() {
     try {
       await applicationService.cancel(cancelTargetId);
       setData((prev) => (Array.isArray(prev) ? prev.filter((a) => a.id !== cancelTargetId) : prev));
-      toast.success("Inscricao cancelada.");
+      toast.success("Inscrição cancelada.");
       setCancelTargetId(null);
       if (expandedId === cancelTargetId) setExpandedId(null);
     } catch (err) {
-      toast.error(err.message || "Nao foi possivel cancelar a inscricao.");
+      toast.error(err.message || "Não foi possível cancelar a inscrição.");
     } finally {
       setCancelSubmitting(false);
     }
@@ -146,17 +146,17 @@ export default function ApplicationsPage() {
   if (loading) return <ApplicationsSkeleton />;
 
   if (error) {
-    return <StatusView title="Falha ao carregar inscricoes" description={error.message} />;
+    return <StatusView title="Falha ao carregar inscrições" description={error.message} />;
   }
 
   return (
     <div className="pagina-inscricoes">
       <div className="pagina-inscricoes__grade-resumos">
         {[
-          ["all", "Total de inscricoes"],
+          ["all", "Total de inscrições"],
           ["APROVADO", "Aprovadas"],
           ["PENDENTE", "Aguardando"],
-          ["REJEITADO", "Nao aprovadas"],
+          ["REJEITADO", "Não aprovadas"],
         ].map(([status, label]) => (
           <button
             key={status}
@@ -193,12 +193,12 @@ export default function ApplicationsPage() {
             <FileText size={24} style={{ color: "var(--cor-texto-mudo)" }} />
           </div>
           <h3 className="pagina-inscricoes__titulo-vazio">
-            {applications.length === 0 ? "Nenhuma inscricao encontrada" : "Nenhuma inscricao neste filtro"}
+            {applications.length === 0 ? "Nenhuma inscrição encontrada" : "Nenhuma inscrição neste filtro"}
           </h3>
           <p className="pagina-inscricoes__descricao-vazio">
             {applications.length === 0
-              ? "Explore projetos abertos e envie sua primeira inscricao com uma carta de motivacao."
-              : "Tente outro filtro ou volte para ver todas as inscricoes."}
+              ? "Explore projetos abertos e envie sua primeira inscrição com uma carta de motivação."
+              : "Tente outro filtro ou volte para ver todas as inscrições."}
           </p>
           <button type="button" onClick={() => navigate("/app/projects")} className="pagina-inscricoes__botao-explorar">
             Explorar projetos
@@ -255,7 +255,7 @@ export default function ApplicationsPage() {
                     <div className="inscricao-card__secao-expandida">
                       {application.motivation?.trim() ? (
                         <div>
-                          <h4 className="inscricao-card__rotulo-secao">Minha motivacao:</h4>
+                          <h4 className="inscricao-card__rotulo-secao">Minha motivação:</h4>
                           <p className={`inscricao-card__texto-motivacao ${cfg.textoMotivacaoClass ?? ""}`}>
                             {application.motivation}
                           </p>
@@ -287,7 +287,7 @@ export default function ApplicationsPage() {
                             onClick={() => setCancelTargetId(application.id)}
                             className="inscricao-card__botao inscricao-card__botao--cancelar"
                           >
-                            <XCircle size={13} /> Cancelar inscricao
+                            <XCircle size={13} /> Cancelar inscrição
                           </button>
                         )}
                       </div>
@@ -309,8 +309,8 @@ export default function ApplicationsPage() {
           }}
         >
           <div className="modal-inscricao__painel modal-confirmacao">
-            <h3 className="modal-inscricao__titulo">Cancelar inscricao</h3>
-            <p className="modal-confirmacao__texto">Tem certeza que deseja cancelar esta inscricao?</p>
+            <h3 className="modal-inscricao__titulo">Cancelar inscrição</h3>
+            <p className="modal-confirmacao__texto">Tem certeza que deseja cancelar esta inscrição?</p>
             <div className="modal-inscricao__rodape">
               <button
                 type="button"

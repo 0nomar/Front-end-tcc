@@ -6,7 +6,7 @@ function buildBackendUrl(path) {
   const baseUrl = (import.meta.env.VITE_API_URL || import.meta.env.VITE_BACKEND_URL || "").replace(/\/$/, "");
 
   if (!baseUrl) {
-    throw new Error("Backend nao configurado. Defina VITE_API_URL ou VITE_BACKEND_URL.");
+    throw new Error("Backend não configurado. Defina VITE_API_URL ou VITE_BACKEND_URL.");
   }
 
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
@@ -40,7 +40,7 @@ async function saveDocumentoMetadata({ usuarioId, tipo, publicUrl, fileName }) {
   });
 
   if (!response.ok) {
-    throw new Error("Falha ao salvar informacoes no servidor.");
+    throw new Error("Falha ao salvar informações no servidor.");
   }
 
   return response;
@@ -61,7 +61,7 @@ function UploadDocumento({ candidatoId, usuarioId, tipo }) {
     try {
       const ownerId = usuarioId ?? candidatoId;
       if (!ownerId) {
-        throw new Error("Usuario nao informado para vincular o documento.");
+        throw new Error("Usuário não informado para vincular o documento.");
       }
 
       const result = await upload(file, `usuarios/${ownerId}/${tipo?.toLowerCase() || "documento"}`);
@@ -78,13 +78,13 @@ function UploadDocumento({ candidatoId, usuarioId, tipo }) {
       setSuccess(true);
       event.target.value = "";
     } catch (err) {
-      setServerError(err.message || "Nao foi possivel concluir o envio.");
+      setServerError(err.message || "Não foi possível concluir o envio.");
     }
   };
 
   const labelMap = {
-    curriculo: "Curriculo",
-    historico: "Historico Escolar",
+    curriculo: "Currículo",
+    historico: "Histórico Escolar",
   };
 
   const label = labelMap[tipo] || tipo;

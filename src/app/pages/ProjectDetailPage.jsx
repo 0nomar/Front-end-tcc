@@ -208,7 +208,7 @@ export default function ProjectDetailPage() {
         : await conversationService.openPrivate(project.advisor?.id);
       navigate("/app/chat", { state: { conversationId: conversa?.id } });
     } catch {
-      toast.error(kind === "group" ? "Erro ao abrir conversa do grupo" : "Erro ao abrir conversa com o orientador");
+      toast.error(kind === "group" ? "Erro ao abrir conversa do grupo." : "Erro ao abrir conversa com o orientador.");
     }
   };
 
@@ -221,24 +221,24 @@ export default function ProjectDetailPage() {
         try {
           const result = await uploadDocumento(documentFile, `usuarios/${user?.id}/inscricoes/${id}`);
           if (!result?.publicUrl) {
-            throw new Error("Nao foi possivel enviar o documento da inscricao.");
+          throw new Error("Não foi possível enviar o documento da inscrição.");
           }
           await documentService.upload(user.id, "CURRICULO", documentFile.name, result.publicUrl);
         } catch (err) {
-          documentWarning = err.message || "Nao foi possivel anexar o documento da inscricao.";
+          documentWarning = err.message || "Não foi possível anexar o documento da inscrição.";
         }
       }
       if (documentWarning) {
-        toast.warning(`Inscricao enviada, mas o documento nao foi anexado. ${documentWarning}`);
+        toast.warning(`Inscrição enviada, mas o documento não foi anexado. ${documentWarning}`);
       } else {
-        toast.success("Inscricao enviada com sucesso.");
+      toast.success("Inscrição enviada com sucesso.");
       }
       setShowModal(false);
       setMotivation("");
       setDocumentFile(null);
       await reload();
     } catch (err) {
-      toast.error(err.message || "Nao foi possivel enviar a inscricao.");
+      toast.error(err.message || "Não foi possível enviar a inscrição.");
     } finally {
       setLoadingApply(false);
     }
@@ -262,13 +262,13 @@ export default function ProjectDetailPage() {
         nota: feedbackRating,
         comentario: feedbackComment.trim() || undefined,
       });
-      toast.success("Avaliacao enviada com sucesso.");
+      toast.success("Avaliação enviada com sucesso.");
       setShowFeedbackModal(false);
       setFeedbackRating(0);
       setFeedbackComment("");
       await reload();
     } catch (err) {
-      toast.error(err.message || "Nao foi possivel enviar a avaliacao.");
+      toast.error(err.message || "Não foi possível enviar a avaliação.");
     } finally {
       setFeedbackLoading(false);
     }
@@ -281,7 +281,7 @@ export default function ProjectDetailPage() {
       toast.success("Projeto excluido com sucesso.");
       navigate("/app/projects");
     } catch (err) {
-      toast.error(err.message || "Nao foi possivel excluir o projeto.");
+      toast.error(err.message || "Não foi possível excluir o projeto.");
       setShowDeleteConfirm(false);
     } finally {
       setDeleteLoading(false);
@@ -295,7 +295,7 @@ export default function ProjectDetailPage() {
       toast.success("Colaborador removido.");
       loadCollaborators();
     } catch (err) {
-      toast.error(err.message || "Nao foi possivel remover o colaborador.");
+      toast.error(err.message || "Não foi possível remover o colaborador.");
     } finally {
       setRemovingId(null);
     }
@@ -306,14 +306,14 @@ export default function ProjectDetailPage() {
     try {
       if (decision === "accept") {
         await projectService.acceptGuidance(id);
-        toast.success("Projeto aceito. Ele agora esta aberto para inscricoes.");
+      toast.success("Projeto aceito. Ele agora está aberto para inscrições.");
       } else {
         await projectService.rejectGuidance(id);
         toast.success("Projeto recusado.");
       }
       await reload();
     } catch (err) {
-      toast.error(err.message || "Nao foi possivel atualizar a solicitacao.");
+      toast.error(err.message || "Não foi possível atualizar a solicitação.");
     } finally {
       setOrientationActionLoading(null);
     }
@@ -328,14 +328,14 @@ export default function ProjectDetailPage() {
       toast.success("Colaborador recrutado com sucesso.");
       await Promise.all([loadCollaborators(), loadInscricoes()]);
     } catch (err) {
-      toast.error(err.message || "Nao foi possivel recrutar o colaborador.");
+      toast.error(err.message || "Não foi possível recrutar o colaborador.");
     } finally {
       setRecrutandoId(null);
     }
   };
 
   const getCollaboratorName = (c) =>
-    getUserName(c) || `Usuario #${getUserId(c) ?? "?"}`;
+    getUserName(c) || `Usuário #${getUserId(c) ?? "?"}`;
 
   const getCollaboratorId = (c) =>
     getUserId(c);
@@ -351,11 +351,11 @@ export default function ProjectDetailPage() {
   };
 
   const getInscricaoName = (i) =>
-    i?.alunoNome ?? i?.aluno?.usuario?.nome ?? i?.usuario?.nome ?? i?.nome ?? `Inscricao #${i?.id}`;
+    i?.alunoNome ?? i?.aluno?.usuario?.nome ?? i?.usuario?.nome ?? i?.nome ?? `Inscrição #${i?.id}`;
 
   if (loading) return <ProjectDetailSkeleton />;
   if (error || !project) {
-    return <StatusView title="Projeto indisponivel" description={error?.message || "Nao foi possivel localizar este projeto."} />;
+    return <StatusView title="Projeto indisponível" description={error?.message || "Não foi possível localizar este projeto."} />;
   }
 
   return (
@@ -438,7 +438,7 @@ export default function ProjectDetailPage() {
 
             <div className="detalhe-card__estatisticas">
               <div className="detalhe-card__stat-item"><Eye size={14} />{data.feedbacks.length} feedbacks</div>
-              <div className="detalhe-card__stat-item"><BarChart2 size={14} />{data.progress.length} atualizacoes</div>
+              <div className="detalhe-card__stat-item"><BarChart2 size={14} />{data.progress.length} atualizações</div>
               <div className="detalhe-card__stat-item">
                 <Clock size={14} />
                 Publicado em {project.createdAt ? new Date(project.createdAt).toLocaleDateString("pt-BR") : "-"}
@@ -470,10 +470,10 @@ export default function ProjectDetailPage() {
           </div>
 
           <div className="detalhe-card">
-            <h2 className="detalhe-card__titulo-secao">Cursos elegiveis</h2>
+            <h2 className="detalhe-card__titulo-secao">Cursos elegíveis</h2>
             <div className="detalhe-card__chips">
               {project.courses.length === 0 ? (
-                <span className="detalhe-card__chip-curso">Nao informado</span>
+                <span className="detalhe-card__chip-curso">Não informado</span>
               ) : (
                 project.courses.map((course) => (
                   <span key={course} className="detalhe-card__chip-curso">{course}</span>
@@ -483,10 +483,10 @@ export default function ProjectDetailPage() {
           </div>
 
           <div className="detalhe-card">
-            <h2 className="detalhe-card__titulo-secao">Tecnologias e competencias</h2>
+            <h2 className="detalhe-card__titulo-secao">Tecnologias e competências</h2>
             <div className="detalhe-card__chips">
               {project.tags.length === 0 ? (
-                <span className="detalhe-card__chip-tag">Nao informado</span>
+                <span className="detalhe-card__chip-tag">Não informado</span>
               ) : (
                 project.tags.map((tag) => (
                   <span key={tag} className="detalhe-card__chip-tag">{tag}</span>
@@ -495,21 +495,21 @@ export default function ProjectDetailPage() {
             </div>
           </div>
 
-          {/* Inscricoes pendentes (apenas dono) */}
+          {/* Inscrições pendentes (apenas dono) */}
           {isOwner && (
             <div className="detalhe-card">
               <div className="detalhe-card__linha-inscricoes">
-                <h2 className="detalhe-card__titulo-secao detalhe-card__titulo-secao--inline">Inscricoes pendentes</h2>
+                <h2 className="detalhe-card__titulo-secao detalhe-card__titulo-secao--inline">Inscrições pendentes</h2>
                 <button
                   type="button"
                   onClick={() => navigate(`/app/projects/${id}/applications`)}
                   className="detalhe-card__link-gerir-inscricoes"
                 >
-                  <Users size={15} /> Gerenciar inscricoes
+                  <Users size={15} /> Gerenciar inscrições
                 </button>
               </div>
               {inscricoes.length === 0 ? (
-                <p className="detalhe-card__descricao">Nenhuma inscricao pendente.</p>
+                <p className="detalhe-card__descricao">Nenhuma inscrição pendente.</p>
               ) : (
                 <div className="detalhe-colaboradores__lista">
                   {inscricoes.map((insc) => (
@@ -542,7 +542,7 @@ export default function ProjectDetailPage() {
               {[
                 { icon: Users, label: "Vagas disponiveis", value: `${slots.remaining}/${slots.total}` },
                 { icon: Clock, label: "Criado em", value: project.createdAt ? new Date(project.createdAt).toLocaleDateString("pt-BR") : "-" },
-                { icon: BookOpen, label: "Area", value: project.area },
+                { icon: BookOpen, label: "Área", value: project.area },
               ].map((item) => (
                 <div key={item.label} className="card-inscricao__stat">
                   <div className="card-inscricao__stat-linha">
@@ -595,11 +595,11 @@ export default function ProjectDetailPage() {
                 <span className="card-orientador__info-valor">{project.advisor?.email ?? "-"}</span>
               </div>
               <div className="card-orientador__info-linha">
-                <span className="card-orientador__info-label">Feedback medio</span>
+                <span className="card-orientador__info-label">Feedback médio</span>
                 <span className="card-orientador__info-valor">{feedbackAverage}</span>
               </div>
               <div className="card-orientador__info-linha">
-                <span className="card-orientador__info-label">Atualizacoes</span>
+                <span className="card-orientador__info-label">Atualizações</span>
                 <span className="card-orientador__info-valor">{data.progress.length}</span>
               </div>
             </div>
@@ -681,24 +681,24 @@ export default function ProjectDetailPage() {
         >
           <div className="modal-inscricao__painel">
             <div className="modal-inscricao__cabecalho">
-              <h3 className="modal-inscricao__titulo">Inscricao no projeto</h3>
+              <h3 className="modal-inscricao__titulo">Inscrição no projeto</h3>
               <p className="modal-inscricao__subtitulo">{project.title}</p>
             </div>
             <div className="modal-inscricao__corpo">
               <div>
-                <label className="modal-inscricao__label">Carta de motivacao</label>
+                <label className="modal-inscricao__label">Carta de motivação</label>
                 <textarea
                   value={motivation}
                   onChange={(e) => setMotivation(e.target.value)}
                   rows={5}
                   maxLength={1500}
                   className="modal-inscricao__textarea"
-                  placeholder="Escreva sua motivacao para o projeto..."
+                  placeholder="Escreva sua motivação para o projeto..."
                 />
                 <p className="modal-inscricao__contador">{motivation.length}/1500 caracteres</p>
               </div>
               <div>
-                <label className="modal-inscricao__label">Documento da inscricao</label>
+                <label className="modal-inscricao__label">Documento da inscrição</label>
                 <label className="modal-inscricao__arquivo">
                   <Upload size={16} />
                   <span>{documentFile ? documentFile.name : "Anexar PDF, JPG ou PNG"}</span>
@@ -722,7 +722,7 @@ export default function ProjectDetailPage() {
                 Cancelar
               </button>
               <button type="button" onClick={handleApply} disabled={loadingApply || uploadingDocumento} className="modal-inscricao__botao-enviar">
-                {loadingApply || uploadingDocumento ? <div className="modal-inscricao__spinner" /> : <><Send size={15} /> Enviar inscricao</>}
+                {loadingApply || uploadingDocumento ? <div className="modal-inscricao__spinner" /> : <><Send size={15} /> Enviar inscrição</>}
               </button>
             </div>
           </div>
@@ -751,7 +751,7 @@ export default function ProjectDetailPage() {
                 ))}
               </div>
               <div>
-                <label className="modal-inscricao__label">Comentario</label>
+                <label className="modal-inscricao__label">Comentário</label>
                 <textarea
                   value={feedbackComment}
                   onChange={(e) => setFeedbackComment(e.target.value)}
@@ -768,7 +768,7 @@ export default function ProjectDetailPage() {
                 Cancelar
               </button>
               <button type="button" onClick={handleProjectFeedback} disabled={feedbackLoading || feedbackRating === 0} className="modal-inscricao__botao-enviar">
-                {feedbackLoading ? <div className="modal-inscricao__spinner" /> : <><Send size={15} /> Enviar avaliacao</>}
+                {feedbackLoading ? <div className="modal-inscricao__spinner" /> : <><Send size={15} /> Enviar avaliação</>}
               </button>
             </div>
           </div>
@@ -784,7 +784,7 @@ export default function ProjectDetailPage() {
             </div>
             <h3 className="modal-inscricao__titulo">Excluir projeto</h3>
             <p className="modal-confirmacao__texto">
-              Tem certeza que deseja excluir <strong>{project.title}</strong>? Esta acao nao pode ser desfeita.
+              Tem certeza que deseja excluir <strong>{project.title}</strong>? Esta ação não pode ser desfeita.
             </p>
             <div className="modal-inscricao__rodape">
               <button onClick={() => setShowDeleteConfirm(false)} className="modal-inscricao__botao-cancelar" disabled={deleteLoading}>

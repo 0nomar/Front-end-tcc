@@ -9,14 +9,14 @@ import "./DashboardLayout.css";
 const pageTitles = {
   "/app": { title: "Dashboard", subtitle: "Bem-vindo de volta" },
   "/app/projects": { title: "Projetos", subtitle: "Explore oportunidades de pesquisa" },
-  "/app/applications": { title: "Minhas Inscricoes", subtitle: "Acompanhe o status das suas candidaturas" },
+  "/app/applications": { title: "Minhas Inscrições", subtitle: "Acompanhe o status das suas candidaturas" },
   "/app/chat": { title: "Mensagens", subtitle: "Conversas com orientadores" },
   "/app/progress": { title: "Progresso do Projeto", subtitle: "Acompanhe o andamento da sua pesquisa" },
-  "/app/feedback": { title: "Feedback", subtitle: "Avaliacoes e comentarios" },
-  "/app/profile": { title: "Meu Perfil", subtitle: "Gerencie suas informacoes pessoais" },
+  "/app/feedback": { title: "Feedback", subtitle: "Avaliações e comentários" },
+  "/app/profile": { title: "Meu Perfil", subtitle: "Gerencie suas informações pessoais" },
   "/app/documents": { title: "Documentos", subtitle: "Seus arquivos enviados" },
-  "/app/notifications": { title: "Notificacoes", subtitle: "Suas atualizacoes recentes" },
-  "/app/configuracoes": { title: "Configuracoes", subtitle: "Preferencias da conta" },
+  "/app/notifications": { title: "Notificações", subtitle: "Suas atualizações recentes" },
+  "/app/configuracoes": { title: "Configurações", subtitle: "Preferências da conta" },
 };
 
 export function DashboardLayout() {
@@ -25,7 +25,7 @@ export function DashboardLayout() {
   const location = useLocation();
   const { user } = useAuth();
 
-  const baseInfo = pageTitles[location.pathname] || { title: "Iniciacao Cientifica", subtitle: "" };
+  const baseInfo = pageTitles[location.pathname] || { title: "Iniciação Científica", subtitle: "" };
   const pageInfo = {
     ...baseInfo,
     subtitle:

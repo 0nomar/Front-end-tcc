@@ -80,7 +80,7 @@ export async function createApplicationViaApi(request: APIRequestContext, token:
   const learnerToken = auth.token as string;
   const app = await request.post(`${API_URL}/api/inscricoes`, {
     headers: { Authorization: `Bearer ${learnerToken}` },
-    data: { projetoId: projectId, motivacao: "Inscricao E2E" },
+    data: { projetoId: projectId, motivacao: "Inscrição E2E" },
   });
   expect(app.ok()).toBeTruthy();
 }

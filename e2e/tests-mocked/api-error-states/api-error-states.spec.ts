@@ -19,7 +19,7 @@ const cases = [
     name: "inscricoes do projeto",
     path: "/app/projects/2/applications",
     fail: /^\/api\/inscricoes\/projeto\/2$/,
-    expected: "Nao foi possivel carregar",
+    expected: "Não foi possível carregar",
     user: mockUsers.advisor,
   },
   {

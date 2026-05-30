@@ -22,7 +22,7 @@ export default function LoginPage() {
       await login({ email, senha: password });
       navigate("/app");
     } catch (err) {
-      setError(err.message || "Nao foi possivel entrar. Verifique suas credenciais.");
+      setError(err.message || "Não foi possível entrar. Verifique suas credenciais.");
     } finally {
       setLoading(false);
     }

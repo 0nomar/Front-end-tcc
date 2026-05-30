@@ -31,12 +31,12 @@ export function formatApplicationStatus(value) {
 
 export function formatNotificationType(value) {
   const map = {
-    SOLICITACAO_ORIENTACAO: "Solicitacao de orientacao",
+    SOLICITACAO_ORIENTACAO: "Solicitação de orientação",
     PROJETO_ACEITO: "Projeto aceito",
     PROJETO_REJEITADO: "Projeto recusado",
-    INSCRICAO_RECEBIDA: "Inscricao recebida",
-    INSCRICAO_APROVADA: "Inscricao aprovada",
-    INSCRICAO_REJEITADA: "Inscricao rejeitada",
+    INSCRICAO_RECEBIDA: "Inscrição recebida",
+    INSCRICAO_APROVADA: "Inscrição aprovada",
+    INSCRICAO_REJEITADA: "Inscrição rejeitada",
     MENSAGEM_RECEBIDA: "Mensagem recebida",
     PROGRESSO_REGISTRADO: "Progresso registrado",
   };
