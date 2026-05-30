@@ -116,8 +116,10 @@ export default function ProgressPage() {
   const completionPercent = useMemo(() => {
     if (!selectedProject) return 0;
     if (selectedProject.status === "FINALIZADO") return 100;
-    if (selectedProject.status === "EM_ANDAMENTO") return 65;
-    return selectedProgress.length > 0 ? 30 : 10;
+    const updatesProgress = Math.min(selectedProgress.length * 15, 70);
+    if (selectedProject.status === "EM_ANDAMENTO") return Math.min(50 + updatesProgress, 95);
+    if (selectedProject.status === "ABERTO") return Math.min(15 + updatesProgress, 85);
+    return selectedProgress.length > 0 ? Math.min(10 + updatesProgress, 75) : 0;
   }, [selectedProject, selectedProgress]);
 
   const handleAddUpdate = async () => {

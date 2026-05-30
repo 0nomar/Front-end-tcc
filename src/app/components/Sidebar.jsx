@@ -9,9 +9,7 @@ import {
   TrendingUp,
   Star,
   User,
-  Upload,
   Bell,
-  LogOut,
   ChevronLeft,
   FlaskConical,
   Settings,
@@ -19,37 +17,27 @@ import {
 import { useAuth } from "../hooks/useAuth";
 import { useAsyncData } from "../hooks/useAsyncDataHook";
 import { notificationService } from "../services/notificationService";
-import { formatUserType } from "../utils/formatters";
 import "./Sidebar.css";
 
 const navItems = [
   { path: "/app", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { path: "/app/projects", label: "Projetos", icon: FolderOpen },
-  { path: "/app/applications", label: "Inscrições", icon: FileText },
+  { path: "/app/applications", label: "Inscricoes", icon: FileText, roles: ["ALUNO"] },
   { path: "/app/chat", label: "Mensagens", icon: MessageSquare },
   { path: "/app/progress", label: "Progresso", icon: TrendingUp },
   { path: "/app/feedback", label: "Feedback", icon: Star },
-  { path: "/app/notifications", label: "Notificações", icon: Bell },
-  { path: "/app/documents", label: "Documentos", icon: Upload },
-  // { path: "/app/profile", label: "Meu Perfil", icon: User },
+  { path: "/app/notifications", label: "Notificacoes", icon: Bell },
+  { path: "/app/profile", label: "Meu Perfil", icon: User },
 ];
 
-function getInitials(name) {
-  if (!name) return "IC";
-  return name
-    .split(" ")
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("");
-}
-
 export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { data, reload } = useAsyncData(
     () => notificationService.listMine(),
     [],
     { initialData: [] }
   );
+
   useEffect(() => {
     const atualizar = () => {
       reload();
@@ -61,12 +49,10 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
       window.removeEventListener("notificationsUpdated", atualizar);
     };
   }, [reload]);
+
   const notifications = Array.isArray(data) ? data : [];
   const unreadCount = notifications.filter((item) => !item.lida).length;
-
-  const handleLogout = async () => {
-    await logout();
-  };
+  const visibleNavItems = navItems.filter((item) => !item.roles || item.roles.includes(user?.tipo));
 
   const SidebarContent = () => (
     <div className="barra-lateral__conteudo-interno">
@@ -77,13 +63,13 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
         {!collapsed && (
           <div>
             <p className="barra-lateral__nome-app">CollabResearch</p>
-            <p className="barra-lateral__subtitulo-app">Iniciação Científica</p>
+            <p className="barra-lateral__subtitulo-app">Iniciacao Cientifica</p>
           </div>
         )}
       </div>
 
       <nav className="barra-lateral__navegacao">
-        {navItems.map((item) => (
+        {visibleNavItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
@@ -121,7 +107,7 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
                     {item.label}
                   </span>
                 )}
-                {!collapsed && item.label === "Notificações" && unreadCount > 0 && (
+                {!collapsed && item.path === "/app/notifications" && unreadCount > 0 && (
                   <span className="barra-lateral__contador">{unreadCount}</span>
                 )}
               </>
@@ -137,30 +123,8 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
           onClick={() => setMobileOpen(false)}
         >
           <Settings size={18} className="barra-lateral__icone-nav" />
-          {!collapsed && <span className="barra-lateral__rotulo-nav">Configurações</span>}
+          {!collapsed && <span className="barra-lateral__rotulo-nav">Configuracoes</span>}
         </NavLink>
-
-        {/* <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.97 }}
-          onClick={handleLogout}
-          className={`barra-lateral__botao-sair ${collapsed ? "barra-lateral__botao-sair--centralizado" : ""}`}
-        >
-          <LogOut size={18} style={{ flexShrink: 0 }} />
-          {!collapsed && <span className="barra-lateral__rotulo-nav">Sair</span>}
-        </motion.button> */}
-
-        {/* {!collapsed && (
-          <div className="barra-lateral__perfil-usuario">
-            <div className="barra-lateral__avatar-usuario">
-              <span className="barra-lateral__iniciais-usuario">{getInitials(user?.nome)}</span>
-            </div>
-            <div className="barra-lateral__info-usuario">
-              <p className="barra-lateral__nome-usuario">{user?.nome ?? "Usuario"}</p>
-              <p className="barra-lateral__tipo-usuario">{formatUserType(user?.tipo)}</p>
-            </div>
-          </div>
-        )} */}
       </div>
     </div>
   );

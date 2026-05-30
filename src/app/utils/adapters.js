@@ -229,13 +229,22 @@ export function mapNotification(notification) {
 }
 
 export function mapFeedback(feedback) {
+  const avaliador = feedback?.avaliadorNome
+    ? {
+        id: feedback?.avaliadorId ?? null,
+        nome: feedback.avaliadorNome,
+        name: feedback.avaliadorNome,
+        tipo: feedback?.avaliadorTipo ?? "",
+      }
+    : feedback?.aluno?.usuario ?? feedback?.usuario ?? null;
+
   return {
     id: feedback?.id,
     rating: feedback?.nota ?? feedback?.rating ?? 0,
     comment: feedback?.comentario ?? feedback?.comment ?? "",
-    date: feedback?.dataCriacao ?? feedback?.date ?? null,
+    date: feedback?.dataFeedback ?? feedback?.dataCriacao ?? feedback?.date ?? null,
     project: feedback?.projeto ? mapProject(feedback.projeto) : null,
-    from: feedback?.aluno?.usuario ?? feedback?.usuario ?? null,
+    from: avaliador,
   };
 }
 
@@ -255,7 +264,9 @@ export function mapDocument(document) {
     id: document?.id,
     name: document?.nomeArquivo ?? document?.name ?? "Documento",
     type: document?.tipo ?? "CURRICULO",
-    uploadedAt: document?.dataUpload ?? document?.uploadedAt ?? null,
-    status: "verified",
+    uploadedAt: document?.dataEnvio ?? document?.dataUpload ?? document?.uploadedAt ?? null,
+    status: document?.status ?? "ENVIADO",
+    previewUrl: document?.previewUrl ?? null,
+    downloadUrl: document?.downloadUrl ?? null,
   };
 }

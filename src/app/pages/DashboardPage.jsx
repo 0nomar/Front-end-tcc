@@ -154,7 +154,9 @@ export default function DashboardPage() {
     const applications = data?.applications ?? [];
     const notifications = data?.notifications ?? [];
 
-    const activeProjects = projects.filter((item) => item.status !== "FINALIZADO").length;
+    const activeProjects = user?.tipo === "ORIENTADOR"
+      ? projects.filter((item) => Number(item.advisorId) === Number(user.id) && item.status !== "FINALIZADO").length
+      : applications.filter((item) => item.status === "APROVADO" && item.project?.status !== "FINALIZADO").length;
     const unreadNotifications = notifications.filter((item) => !item.read).length;
     const recentProjects = projects.slice(0, 3);
     const recentApplications = applications.slice(0, 4);
@@ -169,7 +171,7 @@ export default function DashboardPage() {
       unreadNotifications,
       activityData,
     };
-  }, [data]);
+  }, [data, user?.id, user?.tipo]);
 
   if (loading) return <DashboardSkeleton />;
 

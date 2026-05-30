@@ -6,6 +6,7 @@ import { userService } from "../services/userService";
 import { conversationService } from "../services/conversationService";
 import { formatUserType } from "../utils/formatters";
 import { StatusView } from "../components/StatusView";
+import { ProfileDocuments } from "../components/ProfileDocuments";
 import { toast } from "sonner";
 import "./ProfilePage.css";
 
@@ -19,15 +20,17 @@ export default function UserProfilePage() {
   const navigate = useNavigate();
 
   const { data, loading, error } = useAsyncData(async () => {
-    const [profile, projects] = await Promise.all([
+    const [profile, projects, documents] = await Promise.all([
       userService.getById(id),
       userService.getProjects(id).catch(() => []),
+      userService.getDocuments(id).catch(() => []),
     ]);
     return {
       profile,
       projects: Array.isArray(projects) ? projects : projects?.content ?? [],
+      documents: Array.isArray(documents) ? documents : [],
     };
-  }, [id], { initialData: { profile: null, projects: [] } });
+  }, [id], { initialData: { profile: null, projects: [], documents: [] } });
 
   const handleEnviarMensagem = async () => {
     try {
@@ -146,6 +149,12 @@ export default function UserProfilePage() {
               <p style={{ color: "var(--cor-texto-medio)", fontSize: "var(--tamanho-medio)", lineHeight: 1.7 }}>
                 {profile.bio}
               </p>
+            </div>
+          )}
+
+          {profile.tipo === "ALUNO" && (
+            <div className="secao-perfil">
+              <ProfileDocuments userId={id} documents={data.documents} editable={false} />
             </div>
           )}
 

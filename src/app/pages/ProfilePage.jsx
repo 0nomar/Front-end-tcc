@@ -8,6 +8,7 @@ import { applicationService } from "../services/applicationService";
 import { mapApplication } from "../utils/adapters";
 import { formatApplicationStatus, formatUserType } from "../utils/formatters";
 import { StatusView } from "../components/StatusView";
+import { ProfileDocuments } from "../components/ProfileDocuments";
 import "./ProfilePage.css";
 
 function ProfileSkeleton() {
@@ -80,18 +81,20 @@ function ProfileSkeleton() {
 
 export default function ProfilePage() {
   const { user, refreshUser } = useAuth();
-  const { data, loading, error } = useAsyncData(async () => {
-    if (!user?.id) return { profile: user, applications: [] };
-    const [profile, applications] = await Promise.all([
+  const { data, loading, error, reload } = useAsyncData(async () => {
+    if (!user?.id) return { profile: user, applications: [], documents: [] };
+    const [profile, applications, documents] = await Promise.all([
       userService.getById(user.id).catch(() => user),
       applicationService.listMine().catch(() => []),
+      userService.getDocuments(user.id).catch(() => []),
     ]);
 
     return {
       profile,
       applications: Array.isArray(applications) ? applications.map(mapApplication) : [],
+      documents: Array.isArray(documents) ? documents : [],
     };
-  }, [user?.id], { initialData: { profile: user, applications: [] } });
+  }, [user?.id], { initialData: { profile: user, applications: [], documents: [] } });
   const [editing, setEditing] = useState(false);
   const [loadingSave, setLoadingSave] = useState(false);
   const [form, setForm] = useState({
@@ -144,6 +147,7 @@ export default function ProfilePage() {
   }
 
   const profile = data.profile;
+  const isAluno = profile.tipo === "ALUNO";
 
   return (
     <div className="pagina-perfil">
@@ -252,6 +256,18 @@ export default function ProfilePage() {
             </div>
           </div>
 
+          {isAluno && (
+            <div className="secao-perfil">
+              <ProfileDocuments
+                userId={user.id}
+                documents={data.documents}
+                editable
+                onUploaded={reload}
+              />
+            </div>
+          )}
+
+          {isAluno && (
           <div className="secao-perfil">
             <h3 className="secao-perfil__titulo">Histórico acadêmico</h3>
             <div className="historico-academico__lista">
@@ -277,6 +293,7 @@ export default function ProfilePage() {
               )}
             </div>
           </div>
+          )}
         </div>
       </div>
     </div>

@@ -13,7 +13,6 @@ import ChatPage from "./pages/ChatPage";
 import ProgressPage from "./pages/ProgressPage";
 import FeedbackPage from "./pages/FeedbackPage";
 import ProfilePage from "./pages/ProfilePage";
-import DocumentsPage from "./pages/DocumentsPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import SettingsPage from "./pages/SettingsPage";
 import CreateProjectPage from "./pages/CreateProjectPage";
@@ -52,7 +51,7 @@ export const router = createBrowserRouter([
       { path: "progress", Component: ProgressPage },
       { path: "feedback", Component: FeedbackPage },
       { path: "profile", Component: ProfilePage },
-      { path: "documents", Component: DocumentsPage },
+      { path: "documents", Component: ProfilePage },
       { path: "notifications", Component: NotificationsPage },
       { path: "configuracoes", Component: SettingsPage },
       { path: "users/:id", Component: UserProfilePage },

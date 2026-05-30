@@ -32,7 +32,7 @@
 .pagina-app__conteudo {
   flex: 1;
   padding: var(--espaco-4);
-  overflow: auto;
+  overflow: visible;
   overflow-x: clip;
 }
 

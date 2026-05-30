@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router";
 import {
   ArrowLeft, Users, Clock, BookOpen, Send, Mail, MessageSquare,
   Share2, Bookmark, BarChart2, Eye, CheckCircle, Pencil, Trash2,
-  UserPlus, UserMinus, Loader2, AlertTriangle, Star, Upload,
+  UserPlus, UserMinus, Loader2, AlertTriangle, Star,
   XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -13,8 +13,6 @@ import { useAuth } from "../hooks/useAuth";
 import { projectService } from "../services/projectService";
 import { applicationService } from "../services/applicationService";
 import { feedbackService } from "../services/feedbackService";
-import { documentService } from "../services/documentService";
-import { useUploadDocumento } from "../../hooks/useUploadDocumento";
 import { StatusView } from "../components/StatusView";
 import {
   getProjectSlotsUsage,
@@ -99,10 +97,8 @@ export default function ProjectDetailPage() {
   const [saved, setSaved] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [motivation, setMotivation] = useState("");
-  const [documentFile, setDocumentFile] = useState(null);
   const [loadingApply, setLoadingApply] = useState(false);
   const [orientationActionLoading, setOrientationActionLoading] = useState(null);
-  const { upload: uploadDocumento, uploading: uploadingDocumento, erro: uploadErro, progresso: uploadProgresso } = useUploadDocumento();
 
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [feedbackRating, setFeedbackRating] = useState(0);
@@ -148,6 +144,8 @@ export default function ProjectDetailPage() {
     return (project.ownerId != null && uid === Number(project.ownerId))
         || (project.advisorId != null && uid === Number(project.advisorId));
   }, [user, project]);
+
+  const canApply = user?.tipo === "ALUNO" && !isOwner;
 
   const canReviewGuidance = useMemo(() => {
     if (!user?.id || !project) return false;
@@ -216,26 +214,9 @@ export default function ProjectDetailPage() {
     setLoadingApply(true);
     try {
       await applicationService.create(id, motivation.trim());
-      let documentWarning = null;
-      if (documentFile) {
-        try {
-          const result = await uploadDocumento(documentFile, `usuarios/${user?.id}/inscricoes/${id}`);
-          if (!result?.publicUrl) {
-          throw new Error("Não foi possível enviar o documento da inscrição.");
-          }
-          await documentService.upload(user.id, "CURRICULO", documentFile.name, result.publicUrl);
-        } catch (err) {
-          documentWarning = err.message || "Não foi possível anexar o documento da inscrição.";
-        }
-      }
-      if (documentWarning) {
-        toast.warning(`Inscrição enviada, mas o documento não foi anexado. ${documentWarning}`);
-      } else {
       toast.success("Inscrição enviada com sucesso.");
-      }
       setShowModal(false);
       setMotivation("");
-      setDocumentFile(null);
       await reload();
     } catch (err) {
       toast.error(err.message || "Não foi possível enviar a inscrição.");
@@ -247,7 +228,6 @@ export default function ProjectDetailPage() {
   const closeApplyModal = () => {
     setShowModal(false);
     setMotivation("");
-    setDocumentFile(null);
   };
 
   const handleProjectFeedback = async () => {
@@ -554,12 +534,12 @@ export default function ProjectDetailPage() {
               ))}
             </div>
 
-            {project.status === "ABERTO" && !isOwner && slots.remaining > 0 ? (
+            {project.status === "ABERTO" && canApply && slots.remaining > 0 ? (
               <button onClick={() => setShowModal(true)} className="card-inscricao__botao-inscrever">
                 <Send size={16} /> Inscrever-se
               </button>
             ) : (
-              !isOwner && (
+              canApply && (
                 <div className="card-inscricao__status-encerrado">
                   {slots.remaining <= 0 ? "Vagas preenchidas" : formatProjectStatus(project.status)}
                 </div>
@@ -697,32 +677,13 @@ export default function ProjectDetailPage() {
                 />
                 <p className="modal-inscricao__contador">{motivation.length}/1500 caracteres</p>
               </div>
-              <div>
-                <label className="modal-inscricao__label">Documento da inscrição</label>
-                <label className="modal-inscricao__arquivo">
-                  <Upload size={16} />
-                  <span>{documentFile ? documentFile.name : "Anexar PDF, JPG ou PNG"}</span>
-                  <input
-                    type="file"
-                    accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
-                    onChange={(e) => setDocumentFile(e.target.files?.[0] ?? null)}
-                    disabled={loadingApply || uploadingDocumento}
-                  />
-                </label>
-                {(uploadingDocumento || uploadProgresso > 0) && (
-                  <div className="modal-inscricao__progresso">
-                    <span style={{ width: `${uploadProgresso}%` }} />
-                  </div>
-                )}
-                {uploadErro && <p className="modal-inscricao__erro-upload">{uploadErro}</p>}
-              </div>
             </div>
             <div className="modal-inscricao__rodape">
               <button type="button" onClick={closeApplyModal} className="modal-inscricao__botao-cancelar" disabled={loadingApply}>
                 Cancelar
               </button>
-              <button type="button" onClick={handleApply} disabled={loadingApply || uploadingDocumento} className="modal-inscricao__botao-enviar">
-                {loadingApply || uploadingDocumento ? <div className="modal-inscricao__spinner" /> : <><Send size={15} /> Enviar inscrição</>}
+              <button type="button" onClick={handleApply} disabled={loadingApply} className="modal-inscricao__botao-enviar">
+                {loadingApply ? <div className="modal-inscricao__spinner" /> : <><Send size={15} /> Enviar inscrição</>}
               </button>
             </div>
           </div>
