@@ -94,6 +94,14 @@ export const projectService = {
     return api.put(`/api/projetos/${id}`, dto);
   },
 
+  acceptGuidance(id) {
+    return api.put(`/api/projetos/${id}/aceitar-orientacao`);
+  },
+
+  rejectGuidance(id) {
+    return api.put(`/api/projetos/${id}/rejeitar-orientacao`);
+  },
+
   // delete
   remove(id) {
     return api.delete(`/api/projetos/${id}`);

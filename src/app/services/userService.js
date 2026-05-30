@@ -4,6 +4,9 @@ export const userService = {
   list() {
     return api.get("/api/usuarios");
   },
+  listAdvisors() {
+    return api.get("/api/usuarios/orientadores");
+  },
   getCurrentUser() {
     return api.get("/api/usuarios/me");
   },

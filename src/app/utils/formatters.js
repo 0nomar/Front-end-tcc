@@ -9,9 +9,11 @@ export function formatUserType(value) {
 
 export function formatProjectStatus(value) {
   const map = {
+    PENDENTE_ORIENTADOR: "Aguardando orientador",
     ABERTO: "Aberto",
     EM_ANDAMENTO: "Em andamento",
     FINALIZADO: "Finalizado",
+    REJEITADO_ORIENTADOR: "Recusado pelo orientador",
   };
 
   return map[value] ?? value ?? "-";
@@ -29,6 +31,9 @@ export function formatApplicationStatus(value) {
 
 export function formatNotificationType(value) {
   const map = {
+    SOLICITACAO_ORIENTACAO: "Solicitacao de orientacao",
+    PROJETO_ACEITO: "Projeto aceito",
+    PROJETO_REJEITADO: "Projeto recusado",
     INSCRICAO_RECEBIDA: "Inscricao recebida",
     INSCRICAO_APROVADA: "Inscricao aprovada",
     INSCRICAO_REJEITADA: "Inscricao rejeitada",
