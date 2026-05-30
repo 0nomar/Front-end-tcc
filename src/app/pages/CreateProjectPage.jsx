@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { ArrowLeft, FolderPlus, Loader2 } from "lucide-react";
 import { areaService } from "../services/areaService";
 import { projectService } from "../services/projectService";
+import { userService } from "../services/userService";
+import { useAuth } from "../hooks/useAuth";
 import { validateProjectDates } from "../utils/projectFormValidation";
 import "./CreateProjectPage.css";
 
@@ -17,17 +19,23 @@ const INITIAL_FORM = {
   dataInicio: "",
   dataFim: "",
   dataLimiteInscricao: "",
+  orientadorId: "",
 };
 
 export default function CreateProjectPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [form, setForm] = useState(INITIAL_FORM);
   const [areas, setAreas] = useState([]);
   const [areasLoading, setAreasLoading] = useState(true);
   const [areasError, setAreasError] = useState(null);
+  const [advisors, setAdvisors] = useState([]);
+  const [advisorsLoading, setAdvisorsLoading] = useState(false);
+  const [advisorsError, setAdvisorsError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const isStudent = user?.tipo === "ALUNO";
 
   useEffect(() => {
     let alive = true;
@@ -55,6 +63,38 @@ export default function CreateProjectPage() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isStudent) {
+      setAdvisors([]);
+      setAdvisorsLoading(false);
+      setAdvisorsError(null);
+      return;
+    }
+
+    let alive = true;
+
+    setAdvisorsLoading(true);
+    userService
+      .listAdvisors()
+      .then((payload) => {
+        if (!alive) return;
+        setAdvisors(Array.isArray(payload) ? payload : []);
+      })
+      .catch(() => {
+        if (!alive) return;
+        setAdvisors([]);
+        setAdvisorsError("Nao foi possivel carregar os orientadores cadastrados.");
+      })
+      .finally(() => {
+        if (!alive) return;
+        setAdvisorsLoading(false);
+      });
+
+    return () => {
+      alive = false;
+    };
+  }, [isStudent]);
+
   function handleChange(e) {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -67,6 +107,8 @@ export default function CreateProjectPage() {
     if (!form.titulo.trim()) { setError("O titulo e obrigatorio."); return; }
     if (!form.areaId) { setError("Selecione uma area de pesquisa."); return; }
     if (!areas.some((area) => String(area.id) === form.areaId)) { setError("Selecione uma area cadastrada."); return; }
+    if (isStudent && !form.orientadorId) { setError("Selecione o orientador que deve avaliar o projeto."); return; }
+    if (isStudent && !advisors.some((advisor) => String(advisor.id) === form.orientadorId)) { setError("Selecione um orientador cadastrado."); return; }
     if (!form.vagas || Number(form.vagas) < 1) { setError("Informe o numero de vagas (minimo 1)."); return; }
     const dateError = validateProjectDates(form);
     if (dateError) { setError(dateError); return; }
@@ -85,6 +127,7 @@ export default function CreateProjectPage() {
         dataInicio: form.dataInicio || undefined,
         dataFim: form.dataFim || undefined,
         dataLimiteInscricao: form.dataLimiteInscricao || undefined,
+        orientadorId: isStudent ? Number(form.orientadorId) : undefined,
       };
 
       const created = await projectService.create(payload);
@@ -102,7 +145,8 @@ export default function CreateProjectPage() {
   }
 
   const areasUnavailable = !areasLoading && areas.length === 0;
-  const isDisabled = loading || success || areasUnavailable;
+  const advisorsUnavailable = isStudent && !advisorsLoading && advisors.length === 0;
+  const isDisabled = loading || success || areasUnavailable || advisorsUnavailable;
 
   return (
     <motion.div
@@ -149,6 +193,12 @@ export default function CreateProjectPage() {
           {areasUnavailable && (
             <div className="formulario-projeto__alerta formulario-projeto__alerta--erro" role="alert">
               {areasError ?? "Nenhuma area de pesquisa cadastrada. Solicite ao administrador o cadastro de uma area antes de criar projetos."}
+            </div>
+          )}
+
+          {advisorsUnavailable && (
+            <div className="formulario-projeto__alerta formulario-projeto__alerta--erro" role="alert">
+              {advisorsError ?? "Nenhum orientador ativo encontrado. Solicite ao administrador o cadastro de um orientador antes de criar projetos."}
             </div>
           )}
 
@@ -235,6 +285,27 @@ export default function CreateProjectPage() {
               />
             </div>
           </div>
+
+          {isStudent && (
+            <div className="formulario-projeto__campo">
+              <label htmlFor="orientadorId" className="formulario-projeto__rotulo">
+                Orientador <span className="formulario-projeto__obrigatorio">*</span>
+              </label>
+              <select
+                id="orientadorId" name="orientadorId"
+                value={form.orientadorId} onChange={handleChange}
+                className="formulario-projeto__select"
+                disabled={isDisabled || advisorsLoading}
+              >
+                <option value="">
+                  {advisorsLoading ? "Carregando..." : advisorsUnavailable ? "Nenhum orientador cadastrado" : "Selecione um orientador"}
+                </option>
+                {advisors.map((advisor) => (
+                  <option key={advisor.id} value={advisor.id}>{advisor.nome}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Datas */}
           <div className="formulario-projeto__grade-3">

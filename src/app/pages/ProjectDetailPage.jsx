@@ -5,6 +5,7 @@ import {
   ArrowLeft, Users, Clock, BookOpen, Send, Mail, MessageSquare,
   Share2, Bookmark, BarChart2, Eye, CheckCircle, Pencil, Trash2,
   UserPlus, UserMinus, Loader2, AlertTriangle, Star, Upload,
+  XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAsyncData } from "../hooks/useAsyncDataHook";
@@ -100,6 +101,7 @@ export default function ProjectDetailPage() {
   const [motivation, setMotivation] = useState("");
   const [documentFile, setDocumentFile] = useState(null);
   const [loadingApply, setLoadingApply] = useState(false);
+  const [orientationActionLoading, setOrientationActionLoading] = useState(null);
   const { upload: uploadDocumento, uploading: uploadingDocumento, erro: uploadErro, progresso: uploadProgresso } = useUploadDocumento();
 
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
@@ -147,6 +149,13 @@ export default function ProjectDetailPage() {
         || (project.advisorId != null && uid === Number(project.advisorId));
   }, [user, project]);
 
+  const canReviewGuidance = useMemo(() => {
+    if (!user?.id || !project) return false;
+    return project.status === "PENDENTE_ORIENTADOR"
+      && project.advisorId != null
+      && Number(user.id) === Number(project.advisorId);
+  }, [user, project]);
+
   const loadCollaborators = useCallback(async () => {
     setCollabLoading(true);
     try {
@@ -184,6 +193,10 @@ export default function ProjectDetailPage() {
 
   const statusClass = project?.status === "FINALIZADO"
     ? "detalhe-card__badge-status--encerrado"
+    : project?.status === "REJEITADO_ORIENTADOR"
+      ? "detalhe-card__badge-status--encerrado"
+      : project?.status === "PENDENTE_ORIENTADOR"
+        ? "detalhe-card__badge-status--pendente"
     : project?.status === "EM_ANDAMENTO"
       ? "detalhe-card__badge-status--andamento"
       : "detalhe-card__badge-status--aberto";
@@ -288,6 +301,24 @@ export default function ProjectDetailPage() {
     }
   };
 
+  const handleGuidanceDecision = async (decision) => {
+    setOrientationActionLoading(decision);
+    try {
+      if (decision === "accept") {
+        await projectService.acceptGuidance(id);
+        toast.success("Projeto aceito. Ele agora esta aberto para inscricoes.");
+      } else {
+        await projectService.rejectGuidance(id);
+        toast.success("Projeto recusado.");
+      }
+      await reload();
+    } catch (err) {
+      toast.error(err.message || "Nao foi possivel atualizar a solicitacao.");
+    } finally {
+      setOrientationActionLoading(null);
+    }
+  };
+
   const handleRecruter = async (inscricao) => {
     const uid = inscricao?.aluno?.usuario?.id ?? inscricao?.usuario?.id ?? inscricao?.id;
     if (!uid) return;
@@ -378,6 +409,32 @@ export default function ProjectDetailPage() {
             </div>
 
             <h1 className="detalhe-card__titulo-projeto">{project.title}</h1>
+
+            {canReviewGuidance && (
+              <div className="detalhe-card__orientacao-pendente">
+                <p className="detalhe-card__orientacao-texto">
+                  Este projeto aguarda seu aceite como orientador.
+                </p>
+                <div className="detalhe-card__orientacao-acoes">
+                  <button
+                    type="button"
+                    onClick={() => handleGuidanceDecision("reject")}
+                    className="detalhe-card__orientacao-botao detalhe-card__orientacao-botao--recusar"
+                    disabled={orientationActionLoading != null}
+                  >
+                    {orientationActionLoading === "reject" ? <Loader2 size={15} className="girando" /> : <><XCircle size={15} /> Recusar</>}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleGuidanceDecision("accept")}
+                    className="detalhe-card__orientacao-botao detalhe-card__orientacao-botao--aceitar"
+                    disabled={orientationActionLoading != null}
+                  >
+                    {orientationActionLoading === "accept" ? <Loader2 size={15} className="girando" /> : <><CheckCircle size={15} /> Aceitar</>}
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="detalhe-card__estatisticas">
               <div className="detalhe-card__stat-item"><Eye size={14} />{data.feedbacks.length} feedbacks</div>
