@@ -16,7 +16,13 @@ type CatalogItem = {
 type CreatedProject = {
   id: number;
   titulo: string;
+  tecnologias?: string;
   alunoCriadorNome?: string;
+};
+
+type Advisor = {
+  id: number;
+  nome: string;
 };
 
 export class ApiHelper {
@@ -85,16 +91,25 @@ export class ApiHelper {
     return { areas, cursos };
   }
 
+  async getAdvisors(token: string): Promise<Advisor[]> {
+    const advisors = await this.get<Advisor[]>("/api/usuarios/orientadores", token);
+    expect(advisors[0]).toEqual(expect.objectContaining({ id: expect.any(Number), nome: expect.any(String) }));
+    return advisors;
+  }
+
   async createProject(token: string, draft: ProjectDraft = buildProjectDraft()): Promise<CreatedProject> {
     const { areas, cursos } = await this.getCatalogs(token);
+    const advisors = await this.getAdvisors(token);
     const firstCourse = cursos[0]?.nome ?? "Ciencia da Computacao";
     const created = await this.post<CreatedProject>("/api/projetos", token, {
       titulo: draft.title,
       descricao: draft.description,
       requisitos: draft.requirements,
+      tecnologias: draft.technologies,
       areaId: areas[0].id,
       curso: firstCourse,
       vagas: draft.slots,
+      orientadorId: advisors[0].id,
     });
 
     expect(created.id).toBeGreaterThan(0);

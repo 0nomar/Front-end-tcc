@@ -36,8 +36,8 @@ export async function runProjectsCrudFlow(page: Page) {
   await page.getByPlaceholder("Ex: Sistema de deteccao de anomalias com IA").fill(project.title);
   await page.getByPlaceholder("Descreva os objetivos, metodologia e resultados esperados...").fill(project.description);
   await page.getByPlaceholder("Ex: Conhecimento em Python, estatistica basica").fill(project.requirements);
+  await page.getByPlaceholder("Ex: React, Spring Boot, PostgreSQL").fill(project.technologies);
   await page.locator("#areaId").selectOption({ index: 1 });
-  await page.locator("#curso").selectOption({ index: 1 });
   await page.getByPlaceholder("Ex: 3").fill(String(project.slots));
   await page.getByRole("button", { name: "Criar projeto" }).click();
   await expect(page.getByText("Projeto criado com sucesso! Redirecionando...")).toBeVisible();

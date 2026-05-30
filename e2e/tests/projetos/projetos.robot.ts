@@ -9,7 +9,14 @@ const API_URL = process.env.VITE_API_URL ?? "http://127.0.0.1:8080";
 export async function prepareAuthenticatedUser(request: APIRequestContext) {
   const user = buildLoginCandidate();
   const response = await request.post(`${API_URL}/api/auth/register`, {
-    data: { nome: user.nome, email: user.email, senha: user.senha, ra: user.ra },
+    data: {
+      nome: user.nome,
+      email: user.email,
+      senha: user.senha,
+      tipo: "ORIENTADOR",
+      departamento: "Computacao",
+      titulacao: "Doutor",
+    },
   });
   expect([200, 409]).toContain(response.status());
   return user;
@@ -26,19 +33,30 @@ export async function runCreateProjectFlow(page: Page) {
   await page.getByPlaceholder("Ex: Sistema de deteccao de anomalias com IA").fill(draft.title);
   await page.getByPlaceholder("Descreva os objetivos, metodologia e resultados esperados...").fill(draft.description);
   await page.getByPlaceholder("Ex: Conhecimento em Python, estatistica basica").fill(draft.requirements);
+  await page.getByPlaceholder("Ex: React, Spring Boot, PostgreSQL").fill(draft.technologies);
   await page.locator("#areaId").selectOption({ index: 1 });
-  await page.locator("#curso").selectOption({ index: 1 });
+  const advisorSelect = page.locator("#orientadorId");
+  if (await advisorSelect.isVisible()) {
+    await advisorSelect.selectOption({ index: 1 });
+  }
   await page.getByPlaceholder("Ex: 3").fill(String(draft.slots));
   await page.getByRole("button", { name: "Criar projeto" }).click();
   await expect(page).toHaveURL(/\/app\/projects\/\d+$/);
   await expect(page.getByRole("heading", { name: draft.title })).toBeVisible();
-  return draft.title;
+  return draft;
 }
 
-export async function assertProjectPersistedViaApi(request: APIRequestContext, token: string, projectId: number, title: string) {
+export async function assertProjectPersistedViaApi(
+  request: APIRequestContext,
+  token: string,
+  projectId: number,
+  draft: ReturnType<typeof buildProjectCandidate>,
+) {
   const api = new ApiHelper(request);
-  const project = await api.get<{ titulo: string }>(`/api/projetos/${projectId}`, token);
-  expect(project.titulo).toBe(title);
+  const project = await api.get<{ titulo: string; requisitos: string; tecnologias: string }>(`/api/projetos/${projectId}`, token);
+  expect(project.titulo).toBe(draft.title);
+  expect(project.requisitos).toBe(draft.requirements);
+  expect(project.tecnologias).toBe(draft.technologies);
 }
 
 export async function runOpenProjectAndFilter(page: Page, title: string) {

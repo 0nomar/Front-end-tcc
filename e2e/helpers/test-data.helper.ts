@@ -14,6 +14,7 @@ export type ProjectDraft = {
   title: string;
   description: string;
   requirements: string;
+  technologies: string;
   slots: number;
 };
 
@@ -42,6 +43,7 @@ export function buildProjectDraft(prefix = "ic"): ProjectDraft {
     title: `Projeto E2E ${unique(prefix)}`,
     description: "Pesquisa criada por teste E2E.",
     requirements: "Python, testes automatizados",
+    technologies: "React, Spring Boot, PostgreSQL",
     slots: 2,
   };
 }
