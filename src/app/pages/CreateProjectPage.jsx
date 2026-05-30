@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
-import { ArrowLeft, FolderPlus, Loader2 } from "lucide-react";
+import { ArrowLeft, FolderPlus, Loader2, Plus, X } from "lucide-react";
 import { areaService } from "../services/areaService";
 import { projectService } from "../services/projectService";
 import { userService } from "../services/userService";
@@ -13,7 +13,7 @@ const INITIAL_FORM = {
   titulo: "",
   descricao: "",
   requisitos: "",
-  tecnologias: "",
+  tecnologias: [],
   areaId: "",
   vagas: "",
   dataInicio: "",
@@ -35,7 +35,49 @@ export default function CreateProjectPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [technologyDraft, setTechnologyDraft] = useState("");
   const isStudent = user?.tipo === "ALUNO";
+
+  function parseTextList(value) {
+    return String(value ?? "")
+      .split(/[,;\n]+/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  function addTechnologies() {
+    const items = parseTextList(technologyDraft);
+    if (items.length === 0) return;
+
+    setForm((prev) => {
+      const existing = new Set(prev.tecnologias.map((item) => item.toLowerCase()));
+      const next = [...prev.tecnologias];
+      items.forEach((item) => {
+        const key = item.toLowerCase();
+        if (!existing.has(key)) {
+          existing.add(key);
+          next.push(item);
+        }
+      });
+      return { ...prev, tecnologias: next };
+    });
+    setTechnologyDraft("");
+    if (error) setError(null);
+  }
+
+  function removeTechnology(value) {
+    setForm((prev) => ({
+      ...prev,
+      tecnologias: prev.tecnologias.filter((item) => item !== value),
+    }));
+  }
+
+  function handleTechnologyKeyDown(e) {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      addTechnologies();
+    }
+  }
 
   useEffect(() => {
     let alive = true;
@@ -117,11 +159,18 @@ export default function CreateProjectPage() {
     setError(null);
 
     try {
+      const tecnologias = [...form.tecnologias];
+      parseTextList(technologyDraft).forEach((item) => {
+        if (!tecnologias.some((existing) => existing.toLowerCase() === item.toLowerCase())) {
+          tecnologias.push(item);
+        }
+      });
+
       const payload = {
         titulo: form.titulo.trim(),
         descricao: form.descricao.trim() || undefined,
         requisitos: form.requisitos.trim() || undefined,
-        tecnologias: form.tecnologias.trim() || undefined,
+        tecnologias: tecnologias.length > 0 ? tecnologias : undefined,
         areaId: Number(form.areaId),
         vagas: Number(form.vagas),
         dataInicio: form.dataInicio || undefined,
@@ -242,13 +291,45 @@ export default function CreateProjectPage() {
 
           <div className="formulario-projeto__campo">
             <label htmlFor="tecnologias" className="formulario-projeto__rotulo">Tecnologias e competencias</label>
-            <input
-              id="tecnologias" name="tecnologias" type="text"
-              value={form.tecnologias} onChange={handleChange}
-              placeholder="Ex: React, Spring Boot, PostgreSQL"
-              className="formulario-projeto__input"
-              disabled={isDisabled}
-            />
+            <div className="formulario-projeto__lista-input">
+              <input
+                id="tecnologias" name="tecnologias" type="text"
+                value={technologyDraft}
+                onChange={(e) => setTechnologyDraft(e.target.value)}
+                onKeyDown={handleTechnologyKeyDown}
+                onBlur={addTechnologies}
+                placeholder="Ex: React, Spring Boot, PostgreSQL"
+                className="formulario-projeto__input"
+                disabled={isDisabled}
+              />
+              <button
+                type="button"
+                className="formulario-projeto__botao-adicionar"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={addTechnologies}
+                disabled={isDisabled || !technologyDraft.trim()}
+                aria-label="Adicionar tecnologia"
+              >
+                <Plus size={16} />
+              </button>
+            </div>
+            {form.tecnologias.length > 0 && (
+              <div className="formulario-projeto__chips" aria-label="Tecnologias adicionadas">
+                {form.tecnologias.map((technology) => (
+                  <span key={technology} className="formulario-projeto__chip">
+                    {technology}
+                    <button
+                      type="button"
+                      onClick={() => removeTechnology(technology)}
+                      disabled={isDisabled}
+                      aria-label={`Remover ${technology}`}
+                    >
+                      <X size={13} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Area + Vagas */}

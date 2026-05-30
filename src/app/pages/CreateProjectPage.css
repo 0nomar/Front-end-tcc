@@ -146,6 +146,75 @@
   cursor: not-allowed;
 }
 
+.formulario-projeto__lista-input {
+  display: grid;
+  grid-template-columns: 1fr 2.75rem;
+  gap: var(--espaco-2);
+  align-items: center;
+}
+
+.formulario-projeto__botao-adicionar {
+  width: 2.75rem;
+  height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-grande);
+  background-color: var(--cor-branco);
+  color: var(--cor-primaria);
+  cursor: pointer;
+  transition: var(--transicao-normal);
+}
+
+.formulario-projeto__botao-adicionar:hover:not(:disabled) {
+  border-color: var(--cor-primaria);
+  background-color: var(--cor-fundo);
+}
+
+.formulario-projeto__botao-adicionar:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.formulario-projeto__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--espaco-2);
+}
+
+.formulario-projeto__chip {
+  min-height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-2);
+  padding: 0.35rem 0.45rem 0.35rem 0.75rem;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-grande);
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto);
+  font-size: var(--tamanho-pequeno);
+  font-weight: var(--peso-medio);
+}
+
+.formulario-projeto__chip button {
+  width: 1.35rem;
+  height: 1.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  background-color: transparent;
+  color: var(--cor-texto-mudo);
+  cursor: pointer;
+}
+
+.formulario-projeto__chip button:hover:not(:disabled) {
+  background-color: var(--cor-borda-clara);
+  color: var(--cor-texto);
+}
+
 /* Textarea */
 .formulario-projeto__textarea {
   width: 100%;
