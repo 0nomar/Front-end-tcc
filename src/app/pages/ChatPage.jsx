@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Send, Search, Loader2, Pencil, Trash2, X, Check } from "lucide-react";
+import { Send, Search, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../hooks/useAuth";
 import { conversationService } from "../services/conversationService";
@@ -46,6 +46,81 @@ function formatarDia(data) {
     month: "2-digit",
     year: "numeric",
   });
+}
+
+function ChatPageSkeleton() {
+  return (
+    <div className="pagina-chat" aria-busy="true">
+      <div className="pagina-chat__lista-conversas">
+        <div className="pagina-chat__cabecalho-lista">
+          <div className="chat-skeleton chat-skeleton--titulo" />
+          <div className="chat-skeleton chat-skeleton--busca" />
+        </div>
+        <div className="pagina-chat__rolagem-conversas">
+          {[0, 1, 2, 3, 4].map((item) => (
+            <div className="conversa-item conversa-item--skeleton" key={item}>
+              <div className="chat-skeleton chat-skeleton--avatar" />
+              <div className="conversa-item__info">
+                <div className="chat-skeleton chat-skeleton--linha-media" />
+                <div className="chat-skeleton chat-skeleton--linha-curta" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="pagina-chat__area-conversa pagina-chat__area-conversa--visivel">
+        <div className="pagina-chat__topo-conversa">
+          <div className="chat-skeleton chat-skeleton--topo" />
+        </div>
+        <MessageListSkeleton />
+        <div className="pagina-chat__area-input">
+          <div className="pagina-chat__linha-input">
+            <div className="chat-skeleton chat-skeleton--input" />
+            <div className="chat-skeleton chat-skeleton--botao" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MessageListSkeleton() {
+  return (
+    <div className="pagina-chat__mensagens pagina-chat__mensagens--skeleton">
+      <MessageSkeletonRows />
+    </div>
+  );
+}
+
+function MessageSkeletonRows() {
+  const rows = [
+    { side: "contato", width: "48%" },
+    { side: "usuario", width: "38%" },
+    { side: "contato", width: "56%" },
+    { side: "usuario", width: "44%" },
+  ];
+
+  return (
+    <>
+      <div className="chat-data-divider chat-data-divider--skeleton">
+        <span className="chat-skeleton chat-skeleton--data" />
+      </div>
+      {rows.map((row, index) => (
+        <div
+          className={`mensagem-linha mensagem-linha--${row.side}`}
+          key={`${row.side}-${index}`}
+        >
+          <div className="bolha-mensagem bolha-mensagem--skeleton" style={{ width: row.width }}>
+            {row.side === "contato" && <div className="chat-skeleton chat-skeleton--nome" />}
+            <div className="chat-skeleton chat-skeleton--texto" />
+            <div className="chat-skeleton chat-skeleton--texto chat-skeleton--texto-menor" />
+            <div className="chat-skeleton chat-skeleton--hora" />
+          </div>
+        </div>
+      ))}
+    </>
+  );
 }
 
 export default function ChatPage() {
@@ -226,7 +301,7 @@ export default function ChatPage() {
     }
   };
 
-  if (loading) return <StatusView title="Carregando..." description="Buscando conversas" />;
+  if (loading) return <ChatPageSkeleton />;
   if (error) return <StatusView title="Erro" description="Falha ao carregar" />;
 
   return (
@@ -288,10 +363,7 @@ export default function ChatPage() {
 
             <div className="pagina-chat__mensagens">
               {loadingMessages ? (
-                <div className="pagina-chat__loading-mensagens">
-                  <Loader2 size={24} className="pagina-chat__spinner" />
-                  <span>Carregando mensagens...</span>
-                </div>
+                <MessageSkeletonRows />
               ) : (
                 <>
                   {messages.map((m, i) => {
