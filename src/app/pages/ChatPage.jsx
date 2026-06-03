@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Send, Search, Pencil, Trash2 } from "lucide-react";
+import { Send, Search, Pencil, Trash2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../hooks/useAuth";
 import { conversationService } from "../services/conversationService";
@@ -176,6 +176,7 @@ export default function ChatPage() {
       : null;
     setSelectedConversation(target ?? conversations[0]);
     if (targetId) {
+      setShowMobileList(false);
       navigate(location.pathname, { replace: true, state: null });
     }
   }, [conversations, selectedConversation, location.state?.conversationId, location.pathname, navigate]);
@@ -356,6 +357,14 @@ export default function ChatPage() {
         {selectedConversation ? (
           <>
             <div className="pagina-chat__topo-conversa">
+              <button
+                type="button"
+                className="pagina-chat__botao-voltar"
+                onClick={() => setShowMobileList(true)}
+                aria-label="Voltar para a lista de conversas"
+              >
+                <ArrowLeft size={16} />
+              </button>
               <div>
                 <p className="pagina-chat__nome-contato">{selectedConversation?.titulo ?? "Conversa"}</p>
               </div>
