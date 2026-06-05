@@ -1,5 +1,5 @@
 import { NavLink } from "react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   LayoutDashboard,
@@ -13,10 +13,12 @@ import {
   ChevronLeft,
   FlaskConical,
   Settings,
+  Search,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { useAsyncData } from "../hooks/useAsyncDataHook";
 import { notificationService } from "../services/notificationService";
+import { SearchModal } from "./SearchModal";
 import "./Sidebar.css";
 
 const navItems = [
@@ -32,6 +34,8 @@ const navItems = [
 
 export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) {
   const { user } = useAuth();
+  const [searchOpen, setSearchOpen] = useState(false);
+
   const { data, reload } = useAsyncData(
     () => notificationService.listMine(),
     [],
@@ -39,24 +43,36 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
   );
 
   useEffect(() => {
-    const atualizar = () => {
-      reload();
-    };
-
+    const atualizar = () => reload();
     window.addEventListener("notificationsUpdated", atualizar);
-
-    return () => {
-      window.removeEventListener("notificationsUpdated", atualizar);
-    };
+    return () => window.removeEventListener("notificationsUpdated", atualizar);
   }, [reload]);
+
+  // Atalho de teclado Ctrl+K / Cmd+K
+  useEffect(() => {
+    const handler = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, []);
 
   const notifications = Array.isArray(data) ? data : [];
   const unreadCount = notifications.filter((item) => !item.lida).length;
-  const visibleNavItems = navItems.filter((item) => !item.roles || item.roles.includes(user?.tipo));
+  const visibleNavItems = navItems.filter(
+    (item) => !item.roles || item.roles.includes(user?.tipo)
+  );
 
   const SidebarContent = () => (
     <div className="barra-lateral__conteudo-interno">
-      <div className={`barra-lateral__cabecalho ${collapsed ? "barra-lateral__cabecalho--centralizado" : ""}`}>
+      <div
+        className={`barra-lateral__cabecalho ${
+          collapsed ? "barra-lateral__cabecalho--centralizado" : ""
+        }`}
+      >
         <div className="barra-lateral__logo">
           <FlaskConical size={18} className="barra-lateral__logo-icone" />
         </div>
@@ -66,6 +82,30 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
             <p className="barra-lateral__subtitulo-app">Iniciacao Cientifica</p>
           </div>
         )}
+      </div>
+
+      {/* Área de pesquisa */}
+      <div className="barra-lateral__pesquisa">
+        <button
+          className={`barra-lateral__botao-pesquisa ${
+            collapsed ? "barra-lateral__botao-pesquisa--recolhido" : ""
+          }`}
+          onClick={() => {
+            setMobileOpen(false);
+            setSearchOpen(true);
+          }}
+          title="Buscar (Ctrl+K)"
+        >
+          <Search size={15} className="barra-lateral__pesquisa-icone" />
+          {!collapsed && (
+            <>
+              <span className="barra-lateral__pesquisa-placeholder">
+                Buscar...
+              </span>
+              <span className="barra-lateral__pesquisa-atalho">CTRL+K</span>
+            </>
+          )}
+        </button>
       </div>
 
       <nav className="barra-lateral__navegacao">
@@ -107,9 +147,11 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
                     {item.label}
                   </span>
                 )}
-                {!collapsed && item.path === "/app/notifications" && unreadCount > 0 && (
-                  <span className="barra-lateral__contador">{unreadCount}</span>
-                )}
+                {!collapsed &&
+                  item.path === "/app/notifications" &&
+                  unreadCount > 0 && (
+                    <span className="barra-lateral__contador">{unreadCount}</span>
+                  )}
               </>
             )}
           </NavLink>
@@ -123,7 +165,9 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
           onClick={() => setMobileOpen(false)}
         >
           <Settings size={18} className="barra-lateral__icone-nav" />
-          {!collapsed && <span className="barra-lateral__rotulo-nav">Configuracoes</span>}
+          {!collapsed && (
+            <span className="barra-lateral__rotulo-nav">Configuracoes</span>
+          )}
         </NavLink>
       </div>
     </div>
@@ -131,7 +175,9 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
 
   return (
     <>
-      <aside className={`barra-lateral ${collapsed ? "barra-lateral--recolhida" : ""}`}>
+      <aside
+        className={`barra-lateral ${collapsed ? "barra-lateral--recolhida" : ""}`}
+      >
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.97 }}
@@ -140,7 +186,9 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
         >
           <ChevronLeft
             size={14}
-            className={`barra-lateral__icone-recolher ${collapsed ? "barra-lateral__icone-recolher--invertido" : ""}`}
+            className={`barra-lateral__icone-recolher ${
+              collapsed ? "barra-lateral__icone-recolher--invertido" : ""
+            }`}
           />
         </motion.button>
         <SidebarContent />
@@ -175,6 +223,8 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
           </motion.aside>
         )}
       </AnimatePresence>
+
+      {searchOpen && <SearchModal onClose={() => setSearchOpen(false)} />}
     </>
   );
 }

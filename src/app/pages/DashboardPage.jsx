@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { motion } from "framer-motion";
 import {
@@ -8,6 +8,7 @@ import {
   TrendingUp,
   ArrowRight,
   ChevronRight,
+  Search,
 } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
 import { useAuth } from "../hooks/useAuth";
@@ -16,6 +17,7 @@ import { projectService } from "../services/projectService";
 import { applicationService } from "../services/applicationService";
 import { notificationService } from "../services/notificationService";
 import { StatusView } from "../components/StatusView";
+import { SearchModal } from "../components/SearchModal";
 import {
   getProjectSeatHolders,
   getProjectSlotsUsage,
@@ -119,6 +121,36 @@ const statusClassMap = {
 export default function DashboardPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchRef = useRef(null);
+
+  // Fecha ao clicar fora da barra de pesquisa inline (não do modal)
+  useEffect(() => {
+    const handler = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        // noop — pesquisa inline não tem dropdown; modal fecha pelo próprio overlay
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    document.addEventListener("touchstart", handler);
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      document.removeEventListener("touchstart", handler);
+    };
+  }, []);
+
+  // Atalho Ctrl+K / Cmd+K
+  useEffect(() => {
+    const handler = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, []);
+
   const { data, loading, error } = useAsyncData(async () => {
     const [projects, applications, notifications] = await Promise.all([
       projectService.list(),
@@ -219,240 +251,257 @@ export default function DashboardPage() {
   ];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className="painel"
-    >
-      <div className="painel__banner-boas-vindas">
-        <div className="painel__decoracao-banner">
-          <div className="painel__decoracao-circulo-topo" />
-          <div className="painel__decoracao-circulo-base" />
-        </div>
-        <div className="painel__conteudo-banner">
-          <p className="painel__data-banner">
-            {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}
-          </p>
-          <h2 className="painel__titulo-banner">
-            <span className="painel__titulo-destaque">Olá, {user?.nome?.split(" ")[0] ?? "pesquisador"}!</span>
-          </h2>
-          <p className="painel__descricao-banner">
-            Você tem <strong className="painel__destaque-banner">{derived.unreadNotifications} notificações</strong> pendentes
-            e <strong className="painel__destaque-banner"> {derived.recentApplications.length} inscrições</strong> vinculadas ao seu perfil.
-          </p>
-          <div className="painel__botoes-banner">
-            <button
-              onClick={() => navigate("/app/projects")}
-              className="painel__botao-banner painel__botao-banner--primario"
-            >
-              <FolderOpen size={14} /> Buscar projetos
-            </button>
-            <button
-              onClick={() => navigate("/app/progress")}
-              className="painel__botao-banner painel__botao-banner--secundario"
-            >
-              <TrendingUp size={14} /> Ver progresso
-            </button>
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="painel"
+      >
+        {/* Banner de boas-vindas */}
+        <div className="painel__banner-boas-vindas">
+          <div className="painel__decoracao-banner">
+            <div className="painel__decoracao-circulo-topo" />
+            <div className="painel__decoracao-circulo-base" />
+          </div>
+          <div className="painel__conteudo-banner">
+            <p className="painel__data-banner">
+              {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })}
+            </p>
+            <h2 className="painel__titulo-banner">
+              <span className="painel__titulo-destaque">Olá, {user?.nome?.split(" ")[0] ?? "pesquisador"}!</span>
+            </h2>
+            <p className="painel__descricao-banner">
+              Você tem <strong className="painel__destaque-banner">{derived.unreadNotifications} notificações</strong> pendentes
+              e <strong className="painel__destaque-banner"> {derived.recentApplications.length} inscrições</strong> vinculadas ao seu perfil.
+            </p>
+            <div className="painel__botoes-banner">
+              <button
+                onClick={() => navigate("/app/projects")}
+                className="painel__botao-banner painel__botao-banner--primario"
+              >
+                <FolderOpen size={14} /> Buscar projetos
+              </button>
+              <button
+                onClick={() => navigate("/app/progress")}
+                className="painel__botao-banner painel__botao-banner--secundario"
+              >
+                <TrendingUp size={14} /> Ver progresso
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="painel__grade-resumos">
-        {statCards.map((card) => (
-          <motion.button
-            key={card.label}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            whileHover={{ scale: 1.03, boxShadow: "0 16px 30px rgba(37,99,235,0.18)" }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => navigate(card.href)}
-            className={`cartao-resumo ${card.bordaClass}`}
+        {/* Barra de pesquisa — visível apenas em mobile/tablet */}
+        <div className="painel__barra-pesquisa" ref={searchRef}>
+          <button
+            className="painel__campo-pesquisa"
+            onClick={() => setSearchOpen(true)}
           >
-            <div className="cartao-resumo__cabecalho">
-              <div className={`cartao-resumo__icone-area ${card.areaClass}`}>
-                <card.icon size={18} className={card.iconClass} />
-              </div>
-              <ChevronRight size={14} className="cartao-resumo__seta" />
-            </div>
-            <p className="cartao-resumo__valor">{card.value}</p>
-            <p className="cartao-resumo__descricao">{card.label}</p>
-          </motion.button>
-        ))}
-      </div>
-
-      <div className="painel__grade-principal">
-        <div className="painel__coluna-esquerda">
-          <div className="painel__card">
-            <div className="painel__card-cabecalho">
-              <h3 className="painel__card-titulo">Projetos recentes</h3>
-              <button onClick={() => navigate("/app/projects")} className="painel__link-ver-mais">
-                Ver detalhes <ArrowRight size={13} />
-              </button>
-            </div>
-            <div className="projeto-andamento__corpo">
-              {derived.recentProjects.length === 0 ? (
-                <StatusView title="Nenhum projeto encontrado" description="A API ainda não retornou projetos para exibir aqui." />
-              ) : (
-                derived.recentProjects.map((project) => (
-                  <div key={project.id} className="inscricao-item">
-                    <div className="inscricao-item__icone-area">
-                      <FolderOpen size={15} style={{ color: "var(--cor-texto-fraco)" }} />
-                    </div>
-                    <div className="inscricao-item__info">
-                      <p className="inscricao-item__titulo">{project.title}</p>
-                      <p className="inscricao-item__orientador">{project.advisor?.name ?? "Sem orientador"}</p>
-                    </div>
-                    <span className="inscricao-item__status inscricao-item__status--pendente">
-                      {formatProjectStatus(project.status)}
-                    </span>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          <div className="painel__card">
-            <div className="painel__card-cabecalho">
-              <h3 className="painel__card-titulo">Minhas inscrições</h3>
-              <button onClick={() => navigate("/app/applications")} className="painel__link-ver-mais">
-                Ver todas <ArrowRight size={13} />
-              </button>
-            </div>
-            <div>
-              {derived.recentApplications.length === 0 ? (
-                <StatusView title="Sem inscrições" description="Quando você se candidatar a projetos, elas aparecerão aqui." />
-              ) : (
-                derived.recentApplications.map((application, index) => (
-                  <motion.div
-                    key={application.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25, delay: index * 0.04 }}
-                    className="inscricao-item"
-                  >
-                    <div className="inscricao-item__icone-area">
-                      <FileText size={15} style={{ color: "var(--cor-texto-fraco)" }} />
-                    </div>
-                    <div className="inscricao-item__info">
-                      <p className="inscricao-item__titulo">{application.project?.title ?? "Projeto"}</p>
-                      <p className="inscricao-item__orientador">{application.project?.advisor?.name ?? "Sem orientador"}</p>
-                    </div>
-                    <span className={`inscricao-item__status ${statusClassMap[application.status] ?? "inscricao-item__status--pendente"}`}>
-                      {formatApplicationStatus(application.status)}
-                    </span>
-                  </motion.div>
-                ))
-              )}
-            </div>
-          </div>
-
-          <div className="painel__card-grafico">
-            <div className="painel__grafico-cabecalho">
-              <h3 className="painel__card-titulo">Atividade recente</h3>
-            </div>
-            <ResponsiveContainer width="100%" height={120}>
-              <AreaChart data={derived.activityData}>
-                <defs>
-                  <linearGradient id="colorAtiv" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#2563eb" stopOpacity={0.15} />
-                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#9ca3af" }} />
-                <YAxis hide />
-                <Tooltip
-                  contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 4px 24px rgba(0,0,0,0.1)", fontSize: "0.8rem" }}
-                  labelStyle={{ fontWeight: 600, color: "#374151" }}
-                />
-                <Area type="monotone" dataKey="atividade" stroke="#2563eb" strokeWidth={2} fill="url(#colorAtiv)" dot={{ fill: "#2563eb", strokeWidth: 2, r: 3 }} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+            <Search size={16} className="painel__icone-pesquisa" />
+            <span className="painel__pesquisa-placeholder">Buscar projetos, usuários...</span>
+            <span className="painel__pesquisa-atalho">CRTL+K</span>
+          </button>
         </div>
 
-        <div className="painel__coluna-direita">
-          <div className="painel__card painel__card-projetos-sugeridos">
-            <div className="painel__card-cabecalho">
-              <h3 className="painel__card-titulo">Projetos sugeridos</h3>
-              <button onClick={() => navigate("/app/projects")} className="painel__link-ver-mais">
-                Ver todos <ArrowRight size={12} />
-              </button>
-            </div>
-            <div className="painel__card-lista">
-              {derived.recentProjects.map((project, index) => {
-                const slots = getProjectSlotsUsage(project);
+        {/* Grade de cartões de resumo */}
+        <div className="painel__grade-resumos">
+          {statCards.map((card) => (
+            <motion.button
+              key={card.label}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              whileHover={{ scale: 1.03, boxShadow: "0 16px 30px rgba(37,99,235,0.18)" }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => navigate(card.href)}
+              className={`cartao-resumo ${card.bordaClass}`}
+            >
+              <div className="cartao-resumo__cabecalho">
+                <div className={`cartao-resumo__icone-area ${card.areaClass}`}>
+                  <card.icon size={18} className={card.iconClass} />
+                </div>
+                <ChevronRight size={14} className="cartao-resumo__seta" />
+              </div>
+              <p className="cartao-resumo__valor">{card.value}</p>
+              <p className="cartao-resumo__descricao">{card.label}</p>
+            </motion.button>
+          ))}
+        </div>
 
-                return (
-                  <motion.button
-                    key={project.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25, delay: index * 0.05 }}
-                    whileHover={{ scale: 1.03, boxShadow: "0 10px 24px rgba(37,99,235,0.12)" }}
-                    whileTap={{ scale: 0.97 }}
-                    onClick={() => navigate(`/app/projects/${project.id}`)}
-                    className="projeto-sugerido"
-                  >
-                    <div className="projeto-sugerido__linha">
-                      <div className="projeto-sugerido__icone-area">
-                        <FolderOpen size={14} style={{ color: "var(--cor-primaria)" }} />
+        {/* Grade principal */}
+        <div className="painel__grade-principal">
+          <div className="painel__coluna-esquerda">
+            <div className="painel__card">
+              <div className="painel__card-cabecalho">
+                <h3 className="painel__card-titulo">Projetos recentes</h3>
+                <button onClick={() => navigate("/app/projects")} className="painel__link-ver-mais">
+                  Ver detalhes <ArrowRight size={13} />
+                </button>
+              </div>
+              <div className="projeto-andamento__corpo">
+                {derived.recentProjects.length === 0 ? (
+                  <StatusView title="Nenhum projeto encontrado" description="A API ainda não retornou projetos para exibir aqui." />
+                ) : (
+                  derived.recentProjects.map((project) => (
+                    <div key={project.id} className="inscricao-item">
+                      <div className="inscricao-item__icone-area">
+                        <FolderOpen size={15} style={{ color: "var(--cor-texto-fraco)" }} />
                       </div>
-                      <div className="projeto-sugerido__info">
-                        <p className="projeto-sugerido__titulo">{project.title}</p>
-                        <div className="projeto-sugerido__metadados">
-                          <span className="projeto-sugerido__indicador-vaga" />
-                          <span className="projeto-sugerido__vagas">
-                            {slots.remaining} vagas
-                          </span>
+                      <div className="inscricao-item__info">
+                        <p className="inscricao-item__titulo">{project.title}</p>
+                        <p className="inscricao-item__orientador">{project.advisor?.name ?? "Sem orientador"}</p>
+                      </div>
+                      <span className="inscricao-item__status inscricao-item__status--pendente">
+                        {formatProjectStatus(project.status)}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <div className="painel__card">
+              <div className="painel__card-cabecalho">
+                <h3 className="painel__card-titulo">Minhas inscrições</h3>
+                <button onClick={() => navigate("/app/applications")} className="painel__link-ver-mais">
+                  Ver todas <ArrowRight size={13} />
+                </button>
+              </div>
+              <div>
+                {derived.recentApplications.length === 0 ? (
+                  <StatusView title="Sem inscrições" description="Quando você se candidatar a projetos, elas aparecerão aqui." />
+                ) : (
+                  derived.recentApplications.map((application, index) => (
+                    <motion.div
+                      key={application.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.25, delay: index * 0.04 }}
+                      className="inscricao-item"
+                    >
+                      <div className="inscricao-item__icone-area">
+                        <FileText size={15} style={{ color: "var(--cor-texto-fraco)" }} />
+                      </div>
+                      <div className="inscricao-item__info">
+                        <p className="inscricao-item__titulo">{application.project?.title ?? "Projeto"}</p>
+                        <p className="inscricao-item__orientador">{application.project?.advisor?.name ?? "Sem orientador"}</p>
+                      </div>
+                      <span className={`inscricao-item__status ${statusClassMap[application.status] ?? "inscricao-item__status--pendente"}`}>
+                        {formatApplicationStatus(application.status)}
+                      </span>
+                    </motion.div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <div className="painel__card-grafico">
+              <div className="painel__grafico-cabecalho">
+                <h3 className="painel__card-titulo">Atividade recente</h3>
+              </div>
+              <ResponsiveContainer width="100%" height={120}>
+                <AreaChart data={derived.activityData}>
+                  <defs>
+                    <linearGradient id="colorAtiv" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#2563eb" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#9ca3af" }} />
+                  <YAxis hide />
+                  <Tooltip
+                    contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 4px 24px rgba(0,0,0,0.1)", fontSize: "0.8rem" }}
+                    labelStyle={{ fontWeight: 600, color: "#374151" }}
+                  />
+                  <Area type="monotone" dataKey="atividade" stroke="#2563eb" strokeWidth={2} fill="url(#colorAtiv)" dot={{ fill: "#2563eb", strokeWidth: 2, r: 3 }} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="painel__coluna-direita">
+            <div className="painel__card painel__card-projetos-sugeridos">
+              <div className="painel__card-cabecalho">
+                <h3 className="painel__card-titulo">Projetos sugeridos</h3>
+                <button onClick={() => navigate("/app/projects")} className="painel__link-ver-mais">
+                  Ver todos <ArrowRight size={12} />
+                </button>
+              </div>
+              <div className="painel__card-lista">
+                {derived.recentProjects.map((project, index) => {
+                  const slots = getProjectSlotsUsage(project);
+                  return (
+                    <motion.button
+                      key={project.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.25, delay: index * 0.05 }}
+                      whileHover={{ scale: 1.03, boxShadow: "0 10px 24px rgba(37,99,235,0.12)" }}
+                      whileTap={{ scale: 0.97 }}
+                      onClick={() => navigate(`/app/projects/${project.id}`)}
+                      className="projeto-sugerido"
+                    >
+                      <div className="projeto-sugerido__linha">
+                        <div className="projeto-sugerido__icone-area">
+                          <FolderOpen size={14} style={{ color: "var(--cor-primaria)" }} />
+                        </div>
+                        <div className="projeto-sugerido__info">
+                          <p className="projeto-sugerido__titulo">{project.title}</p>
+                          <div className="projeto-sugerido__metadados">
+                            <span className="projeto-sugerido__indicador-vaga" />
+                            <span className="projeto-sugerido__vagas">{slots.remaining} vagas</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </motion.button>
-                );
-              })}
+                    </motion.button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
 
-          <div className="painel__card">
-            <div className="painel__card-cabecalho">
-              <h3 className="painel__card-titulo">Notificações</h3>
-              <button onClick={() => navigate("/app/notifications")} className="painel__link-ver-mais">
-                Ver todas <ArrowRight size={12} />
-              </button>
-            </div>
-            <div>
-              {derived.recentNotifications.length === 0 ? (
-                <StatusView title="Sem notificações" description="As notificações do sistema aparecerão aqui." />
-              ) : (
-                derived.recentNotifications.map((notif, index) => (
-                  <motion.div
-                    key={notif.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25, delay: index * 0.05 }}
-                    className={`notificacao-resumo ${!notif.read ? "notificacao-resumo--nao-lida" : ""}`}
-                  >
-                    <div className="notificacao-resumo__icone-area notificacao-resumo__icone-area--info">
-                      <Bell size={14} style={{ color: "var(--cor-primaria)" }} />
-                    </div>
-                    <div className="notificacao-resumo__info">
-                      <p className={`notificacao-resumo__titulo ${!notif.read ? "notificacao-resumo__titulo--nao-lida" : ""}`}>
-                        {notif.title}
-                      </p>
-                      <p className="notificacao-resumo__data">
-                        {notif.createdAt ? new Date(notif.createdAt).toLocaleDateString("pt-BR") : "-"}
-                      </p>
-                    </div>
-                    {!notif.read && <div className="notificacao-resumo__ponto-nao-lido" />}
-                  </motion.div>
-                ))
-              )}
+            <div className="painel__card">
+              <div className="painel__card-cabecalho">
+                <h3 className="painel__card-titulo">Notificações</h3>
+                <button onClick={() => navigate("/app/notifications")} className="painel__link-ver-mais">
+                  Ver todas <ArrowRight size={12} />
+                </button>
+              </div>
+              <div>
+                {derived.recentNotifications.length === 0 ? (
+                  <StatusView title="Sem notificações" description="As notificações do sistema aparecerão aqui." />
+                ) : (
+                  derived.recentNotifications.map((notif, index) => (
+                    <motion.div
+                      key={notif.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.25, delay: index * 0.05 }}
+                      className={`notificacao-resumo ${!notif.read ? "notificacao-resumo--nao-lida" : ""}`}
+                    >
+                      <div className="notificacao-resumo__icone-area notificacao-resumo__icone-area--info">
+                        <Bell size={14} style={{ color: "var(--cor-primaria)" }} />
+                      </div>
+                      <div className="notificacao-resumo__info">
+                        <p className={`notificacao-resumo__titulo ${!notif.read ? "notificacao-resumo__titulo--nao-lida" : ""}`}>
+                          {notif.title}
+                        </p>
+                        <p className="notificacao-resumo__data">
+                          {notif.createdAt ? new Date(notif.createdAt).toLocaleDateString("pt-BR") : "-"}
+                        </p>
+                      </div>
+                      {!notif.read && <div className="notificacao-resumo__ponto-nao-lido" />}
+                    </motion.div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </motion.div>
+      </motion.div>
+
+      {/* Modal de pesquisa — fecha ao clicar no overlay (mousedown + touchstart no próprio SearchModal) */}
+      {searchOpen && <SearchModal onClose={() => setSearchOpen(false)} />}
+    </>
   );
 }

@@ -2,7 +2,6 @@
    Sidebar.css — Estilos da barra lateral de navegação
    ============================================================ */
 
-/* ---- Conteúdo interno (compartilhado desktop/mobile) ---- */
 .barra-lateral__conteudo-interno {
   display: flex;
   flex-direction: column;
@@ -110,6 +109,62 @@
   color: var(--cor-texto-mudo);
 }
 
+/* ---- Área de pesquisa ---- */
+.barra-lateral__pesquisa {
+  padding: var(--espaco-3) var(--espaco-3);
+  border-bottom: 1px solid var(--cor-separador-suave);
+}
+
+.barra-lateral__botao-pesquisa {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-2);
+  width: 100%;
+  padding: 0.5rem var(--espaco-3);
+  background-color: var(--cor-fundo-leve);
+  border: 1px solid var(--cor-borda-clara);
+  border-radius: var(--raio-medio);
+  cursor: pointer;
+  transition: var(--transicao-normal);
+  color: var(--cor-texto-mudo);
+  font-family: var(--fonte-principal);
+  text-align: left;
+}
+
+.barra-lateral__botao-pesquisa:hover {
+  background-color: var(--cor-primaria-clara);
+  border-color: var(--cor-primaria-leve);
+  color: var(--cor-texto);
+}
+
+.barra-lateral__botao-pesquisa--recolhido {
+  justify-content: center;
+  padding: 0.5rem;
+  width: 2.25rem;
+  margin: 0 auto;
+}
+
+.barra-lateral__pesquisa-icone {
+  flex-shrink: 0;
+  color: var(--cor-texto-mudo);
+}
+
+.barra-lateral__pesquisa-placeholder {
+  flex: 1;
+  font-size: var(--tamanho-base);
+  color: var(--cor-texto-mudo);
+}
+
+.barra-lateral__pesquisa-atalho {
+  font-size: var(--tamanho-xs);
+  color: var(--cor-texto-mudo);
+  background-color: var(--cor-superficie);
+  border: 1px solid var(--cor-borda-clara);
+  border-radius: var(--raio-pequeno);
+  padding: 1px 5px;
+  flex-shrink: 0;
+}
+
 /* ---- Navegação ---- */
 .barra-lateral__navegacao {
   flex: 1;
@@ -128,10 +183,9 @@
   padding: 0.625rem var(--espaco-2);
   border-radius: var(--raio-medio);
   transition: var(--transicao-rapida);
-  color: var(--cor-texto-fraco);
+  color: var(--cor-texto-mudo);
   font-size: var(--tamanho-medio);
   font-weight: var(--peso-normal);
-  color: var(--cor-texto-mudo);
   text-decoration: none;
   position: relative;
   min-width: max-content;
@@ -173,10 +227,6 @@
   color: var(--cor-primaria);
 }
 
-.barra-lateral__icone-nav--hover:hover {
-  color: var(--cor-texto-medio);
-}
-
 .barra-lateral__rotulo-nav {
   font-size: var(--tamanho-medio);
 }
@@ -184,7 +234,6 @@
 .barra-lateral__rotulo-nav--ativo {
   font-weight: var(--peso-semi);
 }
-
 
 .barra-lateral__contador {
   margin-left: auto;
@@ -200,11 +249,9 @@
   font-weight: var(--peso-negrito);
 }
 
-.barra-lateral__contador--mensagens {
-  background-color: var(--cor-secundaria-media);
-}
-
-.barra-lateral--recolhida, .barra-lateral__item-nav, .barra-lateral__cabecalho{
+.barra-lateral--recolhida,
+.barra-lateral__item-nav,
+.barra-lateral__cabecalho {
   justify-content: flex-start !important;
 }
 
@@ -212,7 +259,6 @@
 .barra-lateral__rodape {
   padding: var(--espaco-3);
   border-top: 1px solid var(--cor-separador-suave);
-  padding-top: var(--espaco-3);
   display: flex;
   flex-direction: column;
   gap: var(--espaco-1);
@@ -224,11 +270,10 @@
   gap: var(--espaco-3);
   padding: 0.625rem var(--espaco-2);
   border-radius: var(--raio-medio);
-  color: var(--cor-texto-fraco);
+  color: var(--cor-texto-mudo);
   text-decoration: none;
   transition: var(--transicao-rapida);
   font-size: var(--tamanho-medio);
-  color: var(--cor-texto-mudo);
 }
 
 .barra-lateral__item-configuracoes:hover {

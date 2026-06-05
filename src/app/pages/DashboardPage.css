@@ -179,20 +179,68 @@
 }
 
 /* ================================================================
+   Barra de pesquisa (mobile/tablet apenas)
+   ================================================================ */
+.painel__barra-pesquisa {
+  display: block;
+}
+
+@media (min-width: 1024px) {
+  .painel__barra-pesquisa {
+    display: none;
+  }
+}
+
+.painel__campo-pesquisa {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-3);
+  width: 100%;
+  padding: var(--espaco-3) var(--espaco-4);
+  background-color: var(--cor-superficie);
+  border: 1px solid var(--cor-borda-clara);
+  border-radius: var(--raio-grande);
+  cursor: pointer;
+  transition: var(--transicao-normal);
+  font-family: var(--fonte-principal);
+  text-align: left;
+}
+
+.painel__campo-pesquisa:hover {
+  border-color: var(--cor-primaria);
+  box-shadow: 0 0 0 3px var(--cor-primaria-leve);
+}
+
+.painel__icone-pesquisa {
+  color: var(--cor-texto-mudo);
+  flex-shrink: 0;
+}
+
+.painel__pesquisa-placeholder {
+  flex: 1;
+  font-size: var(--tamanho-base);
+  color: var(--cor-texto-mudo);
+}
+
+.painel__pesquisa-atalho {
+  font-size: var(--tamanho-xs);
+  color: var(--cor-texto-mudo);
+  background-color: var(--cor-fundo-leve);
+  border: 1px solid var(--cor-borda-clara);
+  border-radius: var(--raio-pequeno);
+  padding: 1px 5px;
+  flex-shrink: 0;
+}
+
+/* ================================================================
    Grade de cartões de resumo
    ================================================================ */
 .painel__grade-resumos {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: var(--espaco-4);
   width: 100%;
   max-width: 100%;
-}
-
-@media (min-width: 768px) {
-  .painel__grade-resumos {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 @media (min-width: 1024px) {
@@ -234,19 +282,19 @@
   justify-content: center;
 }
 
-.cartao-resumo__icone-area--azul   { background-color: var(--cor-primaria-clara); }
+.cartao-resumo__icone-area--azul    { background-color: var(--cor-primaria-clara); }
 .cartao-resumo__icone-area--violeta { background-color: var(--cor-secundaria-clara); }
-.cartao-resumo__icone-area--verde  { background-color: var(--cor-esmeralda-clara); }
+.cartao-resumo__icone-area--verde   { background-color: var(--cor-esmeralda-clara); }
 .cartao-resumo__icone-area--laranja { background-color: var(--cor-laranja-clara); }
 
-.cartao-resumo__icone--azul   { color: var(--cor-primaria); }
+.cartao-resumo__icone--azul    { color: var(--cor-primaria); }
 .cartao-resumo__icone--violeta { color: var(--cor-secundaria); }
-.cartao-resumo__icone--verde  { color: var(--cor-esmeralda); }
+.cartao-resumo__icone--verde   { color: var(--cor-esmeralda); }
 .cartao-resumo__icone--laranja { color: var(--cor-laranja); }
 
-.cartao-resumo--borda-azul   { border-color: var(--cor-primaria-leve); }
+.cartao-resumo--borda-azul    { border-color: var(--cor-primaria-leve); }
 .cartao-resumo--borda-violeta { border-color: var(--cor-secundaria-leve); }
-.cartao-resumo--borda-verde  { border-color: var(--cor-sucesso-leve); }
+.cartao-resumo--borda-verde   { border-color: var(--cor-sucesso-leve); }
 .cartao-resumo--borda-laranja { border-color: var(--cor-laranja-leve); }
 
 .cartao-resumo__seta {
@@ -309,7 +357,7 @@
 }
 
 /* ================================================================
-   Cartões internos (projeto, inscrições, notificações)
+   Cartões internos
    ================================================================ */
 .painel__card {
   background-color: var(--cor-superficie);
@@ -319,7 +367,7 @@
 }
 
 .painel__card-cabecalho {
-  padding: var(--espaco-4) var(--espaco-4);
+  padding: var(--espaco-4);
   border-bottom: 1px solid var(--cor-fundo);
   display: flex;
   flex-direction: column;
@@ -369,121 +417,6 @@
   .projeto-andamento__corpo {
     padding: var(--espaco-6);
   }
-}
-
-.projeto-andamento__linha {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--espaco-4);
-}
-
-.projeto-andamento__icone-area {
-  width: 2.5rem;
-  height: 2.5rem;
-  background-color: var(--cor-primaria-leve);
-  border-radius: var(--raio-medio);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.projeto-andamento__info {
-  flex: 1;
-  min-width: 0;
-}
-
-.projeto-andamento__nome {
-  font-weight: var(--peso-semi);
-  font-size: 0.9rem;
-  color: var(--cor-texto);
-  margin-bottom: var(--espaco-1);
-  overflow-wrap: break-word;
-}
-
-.projeto-andamento__orientador {
-  font-size: var(--tamanho-base);
-  color: var(--cor-texto-fraco);
-  margin-bottom: var(--espaco-4);
-}
-
-/* Barra de progresso */
-.projeto-andamento__progresso {
-  margin-bottom: var(--espaco-3);
-}
-
-.projeto-andamento__progresso-cabecalho {
-  display: flex;
-  flex-direction: column;
-  gap: var(--espaco-1);
-  margin-bottom: var(--espaco-1);
-}
-
-@media (min-width: 640px) {
-  .projeto-andamento__progresso-cabecalho {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-}
-
-.projeto-andamento__fase {
-  font-size: var(--tamanho-base);
-  color: var(--cor-texto-medio);
-  overflow-wrap: break-word;
-}
-
-.projeto-andamento__percentual {
-  font-size: var(--tamanho-base);
-  font-weight: var(--peso-semi);
-  color: var(--cor-primaria);
-}
-
-.projeto-andamento__trilha {
-  height: 0.5rem;
-  background-color: var(--cor-fundo-leve);
-  border-radius: var(--raio-completo);
-  overflow: hidden;
-}
-
-.projeto-andamento__barra {
-  height: 100%;
-  background: var(--gradiente-barra);
-  border-radius: var(--raio-completo);
-  transition: width 0.5s ease;
-}
-
-/* Marcos */
-.projeto-andamento__marcos {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--espaco-2);
-}
-
-@media (min-width: 640px) {
-  .projeto-andamento__marcos {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-.marco-item {
-  padding: var(--espaco-2);
-  border-radius: var(--raio-medio);
-  text-align: center;
-}
-
-.marco-item--concluido   { background-color: var(--cor-sucesso-clara); }
-.marco-item--andamento   { background-color: var(--cor-primaria-clara); }
-.marco-item--pendente    { background-color: var(--cor-fundo); }
-
-.marco-item__icone {
-  margin-bottom: var(--espaco-1);
-}
-
-.marco-item__titulo {
-  font-size: 0.65rem;
-  color: var(--cor-texto-medio);
-  line-height: 1.3;
 }
 
 /* ================================================================
@@ -551,9 +484,9 @@
   flex-shrink: 0;
 }
 
-.inscricao-item__status--aprovado  { background-color: var(--cor-sucesso-clara); color: var(--cor-sucesso-escura); }
-.inscricao-item__status--pendente  { background-color: var(--cor-atencao-clara); color: var(--cor-atencao-escura); }
-.inscricao-item__status--rejeitado { background-color: var(--cor-erro-clara);    color: var(--cor-erro-escura);   }
+.inscricao-item__status--aprovado  { background-color: var(--cor-sucesso-clara);  color: var(--cor-sucesso-escura); }
+.inscricao-item__status--pendente  { background-color: var(--cor-atencao-clara);  color: var(--cor-atencao-escura); }
+.inscricao-item__status--rejeitado { background-color: var(--cor-erro-clara);     color: var(--cor-erro-escura); }
 
 /* ================================================================
    Gráfico de atividade
@@ -576,11 +509,6 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: var(--espaco-4);
-}
-
-.painel__grafico-periodo {
-  font-size: var(--tamanho-pequeno);
-  color: var(--cor-texto-mudo);
 }
 
 /* ================================================================
@@ -656,15 +584,6 @@
   color: var(--cor-texto-mudo);
 }
 
-.projeto-sugerido__separador {
-  color: var(--cor-borda-media);
-}
-
-.projeto-sugerido__bolsa {
-  font-size: var(--tamanho-xs);
-  color: var(--cor-texto-mudo);
-}
-
 /* ================================================================
    Notificações recentes
    ================================================================ */
@@ -695,10 +614,7 @@
   flex-shrink: 0;
 }
 
-.notificacao-resumo__icone-area--sucesso  { background-color: var(--cor-sucesso-clara);  }
-.notificacao-resumo__icone-area--info     { background-color: var(--cor-primaria-clara);  }
-.notificacao-resumo__icone-area--atencao  { background-color: var(--cor-laranja-clara);   }
-.notificacao-resumo__icone-area--erro     { background-color: var(--cor-erro-clara);      }
+.notificacao-resumo__icone-area--info { background-color: var(--cor-primaria-clara); }
 
 .notificacao-resumo__info {
   flex: 1;
@@ -731,68 +647,8 @@
 }
 
 /* ================================================================
-   Ações rápidas
+   Espaçamento interno dos cards sugeridos e notificações
    ================================================================ */
-.painel__acoes-rapidas {
-  background: var(--gradiente-suave);
-  border-radius: var(--raio-grande);
-  border: 1px solid var(--cor-secundaria-leve);
-  padding: var(--espaco-5);
-}
-
-.painel__acoes-rapidas-titulo {
-  font-weight: var(--peso-semi);
-  font-size: 0.9rem;
-  color: var(--cor-texto);
-  margin-bottom: var(--espaco-3);
-}
-
-.painel__lista-acoes-rapidas {
-  display: flex;
-  flex-direction: column;
-  gap: var(--espaco-2);
-}
-
-.acao-rapida {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  padding: var(--espaco-2) var(--espaco-3) 0.625rem;
-  background-color: var(--cor-branco);
-  border-radius: var(--raio-medio);
-  border: 1px solid var(--cor-branco);
-  text-align: left;
-  cursor: pointer;
-  transition: var(--transicao-normal);
-}
-
-.acao-rapida:hover {
-  box-shadow: var(--sombra-pequena);
-  border-color: var(--cor-primaria-leve);
-}
-
-.acao-rapida__icone {
-  color: var(--cor-primaria);
-  flex-shrink: 0;
-}
-
-.acao-rapida__rotulo {
-  font-size: var(--tamanho-base);
-  color: var(--cor-texto-secundario);
-  flex: 1;
-}
-
-.acao-rapida__seta {
-  color: var(--cor-borda-media);
-  transition: var(--transicao-normal);
-}
-
-.acao-rapida:hover .acao-rapida__seta {
-  color: #60a5fa; /* blue-400 */
-}
-
-/* Espaçamento interno dos cards sugeridos e notificações */
 .painel__card-lista {
   padding: var(--espaco-3);
   display: flex;
