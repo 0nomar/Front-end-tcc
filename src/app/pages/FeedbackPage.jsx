@@ -142,8 +142,10 @@ export default function FeedbackPage() {
             <div className={`resumo-feedback__icone-area ${item.areaClass}`}>
               <item.icon size={18} className={item.iconClass} />
             </div>
-            <p className="resumo-feedback__valor">{statsValues[index]}</p>
+            <div className="resumo-feedbak__header">
             <p className="resumo-feedback__label">{item.label}</p>
+            <p className="resumo-feedback__valor">{statsValues[index]}</p>
+            </div>
           </div>
         ))}
       </div>

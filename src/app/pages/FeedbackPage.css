@@ -14,7 +14,7 @@
    ================================================================ */
 .pagina-feedback__grade-resumos {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(1, 3fr);
   gap: var(--espaco-4);
 }
 
@@ -23,6 +23,13 @@
   border-radius: var(--raio-grande);
   border: 1px solid var(--cor-borda-clara);
   padding: var(--espaco-5);
+  display: flex;
+  gap: 12px;
+}
+
+.resumo-feedbak__header{
+  display: flex;
+  flex-direction: column;
 }
 
 .resumo-feedback__icone-area {
