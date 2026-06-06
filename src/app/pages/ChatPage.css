@@ -520,6 +520,9 @@
 }
 
 .pagina-chat__botao-enviar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   background: #2563eb;
   border: none; 
   color: white;

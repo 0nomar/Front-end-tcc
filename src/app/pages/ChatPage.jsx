@@ -463,6 +463,7 @@ export default function ChatPage() {
                   rows={1}
                 />
                 <button onClick={sendMessage} className="pagina-chat__botao-enviar">
+                  Enviar Mensagem
                   <Send size={16} />
                 </button>
               </div>
