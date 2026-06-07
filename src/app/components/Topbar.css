@@ -104,7 +104,7 @@
   border-color: var(--cor-borda);
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .barra-topo__busca {
     display: flex;
   }
