@@ -155,20 +155,36 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }) 
               </>
             )}
           </NavLink>
-        ))}
-      </nav>
+                  ))}
+                </nav>
 
-      <div className="barra-lateral__rodape">
-        <NavLink
-          to="/app/configuracoes"
-          className="barra-lateral__item-configuracoes"
-          onClick={() => setMobileOpen(false)}
-        >
-          <Settings size={18} className="barra-lateral__icone-nav" />
-          {!collapsed && (
-            <span className="barra-lateral__rotulo-nav">Configuracoes</span>
-          )}
-        </NavLink>
+                <div className="barra-lateral__rodape">
+                  <NavLink
+            to="/app/configuracoes"
+            onClick={() => setMobileOpen(false)}
+            className={({ isActive }) =>
+              [
+                "barra-lateral__item-configuracoes",
+                isActive ? "barra-lateral__item-nav--ativo" : "",
+                collapsed ? "barra-lateral__item-nav--centralizado" : "",
+              ].filter(Boolean).join(" ")
+            }
+          >
+            {({ isActive }) => (
+              <>
+                {isActive && <span className="barra-lateral__indicador-ativo" />}
+                <Settings
+                  size={18}
+                  className={isActive ? "barra-lateral__icone-nav barra-lateral__icone-nav--ativo" : "barra-lateral__icone-nav"}
+                />
+                {!collapsed && (
+                  <span className={isActive ? "barra-lateral__rotulo-nav barra-lateral__rotulo-nav--ativo" : "barra-lateral__rotulo-nav"}>
+                    Configuracoes
+                  </span>
+                )}
+              </>
+            )}
+          </NavLink>
       </div>
     </div>
   );

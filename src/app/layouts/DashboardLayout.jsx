@@ -5,6 +5,10 @@ import { Sidebar } from "../components/Sidebar";
 import { Topbar } from "../components/Topbar";
 import { useAuth } from "../hooks/useAuth";
 import "./DashboardLayout.css";
+import { createContext, useContext } from "react";
+
+export const SidebarContext = createContext({ collapsed: false });
+export const useSidebarContext = () => useContext(SidebarContext);
 
 const pageTitles = {
   "/app": { title: "Dashboard", subtitle: "Bem-vindo de volta" },
@@ -35,35 +39,37 @@ export function DashboardLayout() {
   };
 
   return (
-    <div className="pagina-app">
-      <Sidebar
-        collapsed={collapsed}
-        setCollapsed={setCollapsed}
-        mobileOpen={mobileOpen}
-        setMobileOpen={setMobileOpen}
-      />
-
-      <div className={`pagina-app__principal ${collapsed ? "pagina-app__principal--recolhida" : ""}`}>
-        <Topbar
-          onMenuClick={() => setMobileOpen(true)}
-          title={pageInfo.title}
-          subtitle={pageInfo.subtitle}
+    <SidebarContext.Provider value={{ collapsed }}>
+      <div className="pagina-app">
+        <Sidebar
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+          mobileOpen={mobileOpen}
+          setMobileOpen={setMobileOpen}
         />
-        <main className="pagina-app__conteudo">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="pagina-app__pagina"
-            >
-              <Outlet />
-            </motion.div>
-          </AnimatePresence>
-        </main>
+
+        <div className={`pagina-app__principal ${collapsed ? "pagina-app__principal--recolhida" : ""}`}>
+          <Topbar
+            onMenuClick={() => setMobileOpen(true)}
+            title={pageInfo.title}
+            subtitle={pageInfo.subtitle}
+          />
+          <main className="pagina-app__conteudo">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={location.pathname}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="pagina-app__pagina"
+              >
+                <Outlet />
+              </motion.div>
+            </AnimatePresence>
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarContext.Provider>
   );
 }

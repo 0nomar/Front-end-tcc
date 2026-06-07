@@ -519,6 +519,10 @@
   line-height: 1.4;
 }
 
+.texto-enviar{
+  display: none;
+}
+
 .pagina-chat__botao-enviar {
   display: flex;
   align-items: center;
@@ -835,8 +839,12 @@
   }
 
   .pagina-chat__input-mensagem {
-    min-height: 78px;
+    min-height: 42px;
     max-height: 160px;
+  }
+
+  .texto-enviar{
+    display: flex;
   }
 
   .pagina-chat__botao-enviar {
