@@ -77,6 +77,12 @@ export const api = {
       body: body === undefined ? undefined : body instanceof FormData ? body : JSON.stringify(body),
       ...options,
     }),
+  patch: (path, body, options = {}) =>
+    request(path, {
+      method: "PATCH",
+      body: body === undefined ? undefined : body instanceof FormData ? body : JSON.stringify(body),
+      ...options,
+    }),
   delete: (path) =>
     request(path, {
       method: "DELETE",
