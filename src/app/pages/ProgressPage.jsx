@@ -15,37 +15,125 @@ import { UpdateFeed } from "../components/progress/UpdateFeed";
 import { UpdateForm } from "../components/progress/UpdateForm";
 import "./ProgressPage.css";
 
+const Sk = ({ w = "100%", h = 14, r = "0.5rem", style }) => (
+  <div className="skeleton" style={{ width: w, height: h, borderRadius: r, ...style }} />
+);
+
 function ProgressSkeleton() {
   return (
     <div className="progress-page">
-      <div className="progress-page__hero">
+      <header className="progress-page__hero">
         <div className="progress-page__hero-copy">
-          <div className="skeleton" style={{ width: 260, height: 22, borderRadius: 12 }} />
-          <div className="skeleton" style={{ width: "70%", height: 14, borderRadius: 999 }} />
+          <Sk w={190} h={28} r={999} style={{ maxWidth: "55%" }} />
+          <Sk w={340} h={38} r={12} style={{ maxWidth: "80%", marginTop: 14 }} />
+          <Sk w="100%" h={14} r={999} style={{ maxWidth: 620, marginTop: 16 }} />
+          <Sk w="72%" h={14} r={999} style={{ maxWidth: 460, marginTop: 8 }} />
         </div>
-        <div className="skeleton" style={{ width: 240, height: 44, borderRadius: 14 }} />
-      </div>
+        <div className="progress-page__project-picker">
+          <Sk w={72} h={13} />
+          <Sk w="100%" h={48} r={16} />
+        </div>
+      </header>
 
-      <div className="progress-page__overview">
+      <section className="progress-page__overview">
         <div className="progress-page__panel progress-page__panel--summary">
-          <div className="skeleton" style={{ width: 170, height: 18, marginBottom: 20 }} />
-          <div className="skeleton" style={{ width: 180, height: 180, borderRadius: "50%", margin: "0 auto 18px" }} />
-          <div className="skeleton" style={{ width: "55%", height: 16, margin: "0 auto 10px" }} />
-          <div className="skeleton" style={{ width: "38%", height: 12, margin: "0 auto" }} />
+          <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <Sk w={180} h={180} r="50%" style={{ marginBottom: 18 }} />
+            <Sk w="58%" h={16} style={{ maxWidth: 150, marginBottom: 10 }} />
+            <Sk w="42%" h={12} style={{ maxWidth: 120 }} />
+          </div>
         </div>
+
         <div className="progress-page__panel progress-page__panel--stats">
-          <div className="skeleton" style={{ width: 220, height: 18, marginBottom: 18 }} />
+          <div className="progress-page__panel-title-row">
+            <div style={{ flex: 1 }}>
+              <Sk w="45%" h={22} style={{ maxWidth: 260 }} />
+              <Sk w="34%" h={13} style={{ maxWidth: 190, marginTop: 10 }} />
+            </div>
+            <Sk w={92} h={30} r={999} />
+          </div>
+
           <div className="progress-page__stats-grid">
             {[1, 2, 3, 4].map((item) => (
               <div key={item} className="progress-stat">
-                <div className="skeleton" style={{ width: 18, height: 18, borderRadius: 999 }} />
-                <div className="skeleton" style={{ width: "70%", height: 14 }} />
-                <div className="skeleton" style={{ width: "45%", height: 12 }} />
+                <Sk w={18} h={18} r={999} />
+                <Sk w="70%" h={14} />
+                <Sk w="45%" h={18} />
+              </div>
+            ))}
+          </div>
+
+          <div className="progress-page__summary-line">
+            <Sk w={120} h={14} />
+            <Sk w={150} h={15} />
+          </div>
+        </div>
+      </section>
+
+      <section className="progress-page__grid">
+        <div className="progress-page__panel">
+          <div className="progress-page__panel-header">
+            <div style={{ flex: 1 }}>
+              <Sk w={96} h={20} />
+              <Sk w="70%" h={13} style={{ maxWidth: 380, marginTop: 10 }} />
+            </div>
+            <Sk w={126} h={30} r={999} />
+          </div>
+
+          <div style={{ display: "grid", gap: 14, marginTop: 20 }}>
+            {[1, 2, 3].map((item) => (
+              <div key={item} className="step-card">
+                <Sk w={42} h={42} r="50%" />
+                <div>
+                  <Sk w="45%" h={16} style={{ maxWidth: 220 }} />
+                  <Sk w="85%" h={12} style={{ maxWidth: 420, marginTop: 10 }} />
+                  <Sk w="58%" h={12} style={{ maxWidth: 300, marginTop: 8 }} />
+                </div>
+                <Sk w={88} h={32} r={999} />
               </div>
             ))}
           </div>
         </div>
-      </div>
+
+        <div className="progress-page__panel">
+          <div className="progress-page__panel-header">
+            <div style={{ flex: 1 }}>
+              <Sk w={155} h={20} />
+              <Sk w="78%" h={13} style={{ maxWidth: 360, marginTop: 10 }} />
+            </div>
+            <Sk w={156} h={40} r={14} />
+          </div>
+
+          <div className="progress-page__collapsed-form">
+            <Sk w="80%" h={14} style={{ maxWidth: 480 }} />
+          </div>
+        </div>
+      </section>
+
+      <section className="progress-page__panel progress-page__panel--feed">
+        <div className="progress-page__panel-header">
+          <div style={{ flex: 1 }}>
+            <Sk w={190} h={20} />
+            <Sk w="68%" h={13} style={{ maxWidth: 460, marginTop: 10 }} />
+          </div>
+        </div>
+
+        <div style={{ display: "grid", gap: 12, marginTop: 18 }}>
+          {[1, 2, 3].map((item) => (
+            <div key={item} className="update-feed__item">
+              <div className="update-feed__header">
+                <div style={{ flex: 1 }}>
+                  <Sk w="52%" h={16} style={{ maxWidth: 260 }} />
+                  <Sk w="38%" h={12} style={{ maxWidth: 190, marginTop: 9 }} />
+                </div>
+                <Sk w={86} h={26} r={999} />
+              </div>
+              <Sk w="90%" h={13} style={{ maxWidth: 720, marginTop: 14 }} />
+              <Sk w="62%" h={13} style={{ maxWidth: 520, marginTop: 8 }} />
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
