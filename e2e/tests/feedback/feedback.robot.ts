@@ -6,6 +6,11 @@ import { unique } from "../../helpers/test-data.helper";
 
 const API_URL = process.env.VITE_API_URL ?? "http://127.0.0.1:8080";
 
+async function waitForFeedbackLoaded(page: Page) {
+  await expect(page.locator(".skeleton").first()).toBeHidden();
+  await expect(page.getByRole("heading", { name: /Avaliar projeto/i })).toBeVisible();
+}
+
 export async function prepareFeedbackContext(request: APIRequestContext) {
   const user = buildLoginCandidate();
   await request.post(`${API_URL}/api/auth/register`, { data: { nome: user.nome, email: user.email, senha: user.senha, ra: user.ra } });
@@ -29,13 +34,15 @@ export async function openFeedback(page: Page, user: { email: string; senha: str
   const loginPage = new LoginPage(page);
   await loginPage.login(user.email, user.senha);
   await page.goto("/app/feedback");
-  await expect(page.getByText(/avaliar projeto|feedback/i).first()).toBeVisible();
+  await waitForFeedbackLoaded(page);
 }
 
 export async function submitFeedback(page: Page) {
   const comment = `feedback-${unique("fb")}`;
+  await waitForFeedbackLoaded(page);
   await page.getByRole("button", { name: "Avaliar" }).click();
   const projectSelect = page.locator("select.formulario-avaliacao__select");
+  await expect(projectSelect).toBeVisible();
   const optionCount = await projectSelect.locator("option").count();
   if (optionCount < 2) return null;
   await projectSelect.selectOption({ index: 1 });
