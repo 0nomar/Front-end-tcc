@@ -213,6 +213,8 @@ export function mapApplication(application) {
 }
 
 export function mapNotification(notification) {
+  const metadata = notification?.metadata ?? notification?.meta ?? notification?.dados ?? notification?.data ?? {};
+
   return {
     id: notification?.id,
     title:
@@ -224,6 +226,23 @@ export function mapNotification(notification) {
     read: notification?.lida ?? notification?.read ?? false,
     createdAt: notification?.dataCriacao ?? notification?.createdAt ?? null,
     actionUrl: notification?.link ?? "/app/notifications",
+    conversationId:
+      notification?.conversaId ??
+      notification?.conversationId ??
+      notification?.conversa_id ??
+      metadata?.conversaId ??
+      metadata?.conversationId ??
+      metadata?.conversa_id ??
+      null,
+    messageId:
+      notification?.mensagemId ??
+      notification?.messageId ??
+      notification?.mensagem_id ??
+      metadata?.mensagemId ??
+      metadata?.messageId ??
+      metadata?.mensagem_id ??
+      null,
+    metadata,
     user: notification?.usuario ?? null,
   };
 }

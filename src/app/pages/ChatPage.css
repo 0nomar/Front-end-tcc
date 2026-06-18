@@ -382,6 +382,19 @@
   opacity: 0.65;
 }
 
+.mensagem-alvo .bolha-mensagem {
+  animation: destacarMensagem 1.8s ease both;
+}
+
+@keyframes destacarMensagem {
+  0%, 100% {
+    box-shadow: none;
+  }
+  20%, 70% {
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.24);
+  }
+}
+
 /* Botões de ação (hover) */
 .mensagem-acoes {
   display: none;

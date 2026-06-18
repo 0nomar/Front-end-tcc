@@ -10,40 +10,68 @@ import { StatusView } from "../components/StatusView";
 import "./FeedbackPage.css";
 
 function FeedbackSkeleton() {
-  const Sk = ({ w = "100%", h = 14, r = "0.5rem" }) => (
-    <div className="skeleton" style={{ width: w, height: h, borderRadius: r }} />
+  const Sk = ({ w = "100%", h = 14, r = "0.5rem", className = "", style }) => (
+    <div className={`skeleton ${className}`.trim()} style={{ width: w, height: h, borderRadius: r, ...style }} />
   );
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--espaco-5)", padding: "var(--espaco-4)" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "var(--espaco-4)" }}>
+    <div className="pagina-feedback pagina-feedback--skeleton" aria-busy="true" aria-label="Carregando feedbacks">
+      <div className="pagina-feedback__grade-resumos">
         {[1, 2, 3].map((i) => (
-          <div key={i} style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", border: "1px solid var(--cor-borda-clara)", padding: "var(--espaco-5)", display: "flex", gap: 14, alignItems: "center" }}>
-            <Sk w={44} h={44} r="var(--raio-medio)" />
-            <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
-              <Sk w={40} h={20} />
-              <Sk w={100} h={12} />
+          <div key={i} className="resumo-feedback resumo-feedback--skeleton">
+            <Sk className="resumo-feedback__icone-area" w={40} h={40} r="var(--raio-grande)" />
+            <div className="resumo-feedbak__header resumo-feedback__skeleton-header">
+              <Sk w={i === 2 ? 56 : 42} h={24} />
+              <Sk w={i === 3 ? 128 : 150} h={13} />
             </div>
           </div>
         ))}
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--espaco-4)" }}>
-        {[1, 2, 3].map((i) => (
-          <div key={i} style={{ background: "var(--cor-superficie)", borderRadius: "var(--raio-grande)", border: "1px solid var(--cor-borda-clara)", padding: "var(--espaco-5)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14 }}>
-              <Sk w="45%" h={15} />
-              <div style={{ display: "flex", gap: 4 }}>
-                {[1, 2, 3, 4, 5].map((j) => <Sk key={j} w={20} h={20} r="50%" />)}
+
+      <div className="pagina-feedback__grade-principal">
+        <div>
+          <Sk w={190} h={22} style={{ marginBottom: "var(--espaco-4)" }} />
+          <div className="pagina-feedback__lista">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="feedback-card feedback-card--skeleton">
+                <div className="feedback-card__cabecalho">
+                  <Sk w={40} h={40} r="50%" />
+                  <div className="feedback-card__info">
+                    <Sk w={i === 1 ? "58%" : "48%"} h={15} />
+                    <Sk w="42%" h={12} style={{ marginTop: 7 }} />
+                  </div>
+                  <div className="feedback-card__estrelas">
+                    {[1, 2, 3, 4, 5].map((j) => (
+                      <Sk key={j} w={14} h={14} r="50%" />
+                    ))}
+                  </div>
+                </div>
+                <div className="feedback-card__comentario feedback-card__comentario--skeleton">
+                  <Sk h={13} />
+                  <Sk w="86%" h={13} />
+                  <Sk w="64%" h={13} />
+                </div>
               </div>
-            </div>
-            <Sk w="100%" h={13} mb={6} />
-            <Sk w="80%" h={13} mb={6} />
-            <Sk w="60%" h={13} />
-            <div style={{ marginTop: 14, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <Sk w={100} h={12} />
-              <Sk w={70} h={22} r="var(--raio-completo)" />
+            ))}
+          </div>
+        </div>
+
+        <div>
+          <Sk w={150} h={22} style={{ marginBottom: "var(--espaco-4)" }} />
+          <div className="avaliacao-orientador avaliacao-orientador--skeleton">
+            <div className="avaliacao-orientador__prompt">
+              <div className="avaliacao-orientador__estrelas-prompt">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <Sk key={i} w={28} h={28} r="50%" />
+                ))}
+              </div>
+              <Sk w="48%" h={18} style={{ margin: "0 auto var(--espaco-3)" }} />
+              <Sk w="78%" h={13} style={{ margin: "0 auto var(--espaco-2)" }} />
+              <Sk w="62%" h={13} style={{ margin: "0 auto var(--espaco-6)" }} />
+              <Sk w={104} h={44} r="var(--raio-grande)" style={{ margin: "0 auto" }} />
             </div>
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );

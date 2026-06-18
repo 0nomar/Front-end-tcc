@@ -10,6 +10,7 @@ import {
   CheckCheck,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router";
 import { useAsyncData } from "../hooks/useAsyncDataHook";
 import { notificationService } from "../services/notificationService";
 import { mapNotification } from "../utils/adapters";
@@ -26,38 +27,43 @@ const typeConfig = {
 };
 
 function NotificationsSkeleton() {
-  const Sk = ({ w = "100%", h = 14, r = "0.5rem" }) => (
-    <div className="skeleton" style={{ width: w, height: h, borderRadius: r }} />
+  const Sk = ({ w = "100%", h = 14, r = "0.5rem", className = "", style }) => (
+    <div className={`skeleton ${className}`.trim()} style={{ width: w, height: h, borderRadius: r, ...style }} />
   );
+
   return (
-    <div className="pagina-notificacoes">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--espaco-4)" }}>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+    <div className="pagina-notificacoes pagina-notificacoes--skeleton" aria-busy="true" aria-label="Carregando notificacoes">
+      <div className="pagina-notificacoes__acoes">
+        <div className="pagina-notificacoes__contagem">
           <Sk w={20} h={20} r="50%" />
           <Sk w={160} h={15} />
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <Sk w={160} h={34} r="var(--raio-medio)" />
-          <Sk w={140} h={34} r="var(--raio-medio)" />
+        <div className="pagina-notificacoes__botoes-acao">
+          <Sk className="pagina-notificacoes__botao-skeleton" w={170} h={38} r="var(--raio-medio)" />
+          <Sk className="pagina-notificacoes__botao-skeleton" w={142} h={38} r="var(--raio-medio)" />
         </div>
       </div>
-      <div style={{ display: "flex", gap: 8, marginBottom: "var(--espaco-4)" }}>
-        {[1, 2, 3].map((i) => <Sk key={i} w={100} h={32} r="var(--raio-completo)" />)}
+
+      <div className="pagina-notificacoes__filtros-tipo">
+        {[112, 142, 126].map((width, i) => (
+          <Sk key={i} className="pagina-notificacoes__chip-skeleton" w={width} h={38} r="var(--raio-medio)" />
+        ))}
       </div>
+
       <div className="pagina-notificacoes__lista">
         {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="notificacao-item" style={{ display: "flex", gap: 14, alignItems: "center", padding: "var(--espaco-4)" }}>
-            <Sk w={40} h={40} r="var(--raio-medio)" />
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 7 }}>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <Sk w="50%" h={14} />
-                <Sk w={60} h={12} />
+          <div key={i} className="notificacao-item notificacao-item--skeleton">
+            <Sk className="notificacao-item__icone-area" w={40} h={40} r="var(--raio-grande)" />
+            <div className="notificacao-item__conteudo">
+              <div className="notificacao-item__linha-topo">
+                <Sk w={i % 2 === 0 ? "48%" : "58%"} h={15} />
+                <Sk w={70} h={12} />
               </div>
-              <Sk w="80%" h={12} />
+              <Sk w={i === 3 ? "68%" : "84%"} h={13} style={{ marginTop: 8 }} />
             </div>
-            <div style={{ display: "flex", gap: 6 }}>
-              <Sk w={32} h={32} r="var(--raio-medio)" />
-              <Sk w={32} h={32} r="var(--raio-medio)" />
+            <div className="notificacao-item__acoes notificacao-item__acoes--skeleton">
+              <Sk w={32} h={32} r="var(--raio-pequeno)" />
+              <Sk w={32} h={32} r="var(--raio-pequeno)" />
             </div>
           </div>
         ))}
@@ -78,7 +84,32 @@ function timeAgo(dateStr) {
   return date.toLocaleDateString("pt-BR");
 }
 
+function getChatTargetFromUrl(actionUrl) {
+  if (!actionUrl) return null;
+
+  try {
+    const url = new URL(actionUrl, window.location.origin);
+    const conversationId =
+      url.searchParams.get("conversationId") ??
+      url.searchParams.get("conversaId") ??
+      url.searchParams.get("conversa");
+    const messageId =
+      url.searchParams.get("messageId") ??
+      url.searchParams.get("mensagemId") ??
+      url.searchParams.get("mensagem");
+
+    if (url.pathname === "/app/chat" || conversationId || messageId) {
+      return { conversationId, messageId };
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
 export default function NotificationsPage() {
+  const navigate = useNavigate();
   const { data, loading, error, setData, reload } = useAsyncData(
     async () => {
       const result = await notificationService.listMine();
@@ -131,6 +162,45 @@ export default function NotificationsPage() {
 
   const clearAll = () => {
     setData([]);
+  };
+
+  const handleOpenNotification = async (notification) => {
+    const urlTarget = getChatTargetFromUrl(notification.actionUrl);
+    const conversationId = notification.conversationId ?? urlTarget?.conversationId ?? null;
+    const messageId = notification.messageId ?? urlTarget?.messageId ?? null;
+
+    if (!notification.read) {
+      try {
+        await notificationService.markAsRead(notification.id);
+        setData((prev) =>
+          prev.map((item) => (item.id === notification.id ? { ...item, read: true } : item)),
+        );
+        window.dispatchEvent(new Event("notifications-updated"));
+        notificarAtualizacaoGlobal();
+      } catch (err) {
+        toast.error(err.message || "Não foi possível marcar como lida.");
+        return;
+      }
+    }
+
+    if (notification.type === "MENSAGEM_RECEBIDA") {
+      if (conversationId) {
+        navigate("/app/chat", { state: { conversationId, messageId } });
+        return;
+      }
+
+      if (notification.actionUrl && notification.actionUrl !== "/app/notifications") {
+        navigate(notification.actionUrl);
+        return;
+      }
+
+      toast.error("Não foi possível identificar a conversa dessa notificação.");
+      return;
+    }
+
+    if (notification.actionUrl && notification.actionUrl !== "/app/notifications") {
+      navigate(notification.actionUrl);
+    }
   };
 
   if (loading) return <NotificationsSkeleton />;
@@ -191,7 +261,20 @@ export default function NotificationsPage() {
             const cfg = typeConfig[notification.type] ?? typeConfig.INSCRICAO_RECEBIDA;
             const Icon = cfg.icon;
             return (
-              <div key={notification.id} className={`notificacao-item ${notification.read ? "notificacao-item--lida" : ""}`}>
+              <div
+                key={notification.id}
+                className={`notificacao-item notificacao-item--clicavel ${notification.read ? "notificacao-item--lida" : ""}`}
+                role="button"
+                tabIndex={0}
+                onClick={() => handleOpenNotification(notification)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    handleOpenNotification(notification);
+                  }
+                }}
+                title={notification.type === "MENSAGEM_RECEBIDA" ? "Abrir mensagem" : "Abrir notificação"}
+              >
                 {!notification.read && <div className="notificacao-item__indicador-nao-lida" />}
                 <div className={`notificacao-item__icone-area ${cfg.iconeAreaClass}`}>
                   <Icon size={18} style={{ color: cfg.iconColor }} />
@@ -206,7 +289,10 @@ export default function NotificationsPage() {
                 <div className="notificacao-item__acoes">
                   {!notification.read && (
                     <button
-                      onClick={() => markAsRead(notification.id)}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        markAsRead(notification.id);
+                      }}
                       className="notificacao-item__botao-acao notificacao-item__botao-acao--confirmar"
                       title="Marcar como lida"
                     >
@@ -214,7 +300,10 @@ export default function NotificationsPage() {
                     </button>
                   )}
                   <button
-                    onClick={() => removeLocally(notification.id)}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      removeLocally(notification.id);
+                    }}
                     className="notificacao-item__botao-acao notificacao-item__botao-acao--excluir"
                     title="Ocultar da lista"
                   >

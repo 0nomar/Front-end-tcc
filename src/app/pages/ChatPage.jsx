@@ -130,6 +130,7 @@ export default function ChatPage() {
 
   const messagesEndRef = useRef(null);
   const enviandoRef = useRef(false);
+  const messageRefs = useRef({});
 
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
@@ -141,6 +142,7 @@ export default function ChatPage() {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [error, setError] = useState(null);
   const [abrindoPrivada, setAbrindoPrivada] = useState(null);
+  const [targetMessageId, setTargetMessageId] = useState(null);
 
   const abrirPerfil = (usuarioId) => {
     if (!usuarioId) return;
@@ -171,15 +173,24 @@ export default function ChatPage() {
   useEffect(() => {
     if (selectedConversation || conversations.length === 0) return;
     const targetId = location.state?.conversationId;
+    const targetMsgId = location.state?.messageId;
     const target = targetId
       ? conversations.find((conversation) => Number(conversation.id) === Number(targetId))
       : null;
     setSelectedConversation(target ?? conversations[0]);
     if (targetId) {
+      setTargetMessageId(targetMsgId ?? null);
       setShowMobileList(false);
       navigate(location.pathname, { replace: true, state: null });
     }
-  }, [conversations, selectedConversation, location.state?.conversationId, location.pathname, navigate]);
+  }, [
+    conversations,
+    selectedConversation,
+    location.state?.conversationId,
+    location.state?.messageId,
+    location.pathname,
+    navigate,
+  ]);
 
   useEffect(() => {
     if (!selectedConversation?.id) return;
@@ -193,8 +204,16 @@ export default function ChatPage() {
   }, [selectedConversation?.id]);
 
   useEffect(() => {
+    if (targetMessageId) {
+      const targetNode = messageRefs.current[String(targetMessageId)];
+      if (targetNode) {
+        targetNode.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+    }
+
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, targetMessageId]);
 
   const filtered = useMemo(() =>
     conversations.filter((c) =>
@@ -388,7 +407,19 @@ export default function ChatPage() {
                     const mostrarData = dataAtual !== dataAnterior;
 
                     return (
-                      <div key={m.id ?? i}>
+                      <div
+                        key={m.id ?? i}
+                        ref={(node) => {
+                          if (m?.id == null) return;
+                          const key = String(m.id);
+                          if (node) {
+                            messageRefs.current[key] = node;
+                          } else {
+                            delete messageRefs.current[key];
+                          }
+                        }}
+                        className={String(m?.id) === String(targetMessageId) ? "mensagem-alvo" : undefined}
+                      >
 
                         {mostrarData && (
                           <div className="chat-data-divider">
