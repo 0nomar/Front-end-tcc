@@ -4,6 +4,7 @@ import { Send, Search, Pencil, Trash2, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "../hooks/useAuth";
 import { conversationService } from "../services/conversationService";
+import { chatRealtimeService } from "../services/chatRealtimeService";
 import { StatusView } from "../components/StatusView";
 import "./ChatPage.css";
 import { useLocation, useNavigate } from "react-router";
@@ -214,6 +215,57 @@ export default function ChatPage() {
       .catch(() => setMessages([]))
       .finally(() => setLoadingMessages(false));
   }, [selectedConversation?.id]);
+
+  useEffect(() => {
+    if (!selectedConversation?.id || !user?.id) return undefined;
+
+    const atualizarConversas = () => {
+      conversationService
+        .listByUser(user.id)
+        .then((res) => setConversations(Array.isArray(res) ? res : []))
+        .catch(() => {});
+    };
+
+    return chatRealtimeService.subscribeToConversation(selectedConversation.id, (event) => {
+      if (Number(event?.conversaId) !== Number(selectedConversation.id)) return;
+
+      if (event.tipo === "MENSAGEM_CRIADA" && event.mensagem) {
+        setMessages((prev) => {
+          const exists = prev.some((message) => Number(message.id) === Number(event.mensagem.id));
+          if (exists) return prev;
+
+          const withoutTemp = prev.filter((message) => {
+            if (!message._temporaria) return true;
+            return !(
+              message.conteudo === event.mensagem.conteudo &&
+              Number(message.remetenteId) === Number(event.mensagem.remetenteId)
+            );
+          });
+
+          return [...withoutTemp, event.mensagem];
+        });
+        atualizarConversas();
+        return;
+      }
+
+      if (event.tipo === "MENSAGEM_EDITADA" && event.mensagem) {
+        setMessages((prev) =>
+          prev.map((message) =>
+            Number(message.id) === Number(event.mensagem.id) ? event.mensagem : message
+          )
+        );
+        atualizarConversas();
+        return;
+      }
+
+      if (event.tipo === "MENSAGEM_EXCLUIDA") {
+        setMessages((prev) =>
+          prev.filter((message) => Number(message.id) !== Number(event.mensagemId))
+        );
+        atualizarConversas();
+      }
+    });
+  }, [selectedConversation?.id, user?.id]);
 
   useEffect(() => {
     if (targetMessageId) {
