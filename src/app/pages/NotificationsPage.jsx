@@ -89,16 +89,20 @@ function getChatTargetFromUrl(actionUrl) {
 
   try {
     const url = new URL(actionUrl, window.location.origin);
+    const conversationPathMatch = url.pathname.match(/(?:\/app)?\/conversas\/(\d+)/);
     const conversationId =
       url.searchParams.get("conversationId") ??
       url.searchParams.get("conversaId") ??
-      url.searchParams.get("conversa");
+      url.searchParams.get("conversa") ??
+      conversationPathMatch?.[1] ??
+      null;
     const messageId =
       url.searchParams.get("messageId") ??
       url.searchParams.get("mensagemId") ??
-      url.searchParams.get("mensagem");
+      url.searchParams.get("mensagem") ??
+      null;
 
-    if (url.pathname === "/app/chat" || conversationId || messageId) {
+    if (url.pathname === "/app/chat" || url.pathname === "/conversas" || conversationId || messageId) {
       return { conversationId, messageId };
     }
   } catch {
@@ -185,7 +189,9 @@ export default function NotificationsPage() {
 
     if (notification.type === "MENSAGEM_RECEBIDA") {
       if (conversationId) {
-        navigate("/app/chat", { state: { conversationId, messageId } });
+        const params = new URLSearchParams({ conversationId: String(conversationId) });
+        if (messageId) params.set("messageId", String(messageId));
+        navigate(`/app/chat?${params.toString()}`, { state: { conversationId, messageId } });
         return;
       }
 

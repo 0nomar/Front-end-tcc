@@ -214,6 +214,9 @@ export function mapApplication(application) {
 
 export function mapNotification(notification) {
   const metadata = notification?.metadata ?? notification?.meta ?? notification?.dados ?? notification?.data ?? {};
+  const relatedEntity = notification?.entidadeRelacionada ?? notification?.relatedEntity ?? null;
+  const relatedEntityId = notification?.entidadeId ?? notification?.relatedEntityId ?? null;
+  const isConversationNotification = String(relatedEntity ?? "").toUpperCase() === "CONVERSA";
 
   return {
     id: notification?.id,
@@ -225,7 +228,13 @@ export function mapNotification(notification) {
     type: notification?.tipo ?? "INFO",
     read: notification?.lida ?? notification?.read ?? false,
     createdAt: notification?.dataCriacao ?? notification?.createdAt ?? null,
-    actionUrl: notification?.link ?? "/app/notifications",
+    actionUrl:
+      notification?.link ??
+      notification?.rotaSugerida ??
+      notification?.actionUrl ??
+      "/app/notifications",
+    relatedEntity,
+    relatedEntityId,
     conversationId:
       notification?.conversaId ??
       notification?.conversationId ??
@@ -233,6 +242,7 @@ export function mapNotification(notification) {
       metadata?.conversaId ??
       metadata?.conversationId ??
       metadata?.conversa_id ??
+      (isConversationNotification ? relatedEntityId : null) ??
       null,
     messageId:
       notification?.mensagemId ??

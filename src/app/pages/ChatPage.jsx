@@ -171,23 +171,35 @@ export default function ChatPage() {
   useEffect(() => { if (user?.id) loadConversations(); }, [user?.id]);
 
   useEffect(() => {
-    if (selectedConversation || conversations.length === 0) return;
-    const targetId = location.state?.conversationId;
-    const targetMsgId = location.state?.messageId;
+    if (conversations.length === 0) return;
+    const params = new URLSearchParams(location.search);
+    const targetId =
+      location.state?.conversationId ??
+      params.get("conversationId") ??
+      params.get("conversaId");
+    const targetMsgId =
+      location.state?.messageId ??
+      params.get("messageId") ??
+      params.get("mensagemId");
     const target = targetId
       ? conversations.find((conversation) => Number(conversation.id) === Number(targetId))
       : null;
-    setSelectedConversation(target ?? conversations[0]);
     if (targetId) {
+      setSelectedConversation(target ?? conversations[0]);
       setTargetMessageId(targetMsgId ?? null);
       setShowMobileList(false);
       navigate(location.pathname, { replace: true, state: null });
+      return;
     }
+
+    if (selectedConversation) return;
+    setSelectedConversation(conversations[0]);
   }, [
     conversations,
     selectedConversation,
     location.state?.conversationId,
     location.state?.messageId,
+    location.search,
     location.pathname,
     navigate,
   ]);
