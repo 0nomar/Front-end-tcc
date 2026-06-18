@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { assertChatApiReachable, loginAndOpenChat, prepareChatUsers, sendChatMessage } from "./chat.robot";
+import { assertChatApiReachable, assertRealtimeMessageDelivery, loginAndOpenChat, prepareChatUsers, sendChatMessage } from "./chat.robot";
 
 const API_URL = process.env.VITE_API_URL ?? "http://127.0.0.1:8080";
 
@@ -15,5 +15,9 @@ test.describe("chat real", () => {
     expect(meRes.ok()).toBeTruthy();
     const me = await meRes.json();
     await assertChatApiReachable(request, token!, Number(me.id));
+  });
+
+  test("entrega mensagem em tempo real sem recarregar a conversa", async ({ browser, request }) => {
+    await assertRealtimeMessageDelivery(browser, request);
   });
 });

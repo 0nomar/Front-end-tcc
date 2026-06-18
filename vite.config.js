@@ -47,6 +47,16 @@ export default defineConfig(({ mode }) => {
           },
           configure: useRenderAllowedOrigin,
         },
+        '/ws': {
+          target: backendUrl,
+          changeOrigin: true,
+          secure: true,
+          ws: true,
+          headers: {
+            origin: renderAllowedOrigin,
+          },
+          configure: useRenderAllowedOrigin,
+        },
       },
     },
     // File types to support raw imports. Never add .css, .tsx, or .ts files to this.

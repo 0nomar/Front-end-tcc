@@ -3,7 +3,7 @@ import { getStoredToken } from "../utils/storage";
 import { api } from "./api";
 
 function buildWsUrl() {
-  const baseUrl = api.baseUrl || window.location.origin;
+  const baseUrl = import.meta.env.DEV ? window.location.origin : api.baseUrl || window.location.origin;
   const normalizedBaseUrl = baseUrl.replace(/\/api\/?$/, "");
   const wsBase = normalizedBaseUrl.replace(/^http/i, (protocol) =>
     protocol.toLowerCase() === "https" ? "wss" : "ws"
@@ -37,6 +37,8 @@ class ChatRealtimeService {
           } catch {
             // Ignore malformed realtime payloads and keep the socket alive.
           }
+        }, {
+          Authorization: `Bearer ${token}`,
         });
       },
     });
