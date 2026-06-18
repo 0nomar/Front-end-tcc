@@ -319,6 +319,80 @@
   color: var(--cor-texto-fraco);
 }
 
+.cartao-resumo--progresso {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(16, 185, 129, 0.28);
+  background:
+    radial-gradient(circle at top right, rgba(16, 185, 129, 0.2), transparent 34%),
+    linear-gradient(135deg, color-mix(in srgb, var(--cor-superficie) 92%, #ecfdf5), var(--cor-superficie));
+}
+
+.cartao-resumo--progresso::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.12), transparent 52%);
+}
+
+.cartao-resumo--progresso > * {
+  position: relative;
+  z-index: 1;
+}
+
+.cartao-resumo--progresso .cartao-resumo__icone-area {
+  background: rgba(16, 185, 129, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.18);
+}
+
+.cartao-resumo__progresso-extra {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--espaco-3);
+  margin-top: var(--espaco-4);
+}
+
+.cartao-resumo__mini-barras {
+  display: flex;
+  align-items: end;
+  gap: 0.25rem;
+  height: 2.2rem;
+}
+
+.cartao-resumo__mini-barras span {
+  width: 0.45rem;
+  min-height: 0.4rem;
+  border-radius: var(--raio-completo);
+  background: linear-gradient(180deg, #22c55e, #2563eb);
+  box-shadow: 0 6px 14px rgba(34, 197, 94, 0.22);
+}
+
+.cartao-resumo__progresso-cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.6rem;
+  border-radius: var(--raio-completo);
+  background-color: rgba(16, 185, 129, 0.12);
+  color: var(--cor-esmeralda);
+  font-size: var(--tamanho-xs);
+  font-weight: var(--peso-semi);
+  white-space: nowrap;
+}
+
+.dark .cartao-resumo--progresso {
+  border-color: rgba(74, 222, 128, 0.26);
+  background:
+    radial-gradient(circle at top right, rgba(34, 197, 94, 0.16), transparent 34%),
+    linear-gradient(135deg, rgba(15, 23, 42, 0.94), rgba(17, 24, 39, 0.9));
+}
+
+.dark .cartao-resumo__progresso-cta {
+  background-color: rgba(34, 197, 94, 0.14);
+  color: #86efac;
+}
+
 /* ================================================================
    Grade principal (colunas centrais)
    ================================================================ */

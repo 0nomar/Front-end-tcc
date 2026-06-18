@@ -194,6 +194,8 @@ export default function DashboardPage() {
     const recentApplications = applications.slice(0, 4);
     const recentNotifications = notifications.slice(0, 4);
     const activityData = buildActivityData(projects, applications);
+    const totalActivity = activityData.reduce((acc, item) => acc + item.atividade, 0);
+    const activityPeak = Math.max(1, ...activityData.map((item) => item.atividade));
 
     return {
       activeProjects,
@@ -202,6 +204,8 @@ export default function DashboardPage() {
       recentNotifications,
       unreadNotifications,
       activityData,
+      activityPeak,
+      totalActivity,
     };
   }, [data, user?.id, user?.tipo]);
 
@@ -241,12 +245,13 @@ export default function DashboardPage() {
     },
     {
       label: "Atualizações",
-      value: derived.activityData.reduce((acc, item) => acc + item.atividade, 0),
+      value: derived.totalActivity,
       icon: TrendingUp,
       areaClass: "cartao-resumo__icone-area--verde",
       iconClass: "cartao-resumo__icone--verde",
       bordaClass: "cartao-resumo--borda-verde",
       href: "/app/progress",
+      variant: "progress",
     },
   ];
 
@@ -315,7 +320,7 @@ export default function DashboardPage() {
               whileHover={{ scale: 1.03, boxShadow: "0 16px 30px rgba(37,99,235,0.18)" }}
               whileTap={{ scale: 0.97 }}
               onClick={() => navigate(card.href)}
-              className={`cartao-resumo ${card.bordaClass}`}
+              className={`cartao-resumo ${card.bordaClass} ${card.variant === "progress" ? "cartao-resumo--progresso" : ""}`}
             >
               <div className="cartao-resumo__cabecalho">
                 <div className={`cartao-resumo__icone-area ${card.areaClass}`}>
@@ -325,6 +330,19 @@ export default function DashboardPage() {
               </div>
               <p className="cartao-resumo__valor">{card.value}</p>
               <p className="cartao-resumo__descricao">{card.label}</p>
+              {card.variant === "progress" ? (
+                <div className="cartao-resumo__progresso-extra">
+                  <div className="cartao-resumo__mini-barras" aria-hidden="true">
+                    {(derived.activityData.length ? derived.activityData.slice(-5) : [{ month: "-", atividade: 0 }]).map((item, index) => (
+                      <span
+                        key={`${item.month}-${index}`}
+                        style={{ height: `${Math.max(18, (item.atividade / derived.activityPeak) * 100)}%` }}
+                      />
+                    ))}
+                  </div>
+                  <span className="cartao-resumo__progresso-cta">Abrir progresso</span>
+                </div>
+              ) : null}
             </motion.button>
           ))}
         </div>
