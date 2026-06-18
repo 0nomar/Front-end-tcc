@@ -49,7 +49,7 @@
 .resumo-inscricao--ativo {
   background-color: var(--cor-primaria-clara);
   border-color: var(--cor-primaria);
-  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.12);
+  box-shadow: 0 4px 16px rgba(31, 122, 90, 0.12);
 }
 
 .resumo-inscricao__valor {

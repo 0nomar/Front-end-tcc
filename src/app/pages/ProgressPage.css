@@ -290,7 +290,7 @@
 }
 
 .marco-linha-do-tempo__conector--concluido { background-color: var(--cor-sucesso-media); }
-.marco-linha-do-tempo__conector--andamento { background-color: #93c5fd; }
+.marco-linha-do-tempo__conector--andamento { background-color: #b8d3a7; }
 .marco-linha-do-tempo__conector--pendente  { background-color: var(--cor-borda-clara); }
 
 .marco-linha-do-tempo__icone {
@@ -675,33 +675,33 @@
    Nova pagina de progresso
 ============================== */
 .progress-page {
-  --progress-bg: linear-gradient(180deg, rgba(248, 250, 252, 0.92) 0%, rgba(241, 245, 249, 0.98) 100%);
+  --progress-bg: linear-gradient(180deg, rgba(246, 248, 245, 0.94) 0%, rgba(239, 245, 236, 0.98) 100%);
   --progress-panel: rgba(255, 255, 255, 0.82);
-  --progress-surface: rgba(248, 250, 252, 0.88);
+  --progress-surface: rgba(246, 248, 245, 0.88);
   --progress-surface-strong: rgba(255, 255, 255, 0.96);
-  --progress-border: rgba(148, 163, 184, 0.22);
-  --progress-shadow: 0 24px 64px rgba(15, 23, 42, 0.08);
-  --progress-text-strong: #0f172a;
-  --progress-text: #334155;
-  --progress-text-soft: #475569;
-  --progress-text-muted: #64748b;
-  --progress-accent: #6d28d9;
-  --progress-accent-2: #8b5cf6;
-  --progress-accent-soft: rgba(109, 40, 217, 0.08);
-  --progress-border-soft: rgba(148, 163, 184, 0.18);
-  --progress-border-input: rgba(148, 163, 184, 0.28);
-  --progress-chip-bg: rgba(15, 23, 42, 0.04);
-  --progress-summary-bg: linear-gradient(90deg, rgba(109, 40, 217, 0.08), rgba(14, 165, 233, 0.08));
+  --progress-border: rgba(199, 209, 195, 0.72);
+  --progress-shadow: 0 24px 64px rgba(23, 37, 29, 0.08);
+  --progress-text-strong: #17251d;
+  --progress-text: #35493c;
+  --progress-text-soft: #4d5f53;
+  --progress-text-muted: #66736a;
+  --progress-accent: #1f7a5a;
+  --progress-accent-2: #7ea06a;
+  --progress-accent-soft: rgba(31, 122, 90, 0.08);
+  --progress-border-soft: rgba(199, 209, 195, 0.45);
+  --progress-border-input: rgba(199, 209, 195, 0.72);
+  --progress-chip-bg: rgba(23, 37, 29, 0.04);
+  --progress-summary-bg: linear-gradient(90deg, rgba(31, 122, 90, 0.08), rgba(126, 160, 106, 0.1));
   --progress-action-bg: linear-gradient(135deg, var(--progress-accent), var(--progress-accent-2));
-  --progress-action-shadow: 0 14px 32px rgba(109, 40, 217, 0.24);
-  --progress-dark-action-bg: #0f172a;
+  --progress-action-shadow: 0 14px 32px rgba(31, 122, 90, 0.24);
+  --progress-dark-action-bg: #17251d;
   --progress-dark-action-text: #fff;
-  --progress-success-soft: rgba(34, 197, 94, 0.12);
-  --progress-success-text: #15803d;
-  --progress-success-strong: #166534;
+  --progress-success-soft: rgba(31, 122, 90, 0.12);
+  --progress-success-text: #1f7a5a;
+  --progress-success-strong: #185e46;
   --progress-danger-text: #dc2626;
-  --progress-donut-track: #e2e8f0;
-  --progress-badge-blue-text: #1d4ed8;
+  --progress-donut-track: #dde5da;
+  --progress-badge-blue-text: #185e46;
   --progress-badge-red-text: #b91c1c;
   --progress-badge-amber-text: #b45309;
 
@@ -710,8 +710,8 @@
   gap: 1.25rem;
   padding: 1rem 0 2rem;
   background:
-    radial-gradient(circle at top right, rgba(109, 40, 217, 0.08), transparent 26%),
-    radial-gradient(circle at left center, rgba(14, 165, 233, 0.08), transparent 28%),
+    radial-gradient(circle at top right, rgba(31, 122, 90, 0.08), transparent 26%),
+    radial-gradient(circle at left center, rgba(126, 160, 106, 0.1), transparent 28%),
     var(--progress-bg);
 }
 
@@ -726,13 +726,13 @@
   --progress-text: #e2e8f0;
   --progress-text-soft: #cbd5e1;
   --progress-text-muted: #94a3b8;
-  --progress-accent: #a78bfa;
-  --progress-accent-2: #60a5fa;
-  --progress-accent-soft: rgba(167, 139, 250, 0.16);
+  --progress-accent: #b8d3a7;
+  --progress-accent-2: #7ea06a;
+  --progress-accent-soft: rgba(126, 160, 106, 0.16);
   --progress-border-soft: rgba(148, 163, 184, 0.2);
   --progress-border-input: rgba(148, 163, 184, 0.3);
   --progress-chip-bg: rgba(148, 163, 184, 0.12);
-  --progress-summary-bg: linear-gradient(90deg, rgba(167, 139, 250, 0.14), rgba(96, 165, 250, 0.12));
+  --progress-summary-bg: linear-gradient(90deg, rgba(126, 160, 106, 0.16), rgba(31, 122, 90, 0.12));
   --progress-action-shadow: 0 14px 32px rgba(2, 6, 23, 0.26);
   --progress-dark-action-bg: #e2e8f0;
   --progress-dark-action-text: #0f172a;
@@ -741,7 +741,7 @@
   --progress-success-strong: #bbf7d0;
   --progress-danger-text: #f87171;
   --progress-donut-track: rgba(148, 163, 184, 0.24);
-  --progress-badge-blue-text: #93c5fd;
+  --progress-badge-blue-text: #b8d3a7;
   --progress-badge-red-text: #fca5a5;
   --progress-badge-amber-text: #fcd34d;
 }
@@ -1058,8 +1058,8 @@
 }
 
 .step-card--active {
-  border-color: rgba(109, 40, 217, 0.34);
-  box-shadow: 0 18px 40px rgba(109, 40, 217, 0.08);
+  border-color: rgba(126, 160, 106, 0.34);
+  box-shadow: 0 18px 40px rgba(31, 122, 90, 0.08);
 }
 
 .step-card__marker {
@@ -1369,7 +1369,7 @@
 }
 
 .progress-badge--blue {
-  background: rgba(59, 130, 246, 0.12);
+  background: rgba(31, 122, 90, 0.12);
   color: var(--progress-badge-blue-text);
 }
 

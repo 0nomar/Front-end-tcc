@@ -168,7 +168,7 @@
 }
 .card-hover:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 40px rgba(37, 99, 235, 0.1);
+  box-shadow: 0 12px 40px rgba(31, 122, 90, 0.1);
 }
 
 /* Buttons */
@@ -224,7 +224,7 @@
 /* ---------- Focus rings ---------- */
 
 *:focus-visible {
-  outline: 2px solid #2563eb;
+  outline: 2px solid #1f7a5a;
   outline-offset: 2px;
   border-radius: 0.5rem;
 }
@@ -283,7 +283,7 @@
 /* ---------- Gradient text ---------- */
 
 .gradient-text {
-  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #1f7a5a 0%, #7ea06a 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

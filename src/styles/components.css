@@ -25,8 +25,8 @@ body {
 /* ---------- Selection ---------- */
 
 ::selection {
-  background: rgba(37, 99, 235, 0.15);
-  color: #1e3a8a;
+  background: rgba(31, 122, 90, 0.16);
+  color: #185e46;
 }
 
 /* ---------- Sidebar ---------- */
@@ -44,7 +44,7 @@ body {
   transform: translateY(-50%);
   width: 3px;
   height: 24px;
-  background: #2563eb;
+  background: #1f7a5a;
   border-radius: 0 4px 4px 0;
 }
 
@@ -65,8 +65,8 @@ body {
 }
 
 .input-focus-ring:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  border-color: #1f7a5a;
+  box-shadow: 0 0 0 3px rgba(31, 122, 90, 0.12);
   outline: none;
 }
 
@@ -96,7 +96,7 @@ body {
   inset: 0;
   padding: 1px;
   border-radius: inherit;
-  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  background: linear-gradient(135deg, #1f7a5a, #7ea06a);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -113,8 +113,8 @@ body {
 }
 
 .project-card:hover {
-  border-color: rgba(37, 99, 235, 0.3);
-  box-shadow: 0 8px 32px rgba(37, 99, 235, 0.08);
+  border-color: rgba(31, 122, 90, 0.3);
+  box-shadow: 0 8px 32px rgba(31, 122, 90, 0.08);
   transform: translateY(-2px);
 }
 
@@ -139,7 +139,7 @@ body {
   top: 0;
   bottom: 0;
   width: 3px;
-  background: #2563eb;
+  background: #1f7a5a;
   border-radius: 0 3px 3px 0;
 }
 
@@ -157,15 +157,15 @@ body {
 /* ---------- Progress bar with glow ---------- */
 
 .progress-glow {
-  box-shadow: 0 0 8px rgba(37, 99, 235, 0.4);
+  box-shadow: 0 0 8px rgba(31, 122, 90, 0.4);
 }
 
 /* ---------- Drop zone ---------- */
 
 .dropzone-active {
-  border-color: #2563eb !important;
-  background-color: rgba(37, 99, 235, 0.04);
-  box-shadow: inset 0 0 0 2px rgba(37, 99, 235, 0.2);
+  border-color: #1f7a5a !important;
+  background-color: rgba(31, 122, 90, 0.05);
+  box-shadow: inset 0 0 0 2px rgba(31, 122, 90, 0.2);
 }
 
 /* ---------- Sticky topbar blur ---------- */
@@ -208,7 +208,7 @@ body {
 /* ---------- Checkbox custom style ---------- */
 
 input[type="checkbox"] {
-  accent-color: #2563eb;
+  accent-color: #1f7a5a;
   cursor: pointer;
 }
 

@@ -276,7 +276,7 @@
   left: 0;
   width: 25rem;
   height: 25rem;
-  background: radial-gradient(circle, var(--cor-primaria-clara), #e0e7ff);
+  background: radial-gradient(circle, var(--cor-primaria-clara), #e0e7d2);
   border-radius: var(--raio-completo);
   opacity: 0.4;
   transform: translate(-33%, 25%);
@@ -400,7 +400,7 @@
   font-weight: var(--peso-semi);
   font-size: 0.95rem;
   font-family: var(--fonte-principal);
-  box-shadow: 0 20px 40px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 20px 40px rgba(31, 122, 90, 0.2);
   transition: var(--transicao-normal);
 }
 
@@ -861,7 +861,7 @@
 }
 
 .landing__secao--gradiente-azul {
-  background: linear-gradient(to bottom right, var(--cor-primaria), #6d28d9);
+  background: linear-gradient(to bottom right, var(--cor-primaria), #557c55);
   position: relative;
   overflow: hidden;
 }
@@ -939,7 +939,7 @@
 }
 
 .landing__secao-subtitulo--azul-claro {
-  color: #bfdbfe;
+  color: #e0e7d2;
   max-width: 48rem;
   margin: 0 auto var(--espaco-12);
   font-size: 1.05rem;
@@ -1184,12 +1184,12 @@
 }
 
 .landing__card-beneficios--alunos {
-  background: linear-gradient(to bottom right, var(--cor-primaria-clara), #e0e7ff);
+  background: linear-gradient(to bottom right, var(--cor-primaria-clara), #e0e7d2);
   border-color: var(--cor-primaria-borda);
 }
 
 .landing__card-beneficios--orientadores {
-  background: linear-gradient(to bottom right, var(--cor-secundaria-clara), #f3e8ff);
+  background: linear-gradient(to bottom right, var(--cor-secundaria-clara), #e0e7d2);
   border-color: var(--cor-secundaria-borda);
 }
 
@@ -1242,7 +1242,7 @@
 .landing__cta-decoracao {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom right, rgba(30, 64, 175, 0.3), rgba(109, 40, 217, 0.3));
+  background: linear-gradient(to bottom right, rgba(31, 122, 90, 0.3), rgba(126, 160, 106, 0.3));
   pointer-events: none;
 }
 
@@ -1303,7 +1303,7 @@
   font-weight: var(--peso-semi);
   font-size: 0.95rem;
   font-family: var(--fonte-principal);
-  box-shadow: 0 20px 40px rgba(37, 99, 235, 0.5);
+  box-shadow: 0 20px 40px rgba(31, 122, 90, 0.35);
   transition: var(--transicao-normal);
 }
 
@@ -1314,7 +1314,7 @@
 }
 
 .landing__cta-botao-primario:hover {
-  background-color: #3b82f6;
+  background-color: #557c55;
 }
 
 .landing__cta-botao-secundario {

@@ -22,7 +22,7 @@ export function ProgressDonut({ percent = 0, title = "Progresso geral", subtitle
               dataKey="value"
               strokeWidth={0}
             >
-              <Cell fill="#6d28d9" />
+              <Cell fill="#1f7a5a" />
               <Cell fill="#e2e8f0" />
             </Pie>
           </PieChart>

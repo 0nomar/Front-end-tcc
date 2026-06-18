@@ -422,8 +422,8 @@ export default function DashboardPage() {
                 <AreaChart data={derived.activityData}>
                   <defs>
                     <linearGradient id="colorAtiv" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#2563eb" stopOpacity={0.15} />
-                      <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
+                      <stop offset="5%" stopColor="#1f7a5a" stopOpacity={0.15} />
+                      <stop offset="95%" stopColor="#1f7a5a" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: "#9ca3af" }} />
@@ -432,7 +432,7 @@ export default function DashboardPage() {
                     contentStyle={{ borderRadius: "12px", border: "none", boxShadow: "0 4px 24px rgba(0,0,0,0.1)", fontSize: "0.8rem" }}
                     labelStyle={{ fontWeight: 600, color: "#374151" }}
                   />
-                  <Area type="monotone" dataKey="atividade" stroke="#2563eb" strokeWidth={2} fill="url(#colorAtiv)" dot={{ fill: "#2563eb", strokeWidth: 2, r: 3 }} />
+                  <Area type="monotone" dataKey="atividade" stroke="#1f7a5a" strokeWidth={2} fill="url(#colorAtiv)" dot={{ fill: "#1f7a5a", strokeWidth: 2, r: 3 }} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
