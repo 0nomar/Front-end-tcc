@@ -6,7 +6,7 @@ const ProjectCard = ({ projeto }) => {
   const navigate = useNavigate();
 
   const handleManageParticipants = () => {
-    navigate(`/projetos/${projeto.id}/inscricoes`);
+    navigate(`/app/projects/${projeto.id}/applications`);
   };
 
   return (

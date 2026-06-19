@@ -212,11 +212,52 @@ export function mapApplication(application) {
   };
 }
 
+function normalizeActionUrl(actionUrl) {
+  if (!actionUrl) return "/app/notifications";
+
+  const legacyProjectApplicationsMatch = String(actionUrl).match(/^\/projetos\/([^/]+)\/inscricoes$/);
+  if (legacyProjectApplicationsMatch) {
+    return `/app/projects/${legacyProjectApplicationsMatch[1]}/applications`;
+  }
+
+  const legacyProjectMatch = String(actionUrl).match(/^\/projetos\/([^/]+)$/);
+  if (legacyProjectMatch) {
+    return `/app/projects/${legacyProjectMatch[1]}`;
+  }
+
+  if (String(actionUrl).startsWith("/projetos?")) {
+    return String(actionUrl).replace("/projetos?", "/app/projects?");
+  }
+
+  if (actionUrl === "/usuarios/me/inscricoes") {
+    return "/app/applications";
+  }
+
+  const legacyRoutes = {
+    "/inscricoes": "/app/projects",
+    "/minhas-inscricoes": "/app/applications",
+    "/meus-projetos": "/app/projects",
+    "/conversas": "/app/chat",
+    "/projetos": "/app/projects",
+  };
+
+  if (legacyRoutes[actionUrl]) {
+    return legacyRoutes[actionUrl];
+  }
+
+  return actionUrl;
+}
+
 export function mapNotification(notification) {
   const metadata = notification?.metadata ?? notification?.meta ?? notification?.dados ?? notification?.data ?? {};
   const relatedEntity = notification?.entidadeRelacionada ?? notification?.relatedEntity ?? null;
   const relatedEntityId = notification?.entidadeId ?? notification?.relatedEntityId ?? null;
   const isConversationNotification = String(relatedEntity ?? "").toUpperCase() === "CONVERSA";
+  const actionUrl =
+    notification?.link ??
+    notification?.rotaSugerida ??
+    notification?.actionUrl ??
+    "/app/notifications";
 
   return {
     id: notification?.id,
@@ -228,11 +269,7 @@ export function mapNotification(notification) {
     type: notification?.tipo ?? "INFO",
     read: notification?.lida ?? notification?.read ?? false,
     createdAt: notification?.dataCriacao ?? notification?.createdAt ?? null,
-    actionUrl:
-      notification?.link ??
-      notification?.rotaSugerida ??
-      notification?.actionUrl ??
-      "/app/notifications",
+    actionUrl: normalizeActionUrl(actionUrl),
     relatedEntity,
     relatedEntityId,
     conversationId:

@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, Navigate, useLocation, useParams } from "react-router";
 import { DashboardLayout } from "./layouts/DashboardLayout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
@@ -33,6 +33,42 @@ export const router = createBrowserRouter([
     Component: RegisterPage,
   },
   {
+    path: "/projetos/:id/inscricoes",
+    element: <NavigateToProjectApplications />,
+  },
+  {
+    path: "/projetos/:id",
+    element: <NavigateToProject />,
+  },
+  {
+    path: "/projetos",
+    element: <Navigate to="/app/projects" replace />,
+  },
+  {
+    path: "/usuarios/me/inscricoes",
+    element: <Navigate to="/app/applications" replace />,
+  },
+  {
+    path: "/minhas-inscricoes",
+    element: <Navigate to="/app/applications" replace />,
+  },
+  {
+    path: "/inscricoes",
+    element: <Navigate to="/app/projects" replace />,
+  },
+  {
+    path: "/meus-projetos",
+    element: <Navigate to="/app/projects" replace />,
+  },
+  {
+    path: "/conversas",
+    element: <Navigate to="/app/chat" replace />,
+  },
+  {
+    path: "/conversas/:id",
+    element: <NavigateToChatConversation />,
+  },
+  {
     path: "/app",
     element: (
       <ProtectedRoute>
@@ -58,3 +94,21 @@ export const router = createBrowserRouter([
     ],
   },
 ]);
+
+function NavigateToProjectApplications() {
+  const { id } = useParams();
+  return <Navigate to={`/app/projects/${id}/applications`} replace />;
+}
+
+function NavigateToProject() {
+  const { id } = useParams();
+  return <Navigate to={`/app/projects/${id}`} replace />;
+}
+
+function NavigateToChatConversation() {
+  const { id } = useParams();
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
+  params.set("conversationId", id);
+  return <Navigate to={`/app/chat?${params.toString()}`} replace />;
+}
