@@ -13,8 +13,14 @@ export const userService = {
   getById(id) {
     return api.get(`/api/usuarios/${id}`);
   },
+  getProfileById(id) {
+    return api.get(`/api/usuarios/${id}/perfil`);
+  },
   update(id, payload) {
     return api.put(`/api/usuarios/${id}`, payload);
+  },
+  updatePreferencias(payload) {
+    return api.put("/api/usuarios/me/preferencias", payload);
   },
   getProjects(id) {
     return api.get(`/api/usuarios/${id}/projetos`);

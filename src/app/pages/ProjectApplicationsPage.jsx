@@ -8,6 +8,7 @@ import {
   ChevronRight,
   Clock,
   Loader2,
+  UserRound,
   Users,
   XCircle,
 } from "lucide-react";
@@ -284,6 +285,19 @@ export default function ProjectApplicationsPage() {
                           {application.appliedAt ? new Date(application.appliedAt).toLocaleDateString("pt-BR") : "-"}
                         </span>
                       </div>
+                      {application.userId != null && (
+                        <button
+                          type="button"
+                          className="pagina-inscricoes-projeto__ver-perfil"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            navigate(`/app/users/${application.userId}`);
+                          }}
+                        >
+                          <UserRound size={13} />
+                          Ver perfil do aluno
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

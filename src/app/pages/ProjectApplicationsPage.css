@@ -172,6 +172,25 @@
   gap: var(--espaco-2);
 }
 
+.pagina-inscricoes-projeto__ver-perfil {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  width: fit-content;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-grande);
+  background: var(--cor-branco);
+  color: var(--cor-texto-medio);
+  font: inherit;
+  cursor: pointer;
+}
+
+.pagina-inscricoes-projeto__ver-perfil:hover {
+  background: var(--cor-fundo-leve);
+  color: var(--cor-texto);
+}
+
 .inscricao-card__botao--aprovar {
   background-color: var(--cor-sucesso-clara);
   border-color: var(--cor-sucesso-borda);

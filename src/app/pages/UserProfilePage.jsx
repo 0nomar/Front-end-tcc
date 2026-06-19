@@ -21,7 +21,7 @@ export default function UserProfilePage() {
 
   const { data, loading, error } = useAsyncData(async () => {
     const [profile, projects, documents] = await Promise.all([
-      userService.getById(id),
+      userService.getProfileById(id),
       userService.getProjects(id).catch(() => []),
       userService.getDocuments(id).catch(() => []),
     ]);
@@ -80,7 +80,15 @@ export default function UserProfilePage() {
           <div className="cartao-perfil__corpo">
             <div className="cartao-perfil__avatar-wrapper">
               <div className="cartao-perfil__avatar">
-                <span className="cartao-perfil__avatar-inicial">{getInitials(profile.nome)}</span>
+                {profile.fotoPerfilUrl ? (
+                  <img
+                    src={profile.fotoPerfilUrl}
+                    alt={profile.nome ?? "Foto de perfil"}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "inherit" }}
+                  />
+                ) : (
+                  <span className="cartao-perfil__avatar-inicial">{getInitials(profile.nome)}</span>
+                )}
               </div>
             </div>
 
@@ -103,7 +111,7 @@ export default function UserProfilePage() {
             <div className="cartao-perfil__info-lista">
               {[
                 { icon: Mail, label: profile.email },
-                { icon: BookOpen, label: profile.curso ?? "Curso não informado" },
+                { icon: BookOpen, label: profile.cursoNome ?? "Curso não informado" },
                 { icon: Building2, label: profile.instituicao ?? "Instituição não informada" },
                 { icon: GraduationCap, label: profile.semestre ?? "Semestre não informado" },
                 { icon: Calendar, label: `Membro desde ${profile.dataCadastro ? new Date(profile.dataCadastro).toLocaleDateString("pt-BR") : "-"}` },

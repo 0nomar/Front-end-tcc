@@ -209,6 +209,11 @@ export function mapApplication(application) {
     updatedAt: application?.dataAtualizacao ?? application?.updatedAt ?? null,
     project: application?.projeto ? mapProject(application.projeto) : null,
     user: application?.aluno?.usuario ?? application?.usuario ?? null,
+    userId:
+      application?.alunoUsuarioId ??
+      application?.aluno?.usuario?.id ??
+      application?.usuario?.id ??
+      null,
   };
 }
 
